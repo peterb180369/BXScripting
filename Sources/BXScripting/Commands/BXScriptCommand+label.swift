@@ -1,7 +1,7 @@
 //**********************************************************************************************************************
 //
-//  BXScriptCommand+goto.swift
-//	Adds a goto command to BXScriptCommand
+//  BXScriptCommand+label.swift
+//	Adds a label command to BXScriptCommand
 //  Copyright ©2023 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
