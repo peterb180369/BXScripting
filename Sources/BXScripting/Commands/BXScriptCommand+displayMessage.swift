@@ -98,7 +98,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand
 		guard let environment = scriptEngine?.environment else { return }
 		guard let textLayer = textLayer else { return }
 		
-		let font = NSFont.boldSystemFont(ofSize:24)
+		let font = environment[.fontKey] ?? NSFont.boldSystemFont(ofSize:24)
 		let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
 		var anchorPoint = CGPoint.zero
 		var alignmentMode = CATextLayerAlignmentMode.center

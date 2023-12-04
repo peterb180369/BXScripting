@@ -61,6 +61,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand
 				layer.addSublayer(frameLayer)
 				
 				guard let environment = scriptEngine?.environment else { return }
+				let font:NSFont = environment[.fontKey] ?? NSFont.boldSystemFont(ofSize:24)
 				let strokeColor:NSColor = environment[.hiliteStrokeColorKey] ?? .systemYellow
 				let fillColor:NSColor = environment[.hiliteFillColorKey] ?? .systemYellow.withAlphaComponent(0.1)
 				let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
@@ -79,7 +80,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand
 					layer.addSublayer(textLayer)
 
 					textLayer.string = string
-					textLayer.font = NSFont.boldSystemFont(ofSize:24)
+					textLayer.font = font
 					textLayer.foregroundColor = textColor.cgColor
 					textLayer.alignmentMode = .center
 					textLayer.bounds = CGRect(origin:.zero, size:CGSize(300,44))

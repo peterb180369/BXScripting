@@ -21,11 +21,13 @@ public class BXScriptEnvironment
 	
 	public static let shared = BXScriptEnvironment()
 	
+	
 	/// Creates a new BXScriptEnvironment
 	
 	public init()
 	{
 		self.setDefaultColors(with:.systemYellow)
+		self.setDefaultFont(NSFont.boldSystemFont(ofSize:24))
 	}
 	
 
@@ -94,11 +96,19 @@ extension BXScriptEnvironment
 		self[.hiliteStrokeColorKey] = primaryColor
 		self[.hiliteFillColorKey] = primaryColor.withAlphaComponent(0.15)
 	}
+
+	/// Sets default font for message commands
+	
+	public func setDefaultFont(_ font:NSFont)
+	{
+		self[.fontKey] = font
+	}
 }
 
 
 extension String
 {
+	public static let fontKey = "font"
 	public static let hiliteTextColorKey = "hiliteTextColor"
 	public static let hiliteStrokeColorKey = "hiliteStrokeColor"
 	public static let hiliteFillColorKey = "hiliteFillColor"
