@@ -7,6 +7,12 @@
 //**********************************************************************************************************************
 
 
+import Foundation
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 extension BXScriptCommand where Self == BXScriptCommand_if
 {
 	public static func `if`(_ condition:@escaping ()->Bool, label:String) -> BXScriptCommand

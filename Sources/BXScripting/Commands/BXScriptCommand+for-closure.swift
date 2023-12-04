@@ -7,6 +7,12 @@
 //**********************************************************************************************************************
 
 
+import Foundation
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 extension BXScriptCommand where Self == BXScriptCommand_for_closure
 {
 	/// Creates a command that performs the supplied closure in a loop with a specified range.

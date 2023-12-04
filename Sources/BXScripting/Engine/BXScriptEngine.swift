@@ -7,6 +7,12 @@
 //**********************************************************************************************************************
 
 
+import Foundation
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 /// BXScriptEngine executes a list of BXScriptCommands, that will be run on a particular queue, with one step being executed per runloop cycle.
 
 public class BXScriptEngine

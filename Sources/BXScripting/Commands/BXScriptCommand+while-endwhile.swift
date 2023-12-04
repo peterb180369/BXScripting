@@ -7,6 +7,12 @@
 //**********************************************************************************************************************
 
 
+import Foundation
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 extension BXScriptCommand where Self == BXScriptCommand_while
 {
 	public static func `while`(_ condition:@escaping ()->Bool, label:String) -> BXScriptCommand

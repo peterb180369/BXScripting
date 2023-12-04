@@ -7,6 +7,12 @@
 //**********************************************************************************************************************
 
 
+import Foundation
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 extension BXScriptCommand where Self == BXScriptCommand_wait
 {
 	/// Creates a command that waits for the specified amount of seconds.

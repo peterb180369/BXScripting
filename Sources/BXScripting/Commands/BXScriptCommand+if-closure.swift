@@ -7,6 +7,12 @@
 //**********************************************************************************************************************
 
 
+import Foundation
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 extension BXScriptCommand where Self == BXScriptCommand_if_closure
 {
 	/// Creates a command that checks a condition and calls one of two supplied closure depending on the condition.

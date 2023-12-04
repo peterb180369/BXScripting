@@ -7,6 +7,12 @@
 //**********************************************************************************************************************
 
 
+import Foundation
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 extension BXScriptCommand where Self == BXScriptCommand_while
 {
 	public static func `for`(_ range:ClosedRange<Int>, label:String) -> BXScriptCommand
