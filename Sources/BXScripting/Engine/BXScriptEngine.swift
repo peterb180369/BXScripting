@@ -8,6 +8,7 @@
 
 
 import Foundation
+import SwiftUI
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -39,11 +40,11 @@ public class BXScriptEngine
 
 	/// The index of the current command
 	
-	public var commandIndex = 0
+	@Published public var commandIndex = 0
 	
 	/// Will be set to true when script execution has been cancelled
 	
-	private var isCancelled = false
+	@Published private var isCancelled = false
 	
 	
 //----------------------------------------------------------------------------------------------------------------------
@@ -56,6 +57,18 @@ public class BXScriptEngine
 	///  This internal dictionary is used to retain a BXScript while it is running.
 	
 	private static var runningScripts:[String:BXScriptEngine] = [:]
+	
+	
+//----------------------------------------------------------------------------------------------------------------------
+
+
+	/// This notification is sent before a command is executed.
+
+	public static let willExecuteCommandNotification = Notification.Name("BXScriptEngine.willExecuteCommand")
+	
+	/// This notification is sent after the script finishes.
+
+	public static let didEndNotification = Notification.Name("BXScriptEngine.didEnd")
 	
 	
 //----------------------------------------------------------------------------------------------------------------------
@@ -111,9 +124,8 @@ public class BXScriptEngine
 
 	/// Executes the next command in the script.
 	
-	private func executeNextCommand()
+	internal func executeNextCommand()
 	{
-	
 		// If this script has been cancelled, then stop execution
 		
 		guard !isCancelled else
@@ -121,6 +133,7 @@ public class BXScriptEngine
 			// Do NOT call completionHandler here, as this might be a subroutine script called from a
 			// parent script. We want to stop the whole chain! Simply release the script and bail out.
 			
+			NotificationCenter.default.post(name:Self.didEndNotification, object:self, userInfo:nil)
 			Self.runningScripts[self.id] = nil
 			return
 		}
@@ -129,6 +142,7 @@ public class BXScriptEngine
 			
 		if commandIndex >= 0 && commandIndex<scriptCommands.count
 		{
+			NotificationCenter.default.post(name:Self.willExecuteCommandNotification, object:self, userInfo:nil)
 			var currentCommand = scriptCommands[commandIndex]
 			commandIndex += 1
 			
@@ -142,6 +156,7 @@ public class BXScriptEngine
 				[weak self] in self?.queue.async { self?.executeNextCommand() }		// current command completes
 			}
 
+			(currentCommand as? BXScriptCommandCancellable)?.reset()
 			currentCommand.execute()
 		}
 		
@@ -153,6 +168,7 @@ public class BXScriptEngine
 			{
 				self.completionHandler?()
 				Self.runningScripts[self.id] = nil
+				NotificationCenter.default.post(name:Self.didEndNotification, object:self, userInfo:nil)
 			}
 		}
 	}
