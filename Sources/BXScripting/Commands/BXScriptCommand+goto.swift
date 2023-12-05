@@ -36,7 +36,7 @@ extension BXScriptCommand where Self == BXScriptCommand_goto
 
 /// This command sets the commandIndex of the script to the specified index.
 
-public struct BXScriptCommand_goto : BXScriptCommand, BXLabeledScriptCommand
+public struct BXScriptCommand_goto : BXScriptCommand, BXScriptCommandLabeled
 {
 	public var label:String
 	

@@ -29,7 +29,7 @@ extension BXScriptCommand where Self == BXScriptCommand_step
 
 /// This command provides a named step that acts as a goto label for the controller buttons and also provides info for the progress bar.
 
-public struct BXScriptCommand_step : BXScriptCommand, BXLabeledScriptCommand
+public struct BXScriptCommand_step : BXScriptCommand, BXScriptCommandLabeled
 {
 	public var label:String
 	

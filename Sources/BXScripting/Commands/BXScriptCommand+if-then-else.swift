@@ -86,7 +86,7 @@ extension BXScriptCommand where Self == BXScriptCommand_endif
 
 /// This command checks a condition and jumps to the then or else label
 
-public struct BXScriptCommand_if : BXScriptCommand, BXLabeledScriptCommand
+public struct BXScriptCommand_if : BXScriptCommand, BXScriptCommandLabeled
 {
 	var condition:()->Bool
 	public var label:String
@@ -130,7 +130,7 @@ public struct BXScriptCommand_if : BXScriptCommand, BXLabeledScriptCommand
 
 /// This command provides a label for the "then"
 
-public struct BXScriptCommand_then : BXScriptCommand, BXLabeledScriptCommand
+public struct BXScriptCommand_then : BXScriptCommand, BXScriptCommandLabeled
 {
 	public var label:String
 	
@@ -153,7 +153,7 @@ public struct BXScriptCommand_then : BXScriptCommand, BXLabeledScriptCommand
 
 /// This command  provides a label for the "else" and jumps directly to the "endif"
 
-public struct BXScriptCommand_else : BXScriptCommand, BXLabeledScriptCommand
+public struct BXScriptCommand_else : BXScriptCommand, BXScriptCommandLabeled
 {
 	public var label:String
 	
@@ -178,7 +178,7 @@ public struct BXScriptCommand_else : BXScriptCommand, BXLabeledScriptCommand
 
 /// This command provides a label for the "endif"
 
-public struct BXScriptCommand_endif : BXScriptCommand, BXLabeledScriptCommand
+public struct BXScriptCommand_endif : BXScriptCommand, BXScriptCommandLabeled
 {
 	public var label:String
 	

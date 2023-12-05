@@ -35,7 +35,7 @@ extension BXScriptCommand where Self == BXScriptCommand_endfor
 
 /// This command checks a condition and jumps to the first command after endwhile if the condition is false.
 
-public struct BXScriptCommand_for : BXScriptCommand, BXLabeledScriptCommand
+public struct BXScriptCommand_for : BXScriptCommand, BXScriptCommandLabeled
 {
 	var range:ClosedRange<Int>
 	public var label:String
@@ -80,7 +80,7 @@ public struct BXScriptCommand_for : BXScriptCommand, BXLabeledScriptCommand
 
 /// This command jumps to the start of the for loop, where the condition will be evaluated again.
 
-public struct BXScriptCommand_endfor : BXScriptCommand, BXLabeledScriptCommand
+public struct BXScriptCommand_endfor : BXScriptCommand, BXScriptCommandLabeled
 {
 	public var label:String
 	

@@ -65,18 +65,18 @@ extension BXScriptCommand
 
 /// This protocol can be adopted by commands that have a label
 
-public protocol BXLabeledScriptCommand
+public protocol BXScriptCommandLabeled
 {
 	/*weak*/ var scriptEngine:BXScriptEngine? { get }
 	var label:String { get }
 }
 
 
-extension BXLabeledScriptCommand
+extension BXScriptCommandLabeled
 {
 	/// Returns the index for the first command of specified type and label.
 	
-	public func index<T:BXLabeledScriptCommand>(for label:String, type:T.Type) -> Int?
+	public func index<T:BXScriptCommandLabeled>(for label:String, type:T.Type) -> Int?
 	{
 		guard let scriptEngine = self.scriptEngine else { return nil }
 

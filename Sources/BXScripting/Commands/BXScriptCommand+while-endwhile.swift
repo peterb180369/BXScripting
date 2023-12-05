@@ -42,7 +42,7 @@ extension BXScriptCommand where Self == BXScriptCommand_endwhile
 
 /// This command checks a condition and jumps to the first command after endwhile if the condition is false.
 
-public struct BXScriptCommand_while : BXScriptCommand, BXLabeledScriptCommand
+public struct BXScriptCommand_while : BXScriptCommand, BXScriptCommandLabeled
 {
 	var condition:()->Bool
 	public var label:String
@@ -74,7 +74,7 @@ public struct BXScriptCommand_while : BXScriptCommand, BXLabeledScriptCommand
 
 /// This command jumps to the start of the while loop, where the condition will be evaluated again.
 
-public struct BXScriptCommand_endwhile : BXScriptCommand, BXLabeledScriptCommand
+public struct BXScriptCommand_endwhile : BXScriptCommand, BXScriptCommandLabeled
 {
 	public var label:String
 	
