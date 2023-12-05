@@ -71,6 +71,7 @@ public struct BXScriptCommand_waitForPublisher<P:Publisher> : BXScriptCommand, B
 		self.timeoutHandler = timeoutHandler
 	}
 	
+	
 	public func execute()
 	{
 		// Call the completionHandler once the specified notification arrives
@@ -85,33 +86,45 @@ public struct BXScriptCommand_waitForPublisher<P:Publisher> : BXScriptCommand, B
 				
 				if self.helper.count >= self.minimumCount
 				{
-					self.helper.subscribers.removeAll()	// Kill subscriber
+					self.helper.subscribers.removeAll()	// Kill all subscribers
 					self.completionHandler?()
 				}
 			}
 		
-		// If we have a timeout, the setup a timer. Once we reach the timeout, kill the notification
-		// subscriber, call the timeoutHandler and then call the completionHandler.
+		// If we have a timeout, the setup a timer. Once we reach the timeout, call the timeoutHandler and then call the completionHandler.
 		
 		if let delay = timeoutDuration
 		{
-			self.queue.asyncAfter(deadline:.now()+delay)
-			{
-				self.helper.subscribers.removeAll() // Kill subscriber
-				self.timeoutHandler?()
-				self.completionHandler?()
-			}
+			self.helper.subscribers += Timer.publish(every:delay, on:.main, in:.default)
+				.autoconnect()
+				.receive(on:queue)
+				.sink
+				{
+					_ in
+					self.helper.subscribers.removeAll()	// Kill all subscribers
+					self.timeoutHandler?()
+					self.completionHandler?()
+				}
 		}
 	}
+	
+	
+	public func cancel()
+	{
+		self.helper.subscribers.removeAll()
+	}
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // This helper class is needed because the struct above is immutable
 
 fileprivate class Helper
 {
-	var subscribers:[Any] = []
 	var count = 0
+	var subscribers:[Any] = []
 }
 
 

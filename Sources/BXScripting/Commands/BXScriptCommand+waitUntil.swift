@@ -40,6 +40,9 @@ public struct BXScriptCommand_waitUntil : BXScriptCommand, BXScriptCommandCancel
 	public weak var scriptEngine:BXScriptEngine? = nil
 	private var startTime:CFAbsoluteTime
 	
+	private var helper = Helper()
+
+
 	public init(condition:@escaping ()->Bool, timeoutDuration:Double? = nil, timeoutHandler:(()->Void)? = nil)
 	{
 		self.condition = condition
@@ -48,8 +51,11 @@ public struct BXScriptCommand_waitUntil : BXScriptCommand, BXScriptCommandCancel
 		self.startTime = CFAbsoluteTimeGetCurrent()
 	}
 	
+	
 	public func execute()
 	{
+		guard !self.helper.isCancelled else { return }
+		
 		self.queue.async
 		{
 			// Once the condition is true, we can continue to the following command
@@ -58,27 +64,44 @@ public struct BXScriptCommand_waitUntil : BXScriptCommand, BXScriptCommandCancel
 			{
 				self.completionHandler?()
 			}
+			
+			// If we reach a timeout, call the timeoutHandler and then go on to the next command
+				
+			else if let timeoutDuration = timeoutDuration, CFAbsoluteTimeGetCurrent() - startTime >= timeoutDuration
+			{
+				self.timeoutHandler?()
+				self.completionHandler?()
+			}
+				
+			// If not true yet, simply check again in next runloop cycle
+			
 			else
 			{
-				// If we reach a timeout, call the timeoutHandler and then go on to the next command
-				
-				if let timeoutDuration = timeoutDuration
-				{
-					if CFAbsoluteTimeGetCurrent() - startTime >= timeoutDuration
-					{
-						self.timeoutHandler?()
-						self.completionHandler?()
-						return
-					}
-				}
-				
-				// If not true yet, simply check again in next runloop cycle
-				
 				self.execute()
 			}
 		}
 	}
 
+	public func reset()
+	{
+		self.helper.isCancelled = false
+	}
+	
+	public func cancel()
+	{
+		self.helper.isCancelled = true
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This helper class is needed because the struct above is immutable
+
+fileprivate class Helper
+{
+	var isCancelled = false
 }
 
 

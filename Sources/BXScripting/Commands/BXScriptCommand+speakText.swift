@@ -51,7 +51,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 		{
 			// If we still have somebody speaking, we cannot start a new speaker. Try again in the next runloop cycle.
 			
-			if currentSpeaker != nil
+			if BXScriptCommandSpeakDelegate.currentSpeaker != nil
 			{
 				self.execute()
 				return
@@ -67,7 +67,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 				self.synthesizer.delegate = self.delegate
 				self.synthesizer.speak(utterance)
 				
-				currentSpeaker = synthesizer
+				BXScriptCommandSpeakDelegate.currentSpeaker = synthesizer
 			}
 			
 			// If waiting for end is not desired, then we can continue to the next command immediately
@@ -94,25 +94,19 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 {
 	var didCallCompletionHandler = false
 	var completionHandler:(()->Void)? = nil
+	public static var currentSpeaker:AVSpeechSynthesizer? = nil
 	
 	func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance)
     {
-		self.finish()
+		Self.currentSpeaker = nil
+		if !didCallCompletionHandler { self.completionHandler?() }
     }
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance)
     {
-		self.finish()
-    }
-    
-    func finish()
-    {
-		currentSpeaker = nil
-		if !didCallCompletionHandler { self.completionHandler?() }
+		Self.currentSpeaker = nil
     }
 }
-
-fileprivate var currentSpeaker:AVSpeechSynthesizer? = nil
  
  
 //----------------------------------------------------------------------------------------------------------------------
