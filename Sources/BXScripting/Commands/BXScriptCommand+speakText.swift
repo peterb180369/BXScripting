@@ -27,7 +27,7 @@ extension BXScriptCommand where Self == BXScriptCommand_speakText
 
 /// This command speaks the specified text.
 
-public struct BXScriptCommand_speakText : BXScriptCommand
+public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancellable
 {
 	public var text:String
 	public var wait:Bool

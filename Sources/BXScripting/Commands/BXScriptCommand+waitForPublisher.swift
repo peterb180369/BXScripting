@@ -50,7 +50,7 @@ extension BXScriptCommand where Self == BXScriptCommand_waitForPublisher<Observa
 //----------------------------------------------------------------------------------------------------------------------
 
 
-public struct BXScriptCommand_waitForPublisher<P:Publisher> : BXScriptCommand where P.Failure==Never
+public struct BXScriptCommand_waitForPublisher<P:Publisher> : BXScriptCommand, BXScriptCommandCancellable where P.Failure==Never
 {
 	public var publisher:P
 	public var minimumCount:Int

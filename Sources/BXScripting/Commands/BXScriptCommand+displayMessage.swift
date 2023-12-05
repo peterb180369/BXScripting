@@ -37,7 +37,7 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 
 /// This command displays a text message at the bottom of a window.
 
-public struct BXScriptCommand_displayMessage : BXScriptCommand
+public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandCancellable
 {
 	var message:String? = nil
 	var window:NSWindow? = nil

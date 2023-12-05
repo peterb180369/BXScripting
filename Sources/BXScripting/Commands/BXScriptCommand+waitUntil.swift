@@ -29,7 +29,7 @@ extension BXScriptCommand where Self == BXScriptCommand_waitUntil
 
 /// This command waits for multiple runloop cycles until the specified condition is true.
 
-public struct BXScriptCommand_waitUntil : BXScriptCommand
+public struct BXScriptCommand_waitUntil : BXScriptCommand, BXScriptCommandCancellable
 {
 	public var condition:()->Bool
 	public var timeoutDuration:Double?

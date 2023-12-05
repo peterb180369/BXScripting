@@ -31,7 +31,7 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteView
 
 /// This command shows or hides a highlight on the view with the specified identifier. You can also supply an optional view label.
 
-public struct BXScriptCommand_hiliteView : BXScriptCommand
+public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCancellable
 {
 	var id:String
 	var visible:Bool

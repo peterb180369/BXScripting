@@ -26,7 +26,7 @@ extension BXScriptCommand where Self == BXScriptCommand_run
 
 /// This command runs the specified script as a subroutine.
 
-public struct BXScriptCommand_run : BXScriptCommand
+public struct BXScriptCommand_run : BXScriptCommand, BXScriptCommandCancellable
 {
 	var scriptCommands:BXScriptCommands
 	

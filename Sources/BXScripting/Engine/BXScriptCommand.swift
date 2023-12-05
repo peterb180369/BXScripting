@@ -42,22 +42,24 @@ public protocol BXScriptCommand
 	/// This required function performs the work for a single step in a script
 	
 	func execute()
-	
-	/// This optional function can perform any necessary cleanup when a script is being cancelled.
-	
-	/*optional*/ func cancel()
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Provide an empty default implementation of cancel() for all command that do not need to cleanup upon cancel.
+/// This protocol can be adopted by commands that need to cleanup upon cancellation
 
-extension BXScriptCommand
+public protocol BXScriptCommandCancellable : BXScriptCommand
 {
-	public func cancel() {}
+	func cancel()
 }
+
+
+//extension BXScriptCommandCancellable
+//{
+//	public func cancel() {}
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------

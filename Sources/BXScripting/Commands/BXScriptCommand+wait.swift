@@ -36,7 +36,7 @@ extension BXScriptCommand where Self == BXScriptCommand_wait
 
 /// This command waits for the specified amount of time.
 
-public struct BXScriptCommand_wait : BXScriptCommand
+public struct BXScriptCommand_wait : BXScriptCommand, BXScriptCommandCancellable
 {
 	var delay:Double
 	

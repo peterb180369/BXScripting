@@ -27,7 +27,7 @@ extension BXScriptCommand where Self == BXScriptCommand_playAudio
 
 /// This command speaks the specified text.
 
-public struct BXScriptCommand_playAudio : BXScriptCommand
+public struct BXScriptCommand_playAudio : BXScriptCommand, BXScriptCommandCancellable
 {
 	public var name:String
 	public var volume:Double = 1.0
