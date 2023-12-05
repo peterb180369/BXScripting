@@ -16,20 +16,6 @@ import SwiftUI
 
 extension View
 {
-	/// Returns a rasterized Image of the original View
-	
-	@ViewBuilder public func asImage() -> some View
-	{
-		if let image = self.renderImage(colorScheme:.light, isTemplate:false)
-		{
-			SwiftUI.Image(nsImage:image)
-		}
-		else
-		{
-			EmptyView()
-		}
-	}
-
 	/// Renders the view to an NSImage
 	
 	public func renderImage(colorScheme:ColorScheme = .dark, isTemplate:Bool = true) -> NSImage?

@@ -55,18 +55,6 @@ extension NSImage
 	{
 		BXScriptEnvironment.shared[key]
 	}
-	
-	@available(macOS 12,*) public static func systemSymbol(_ systemName:String, color:NSColor? = nil, size:CGSize = CGSize(width:64,height:64)) -> NSImage?
-	{
-		let effectiveColor = color ?? BXScriptEnvironment.shared[.hiliteTextColorKey] ?? .systemYellow
-		
-		return SwiftUI.Image(systemName:systemName)
-			.resizable()
-			.aspectRatio(contentMode:.fit)
-			.frame(width:size.width, height:size.height)
-			.foregroundColor(SwiftUI.Color(nsColor:effectiveColor))
-			.renderImage()
-	}
 }
 
 extension CGFloat
