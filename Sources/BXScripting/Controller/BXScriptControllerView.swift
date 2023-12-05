@@ -23,7 +23,7 @@ struct BXScriptControllerView : View
 	
 	public var body: some View
 	{
-		VStack(spacing:9)
+		VStack(spacing:8)
 		{
 				HStack
 				{
@@ -60,10 +60,38 @@ struct BXScriptControllerView : View
 				{
 					Spacer()
 					
-					Button("Repeat", systemImage:"arrow.counterclockwise")
+					if #available(macOS 11,*)
 					{
-						controller.back()
+						Button("Repeat", systemImage:"arrow.counterclockwise")
+						{
+							controller.back()
+						}
+						#if canImport(BXSwiftUI)
+						.buttonStyle(BXStrokedButtonStyle())
+						#endif
 					}
+					else
+					{
+						#if canImport(BXSwiftUI)
+
+						Button(action:controller.back)
+						{
+							HStack
+							{
+								BXImage(systemName:"arrow.counterclockwise")
+								Text("Repeat")
+							}
+						}
+						.buttonStyle(BXStrokedButtonStyle())
+
+						#endif
+					}
+					
+//					Button("Repeat", systemImage:"arrow.counterclockwise")
+//					{
+//						controller.back()
+//					}
+
 					Spacer()
 				}
 
@@ -72,9 +100,6 @@ struct BXScriptControllerView : View
 		.controlSize(.regular)
 		.colorScheme(.dark)
 		
-		#if canImport(BXSwiftUI)
-		.buttonStyle(BXStrokedButtonStyle())
-		#endif
 		
 		.frame(minWidth:240)
 	}
