@@ -79,15 +79,17 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	{
 		guard let view = window?.contentView else { return }
 		guard let layer = view.layer else { return }
-		
+
+		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
+
 		let bounds = view.bounds.insetBy(dx:64, dy:64)
-		var textLayer = view.sublayer(named:sublayerName) as? CATextLayer
+		var textLayer = view.sublayer(named:Self.sublayerName) as? CATextLayer
 		
 		if textLayer == nil
 		{
 			let sublayer = CATextLayer()
-			sublayer.name = sublayerName
-			sublayer.autoresizingMask = [.layerWidthSizable,.layerHeightSizable,.layerMaxYMargin]
+			sublayer.name = Self.sublayerName
+			sublayer.autoresizingMask = [.layerMinXMargin,.layerMaxXMargin]
 			sublayer.zPosition = 1000
 			sublayer.isWrapped = true
 
@@ -138,14 +140,19 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		
 		textLayer.alignmentMode = alignmentMode
 		textLayer.anchorPoint = anchorPoint
-		textLayer.layoutIfNeeded()
 		
 		textLayer.position = position
 		
+//		textLayer.borderColor = NSColor.gray.cgColor
+//		textLayer.borderWidth = 1.0
+		
+		textLayer.transform = CATransform3DIdentity
+//		let size = textLayer.preferredFrameSize()
 		let text = NSAttributedString(string:message, attributes:[.font:font])
 		var size = text.size()
-		size.width *= 2 // Not sure why this is necessary
-		size.height *= 2
+		size.width *= 1.5 // Not sure why this is necessary
+		size.height *= 1.5
+//		let size2 = Self.size(of:textLayer)
 		textLayer.bounds = CGRect(origin:.zero, size:size)
 	}
 	
@@ -153,11 +160,43 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	private func cleanup()
 	{
 		guard let view = window?.contentView else { return }
-		view.removeSublayer(named:sublayerName)
+		view.removeSublayer(named:Self.sublayerName)
+		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
 	}
 	
 
-	private let sublayerName = "\(Self.self).textLayer"
+	static let sublayerName = "\(Self.self).textLayer"
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+extension BXScriptCommand_displayMessage
+{
+	static func size(of textLayer:CATextLayer) -> CGSize
+	{
+		var storage = NSTextStorage()
+		
+		if let text = textLayer.string as? NSAttributedString
+		{
+			storage = NSTextStorage(attributedString:text)
+		}
+		else if let string = textLayer.string as? String, let font = textLayer.font as? NSFont
+		{
+			storage = NSTextStorage(string:string, attributes:[.font:font])
+		}
+		
+		let container = NSTextContainer(containerSize:CGSize(1e10,1e10))
+		let manager = NSLayoutManager()
+		
+		manager.addTextContainer(container)
+		storage.addLayoutManager(manager)
+		container.lineFragmentPadding = 0
+		manager.glyphRange(for:container)
+		let rect = manager.usedRect(for:container)
+		return rect.size
+	}
 }
 
 
