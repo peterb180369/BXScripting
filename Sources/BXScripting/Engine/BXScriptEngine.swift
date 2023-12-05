@@ -211,12 +211,19 @@ public class BXScriptEngine
 	
 	public func cancel()
 	{
+		self.cancelAllCommands()
+		self.isCancelled = true
+	}
+
+
+	/// Call the cancel() function of all commands in this script.
+	
+	public func cancelAllCommands()
+	{
 		for command in scriptCommands
 		{
-			command.cancel()
+			(command as? BXScriptCommandCancellable)?.cancel()
 		}
-		
-		self.isCancelled = true
 	}
 }
 

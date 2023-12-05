@@ -52,14 +52,15 @@ public protocol BXScriptCommand
 
 public protocol BXScriptCommandCancellable : BXScriptCommand
 {
+	func reset()
 	func cancel()
 }
 
 
-//extension BXScriptCommandCancellable
-//{
-//	public func cancel() {}
-//}
+extension BXScriptCommandCancellable
+{
+	public func reset() {}
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
