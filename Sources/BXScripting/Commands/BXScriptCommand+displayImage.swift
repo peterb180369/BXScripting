@@ -60,6 +60,7 @@ public struct BXScriptCommand_displayImage : BXScriptCommand, BXScriptCommandCan
 		public static let all: AnimationOptions = [.pulse,.scale,.wiggle]
 	}
 
+
 	public func execute()
 	{
 		self.queue.async
@@ -80,10 +81,12 @@ public struct BXScriptCommand_displayImage : BXScriptCommand, BXScriptCommandCan
 		}
 	}
 	
+	
 	public func cancel()
 	{
 		self.removeImageLayer()
 	}
+	
 	
 	private func addImageLayer(with image:NSImage, position:CGPoint)
 	{
@@ -116,17 +119,20 @@ public struct BXScriptCommand_displayImage : BXScriptCommand, BXScriptCommandCan
 		
 	}
 	
+	
 	private func removeImageLayer()
 	{
 		guard let view = window?.contentView else { return }
 		view.removeSublayer(named:sublayerName)
 	}
 	
+	
 	private func uniqueName(for image:NSImage) -> String
 	{
 		let ptr = Unmanaged.passUnretained(image).toOpaque()
 		return "\(ptr)"
 	}
+	
 	
 	private let sublayerName = "\(Self.self).imageLayer"
 }

@@ -50,47 +50,11 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 			
 			if visible
 			{
-//				let element = AccessibilityHelper.findElement(by:id)
-			
-				guard let view = window?.contentView?.subviewWithIdentifier(id) else { return }
-				guard let layer = view.layer else { return }
-				let bounds = view.bounds
-			
-				let frameLayer = view.sublayer(named:frameLayerName) ?? CALayer()
-				frameLayer.name = frameLayerName
-				layer.addSublayer(frameLayer)
-				
-				guard let environment = scriptEngine?.environment else { return }
-				let font:NSFont = environment[.fontKey] ?? NSFont.boldSystemFont(ofSize:24)
-				let strokeColor:NSColor = environment[.hiliteStrokeColorKey] ?? .systemYellow
-				let fillColor:NSColor = environment[.hiliteFillColorKey] ?? .systemYellow.withAlphaComponent(0.1)
-				let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
-				
-				frameLayer.bounds = bounds
-				frameLayer.position = bounds.center
-				frameLayer.borderColor = strokeColor.cgColor
-				frameLayer.backgroundColor = fillColor.cgColor
-				frameLayer.borderWidth = 2
-				frameLayer.zPosition = 1000
-				
-				if let string = label
-				{
-					let textLayer = view.sublayer(named:labelLayerName) as? CATextLayer ?? CATextLayer()
-					textLayer.name = labelLayerName
-					layer.addSublayer(textLayer)
-
-					textLayer.string = string
-					textLayer.font = font
-					textLayer.foregroundColor = textColor.cgColor
-					textLayer.alignmentMode = .center
-					textLayer.bounds = CGRect(origin:.zero, size:CGSize(300,44))
-					textLayer.position = bounds.center
-					textLayer.zPosition = 1000
-				}
+				self.addHilite()
 			}
 			else
 			{
-				self.cleanup()
+				self.removeHilite()
 			}
 		}
 	}
@@ -98,11 +62,51 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 
 	public func cancel()
 	{
-		self.cleanup()
+		self.removeHilite()
 	}
 	
 	
-	private func cleanup()
+	private func addHilite()
+	{
+		guard let view = window?.contentView?.subviewWithIdentifier(id) else { return }
+		guard let layer = view.layer else { return }
+		let bounds = view.bounds
+	
+		let frameLayer = view.sublayer(named:frameLayerName) ?? CALayer()
+		frameLayer.name = frameLayerName
+		layer.addSublayer(frameLayer)
+		
+		guard let environment = scriptEngine?.environment else { return }
+		let font:NSFont = environment[.fontKey] ?? NSFont.boldSystemFont(ofSize:24)
+		let strokeColor:NSColor = environment[.hiliteStrokeColorKey] ?? .systemYellow
+		let fillColor:NSColor = environment[.hiliteFillColorKey] ?? .systemYellow.withAlphaComponent(0.1)
+		let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
+		
+		frameLayer.bounds = bounds
+		frameLayer.position = bounds.center
+		frameLayer.borderColor = strokeColor.cgColor
+		frameLayer.backgroundColor = fillColor.cgColor
+		frameLayer.borderWidth = 2
+		frameLayer.zPosition = 1000
+		
+		if let string = label
+		{
+			let textLayer = view.sublayer(named:labelLayerName) as? CATextLayer ?? CATextLayer()
+			textLayer.name = labelLayerName
+			layer.addSublayer(textLayer)
+
+			textLayer.string = string
+			textLayer.font = font
+			textLayer.foregroundColor = textColor.cgColor
+			textLayer.alignmentMode = .center
+			textLayer.bounds = CGRect(origin:.zero, size:CGSize(300,44))
+			textLayer.position = bounds.center
+			textLayer.zPosition = 1000
+		}
+	}
+
+
+	private func removeHilite()
 	{
 		guard let view = window?.contentView?.subviewWithIdentifier(id) else { return }
 		view.removeSublayer(named:frameLayerName)

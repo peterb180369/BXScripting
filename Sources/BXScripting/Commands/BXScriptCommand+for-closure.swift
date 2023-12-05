@@ -24,6 +24,9 @@ extension BXScriptCommand where Self == BXScriptCommand_for_closure
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 public struct BXScriptCommand_for_closure : BXScriptCommand
 {
 	var range:ClosedRange<Int>

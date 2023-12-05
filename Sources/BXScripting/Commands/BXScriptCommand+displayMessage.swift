@@ -194,35 +194,3 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-extension NSView
-{
-	/// Returns the sublayer with the specified name
-	
-	func sublayer(named:String) -> CALayer?
-	{
-		guard let layer = self.layer else { return nil }
-
-		for sublayer in layer.sublayers ?? []
-		{
-			if sublayer.name == named
-			{
-				return sublayer
-			}
-		}
-		
-		return nil
-	}
-
-	/// Removes the first sublayer with the specified name
-	
-	func removeSublayer(named:String)
-	{
-		guard let sublayer = self.sublayer(named:named) else { return }
-		sublayer.removeFromSuperlayer()
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
