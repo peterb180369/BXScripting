@@ -53,7 +53,7 @@ extension BXScriptCommand where Self == BXScriptCommand_log
 
 // Add compiler support for BXScriptCommand_log
 
-extension BXScriptCommand_log : BXCompilableScriptCommand
+extension BXScriptCommand_log : BXScriptCommandCompilable
 {
 	public static var commandBuilders:[BXScriptCommandBuilder]
 	{

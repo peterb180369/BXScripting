@@ -26,11 +26,11 @@ public class BXScriptCompiler
 //----------------------------------------------------------------------------------------------------------------------
 
 
-	/// Registers a BXCompilableScriptCommand with the compiler.
+	/// Registers a BXScriptCommandCompilable with the compiler.
 	///
 	/// Without any registered command the compiler does nothing, as it doesn't know anything about the script commands and the syntax.
 	
-	public static func register(_ commandType:BXCompilableScriptCommand.Type)
+	public static func register(_ commandType:BXScriptCommandCompilable.Type)
 	{
 		Self.registeredBuilders += commandType.commandBuilders
 	}

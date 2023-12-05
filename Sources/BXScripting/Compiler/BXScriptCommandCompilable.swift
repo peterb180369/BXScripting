@@ -1,15 +1,15 @@
 //**********************************************************************************************************************
 //
-//  BXCompilableScriptCommand.swift
-//	Defines the requiresments for a single command in a script
+//  BXScriptCommandCompilable.swift
+//	Defines the requirements for a compilable command
 //  Copyright ©2023 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
 
-/// The BXCompilableScriptCommand protocol can be implemented by BXScriptCommand implementations. That way it can add compiler support.
+/// The BXScriptCommandCompilable protocol can be implemented by BXScriptCommand implementations. That way it can add compiler support.
 
-public protocol BXCompilableScriptCommand
+public protocol BXScriptCommandCompilable
 {
 	/// Returns a list of one or more BXScriptCommandBuilders.
 
