@@ -170,7 +170,7 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	}
 	
 	
-	public func back()
+	public func repeatCurrentStep()
 	{
 		engine.cancelAllCommands()
 		engine.commandIndex = commandIndexes[stepIndex]
