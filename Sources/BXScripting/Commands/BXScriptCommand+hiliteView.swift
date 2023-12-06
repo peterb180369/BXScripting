@@ -77,10 +77,8 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 		layer.addSublayer(frameLayer)
 		
 		guard let environment = scriptEngine?.environment else { return }
-		let font:NSFont = environment[.fontKey] ?? NSFont.boldSystemFont(ofSize:24)
 		let strokeColor:NSColor = environment[.hiliteStrokeColorKey] ?? .systemYellow
 		let fillColor:NSColor = environment[.hiliteFillColorKey] ?? .systemYellow.withAlphaComponent(0.1)
-		let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
 		
 		frameLayer.bounds = bounds
 		frameLayer.position = bounds.center
@@ -95,11 +93,15 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 			textLayer.name = labelLayerName
 			layer.addSublayer(textLayer)
 
-			textLayer.string = string
-			textLayer.font = font
+			let font:NSFont = environment[.fontKey] ?? NSFont.boldSystemFont(ofSize:36)
+			let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
+			let attributes:[NSAttributedString.Key:Any] = [ .font:font, .foregroundColor:textColor.cgColor ]
+			let text = NSAttributedString(string:string, attributes:attributes)
+			
+			textLayer.string = text
 			textLayer.foregroundColor = textColor.cgColor
 			textLayer.alignmentMode = .center
-			textLayer.bounds = CGRect(origin:.zero, size:CGSize(300,44))
+			textLayer.bounds = CGRect(origin:.zero, size:text.size())
 			textLayer.position = bounds.center
 			textLayer.zPosition = 1000
 		}

@@ -103,69 +103,61 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		guard let environment = scriptEngine?.environment else { return }
 		guard let textLayer = textLayer else { return }
 		
-		let font = environment[.fontKey] ?? NSFont.boldSystemFont(ofSize:24)
+		let font = environment[.fontKey] ?? NSFont.boldSystemFont(ofSize:36)
 		let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
-		var anchorPoint = CGPoint.zero
+		let attributes:[NSAttributedString.Key:Any] = [ .font:font, .foregroundColor:textColor.cgColor ]
+		let text = NSAttributedString(string:message, attributes:attributes)
+		
 		var alignmentMode = CATextLayerAlignmentMode.center
 		var autoresizingMask:CAAutoresizingMask = []
-		
-		textLayer.string = message
-		textLayer.font = font
-		textLayer.foregroundColor = textColor.cgColor
+		var anchorPoint = CGPoint.zero
 		
 		if position.x < bounds.width*0.33
 		{
 			alignmentMode = .left
-			anchorPoint.x = 0.0
 			autoresizingMask.insert(.layerMaxXMargin)
+			anchorPoint.x = 0.0
 		}
 		else if position.x < bounds.width*0.66
 		{
 			alignmentMode = .center
-			anchorPoint.x = 0.5
 			autoresizingMask.insert(.layerMinXMargin)
 			autoresizingMask.insert(.layerMaxXMargin)
+			anchorPoint.x = 0.5
 		}
 		else
 		{
 			alignmentMode = .right
-			anchorPoint.x = 1.0
 			autoresizingMask.insert(.layerMinXMargin)
+			anchorPoint.x = 1.0
 		}
 
 		if position.y < bounds.height*0.33
 		{
-			anchorPoint.y = 0.0
 			autoresizingMask.insert(.layerMaxYMargin)
+			anchorPoint.y = 0.0
 		}
 		else if position.y < bounds.height*0.66
 		{
-			anchorPoint.y = 0.5
 			autoresizingMask.insert(.layerMinYMargin)
 			autoresizingMask.insert(.layerMaxYMargin)
+			anchorPoint.y = 0.5
 		}
 		else
 		{
-			anchorPoint.y = 1.0
 			autoresizingMask.insert(.layerMinYMargin)
+			anchorPoint.y = 1.0
 		}
 		
-		textLayer.autoresizingMask = autoresizingMask
+		textLayer.string = text
 		textLayer.alignmentMode = alignmentMode
-		textLayer.anchorPoint = anchorPoint
+		textLayer.autoresizingMask = autoresizingMask
 		textLayer.position = position
+		textLayer.anchorPoint = anchorPoint
+		textLayer.bounds = CGRect(origin:.zero, size:text.size())
 		
 //		textLayer.borderColor = NSColor.gray.cgColor
 //		textLayer.borderWidth = 1.0
-		
-		textLayer.transform = CATransform3DIdentity
-		let text = NSAttributedString(string:message, attributes:[.font:font])
-		var size = text.size()
-		size.width *= 1.5 // Not sure why this is necessary
-		size.height *= 1.5
-//		let size2 = Self.size(of:textLayer)
-		let size3 = self.bounds(for:text, width:1e10)
-		textLayer.bounds = CGRect(origin:.zero, size:size)
 	}
 	
 	

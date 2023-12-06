@@ -27,7 +27,7 @@ public class BXScriptEnvironment
 	public init()
 	{
 		self.setDefaultColors(with:.systemYellow)
-		self.setDefaultFont(NSFont.boldSystemFont(ofSize:24))
+		self.setDefaultFont(NSFont.boldSystemFont(ofSize:36))
 	}
 	
 
