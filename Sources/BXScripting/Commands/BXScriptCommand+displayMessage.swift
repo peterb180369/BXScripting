@@ -91,6 +91,10 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 			sublayer.name = Self.sublayerName
 			sublayer.zPosition = 1000
 			sublayer.isWrapped = true
+			sublayer.shadowColor = NSColor.black.cgColor
+			sublayer.shadowOpacity = 1.0
+			sublayer.shadowOffset = CGSize(0,-1)
+			sublayer.shadowRadius = 3
 
 			layer.addSublayer(sublayer)
 			textLayer = sublayer
