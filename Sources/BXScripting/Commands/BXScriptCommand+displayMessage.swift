@@ -89,7 +89,6 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		{
 			let sublayer = CATextLayer()
 			sublayer.name = Self.sublayerName
-			sublayer.autoresizingMask = [.layerMinXMargin,.layerMaxXMargin]
 			sublayer.zPosition = 1000
 			sublayer.isWrapped = true
 
@@ -104,7 +103,8 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
 		var anchorPoint = CGPoint.zero
 		var alignmentMode = CATextLayerAlignmentMode.center
-
+		var autoresizingMask:CAAutoresizingMask = []
+		
 		textLayer.string = message
 		textLayer.font = font
 		textLayer.foregroundColor = textColor.cgColor
@@ -113,34 +113,42 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		{
 			alignmentMode = .left
 			anchorPoint.x = 0.0
+			autoresizingMask.insert(.layerMaxXMargin)
 		}
 		else if position.x < bounds.width*0.66
 		{
 			alignmentMode = .center
 			anchorPoint.x = 0.5
+			autoresizingMask.insert(.layerMinXMargin)
+			autoresizingMask.insert(.layerMaxXMargin)
 		}
 		else
 		{
 			alignmentMode = .right
 			anchorPoint.x = 1.0
+			autoresizingMask.insert(.layerMinXMargin)
 		}
 
 		if position.y < bounds.height*0.33
 		{
 			anchorPoint.y = 0.0
+			autoresizingMask.insert(.layerMaxYMargin)
 		}
 		else if position.y < bounds.height*0.66
 		{
 			anchorPoint.y = 0.5
+			autoresizingMask.insert(.layerMinYMargin)
+			autoresizingMask.insert(.layerMaxYMargin)
 		}
 		else
 		{
 			anchorPoint.y = 1.0
+			autoresizingMask.insert(.layerMinYMargin)
 		}
 		
+		textLayer.autoresizingMask = autoresizingMask
 		textLayer.alignmentMode = alignmentMode
 		textLayer.anchorPoint = anchorPoint
-		
 		textLayer.position = position
 		
 //		textLayer.borderColor = NSColor.gray.cgColor
