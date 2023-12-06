@@ -159,12 +159,12 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 //		textLayer.borderWidth = 1.0
 		
 		textLayer.transform = CATransform3DIdentity
-//		let size = textLayer.preferredFrameSize()
 		let text = NSAttributedString(string:message, attributes:[.font:font])
 		var size = text.size()
 		size.width *= 1.5 // Not sure why this is necessary
 		size.height *= 1.5
 //		let size2 = Self.size(of:textLayer)
+		let size3 = self.bounds(for:text, width:1e10)
 		textLayer.bounds = CGRect(origin:.zero, size:size)
 	}
 	
@@ -186,60 +186,39 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 
 extension BXScriptCommand_displayMessage
 {
-	static func size(of textLayer:CATextLayer) -> CGSize
+	public func bounds(for text:NSAttributedString, width:CGFloat) -> CGSize
 	{
-		var storage = NSTextStorage()
-		
-		if let text = textLayer.string as? NSAttributedString
-		{
-			storage = NSTextStorage(attributedString:text)
-		}
-		else if let string = textLayer.string as? String, let font = textLayer.font as? NSFont
-		{
-			storage = NSTextStorage(string:string, attributes:[.font:font])
-		}
-		
-		let container = NSTextContainer(containerSize:CGSize(1e10,1e10))
-		let manager = NSLayoutManager()
-		
-		manager.addTextContainer(container)
-		storage.addLayoutManager(manager)
-		container.lineFragmentPadding = 0
-		manager.glyphRange(for:container)
-		let rect = manager.usedRect(for:container)
-		return rect.size
+		let frameSetter = CTFramesetterCreateWithAttributedString(text)
+		let size = CTFramesetterSuggestFrameSizeWithConstraints(frameSetter, CFRangeMake(0,0), nil, CGSize(width,1e10), nil)
+//		CFRelease(frameSetter)
+		return size
 	}
 }
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 //extension BXScriptCommand_displayMessage
 //{
-//	static func createAttributedString(from string:String, visibleTextColor:NSColor = .systemYellow, hiddenTextColor:NSColor = .clear) -> NSMutableAttributedString
+//	static func size(of textLayer:CATextLayer) -> CGSize
 //	{
-//		let pattern = "\\[(.*?)\\]"
-//		let regex = try! NSRegularExpression(pattern:pattern)
-//		let nsString = string as NSString
+//		var storage = NSTextStorage()
 //		
-//		var rangesOfHiddenText = [NSRange]()
-//		
-//		// Find ranges of text within brackets
-//		let matches = regex.matches(in: string, range: NSRange(location: 0, length: nsString.length))
-//		
-//		for match in matches.reversed()
+//		if let text = textLayer.string as? NSAttributedString
 //		{
-//			rangesOfHiddenText.append(match.range(at: 1))
-//			nsString.deleteCharacters(in: match.range)
+//			storage = NSTextStorage(attributedString:text)
 //		}
-//		// Create an attributed string with visible text color
-//		let attributedString = NSMutableAttributedString(string: nsString as String, attributes: [.foregroundColor: visibleTextColor])
-//		// Apply clear color to the text that was within brackets
-//		for range in rangesOfHiddenText {
-//			attributedString.addAttribute(.foregroundColor, value: hiddenTextColor, range: NSRange(location: range.location, length: range.length))
+//		else if let string = textLayer.string as? String, let font = textLayer.font as? NSFont
+//		{
+//			storage = NSTextStorage(string:string, attributes:[.font:font])
 //		}
-//		return attributedString
+//		
+//		let container = NSTextContainer(containerSize:CGSize(1e10,1e10))
+//		let manager = NSLayoutManager()
+//		
+//		manager.addTextContainer(container)
+//		storage.addLayoutManager(manager)
+//		container.lineFragmentPadding = 0
+//		manager.glyphRange(for:container)
+//		let rect = manager.usedRect(for:container)
+//		return rect.size
 //	}
 //}
 
