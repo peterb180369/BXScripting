@@ -25,144 +25,81 @@ struct BXScriptControllerView : View
 	{
 		VStack(spacing:8)
 		{
-				HStack
+			// Name
+			
+			HStack
+			{
+				Spacer()
+				Text(controller.currentStepNumber).opacity(0.33)
+				Text(controller.currentStepName)
+				Spacer()
+			}
+			
+			// Progress Bar
+			
+			HStack
+			{
+				if #available(macOS 11,*)
 				{
-					Spacer()
-					Text(controller.currentStepName)
-					Text(controller.currentStepNumber).opacity(0.33)
-					Spacer()
+					ProgressView(value:Double(controller.stepIndex+1), total:Double(controller.stepCount))
 				}
+				else
+				{
+					#if canImport(BXSwiftUI)
+					BXProgressBar(value:Double(controller.stepIndex+1), maxValue:Double(controller.stepCount))
+					#endif
+				}
+
+//				Button(action:controller.abort)
+//				{
+//					SwiftUI.Image(systemName:"xmark.circle")
+//				}
+//				.buttonStyle(.borderless)
+//				.controlSize(.large)
+			}
+			
+			// Repeat Button
+			
+			HStack
+			{
+				Spacer()
 				
-				HStack
+				if #available(macOS 11,*)
 				{
-					if #available(macOS 11,*)
+					Button("Repeat", systemImage:"arrow.counterclockwise")
 					{
-						ProgressView(value:Double(controller.stepIndex+1), total:Double(controller.stepCount))
+						controller.repeatCurrentStep()
 					}
-					else
-					{
-						#if canImport(BXSwiftUI)
-						BXProgressBar(value:Double(controller.stepIndex+1), maxValue:Double(controller.stepCount))
-						#else
-						BXScriptStepsView(controller:controller)
-						#endif
-					}
-
-//					Button(action:controller.abort)
-//					{
-//						SwiftUI.Image(systemName:"xmark.circle")
-//					}
-//					.buttonStyle(.borderless)
-//					.controlSize(.large)
+					#if canImport(BXSwiftUI)
+					.buttonStyle(BXStrokedButtonStyle())
+					#endif
 				}
-				
-				HStack
+				else
 				{
-					Spacer()
-					
-					if #available(macOS 11,*)
+					#if canImport(BXSwiftUI)
+
+					Button(action:controller.repeatCurrentStep)
 					{
-						Button("Repeat", systemImage:"arrow.counterclockwise")
+						HStack
 						{
-							controller.back()
+							BXImage(systemName:"arrow.counterclockwise")
+							Text("Repeat")
 						}
-						#if canImport(BXSwiftUI)
-						.buttonStyle(BXStrokedButtonStyle())
-						#endif
 					}
-					else
-					{
-						#if canImport(BXSwiftUI)
+					.buttonStyle(BXStrokedButtonStyle())
 
-						Button(action:controller.back)
-						{
-							HStack
-							{
-								BXImage(systemName:"arrow.counterclockwise")
-								Text("Repeat")
-							}
-						}
-						.buttonStyle(BXStrokedButtonStyle())
-
-						#endif
-					}
-					
-//					Button("Repeat", systemImage:"arrow.counterclockwise")
-//					{
-//						controller.back()
-//					}
-
-					Spacer()
+					#endif
 				}
 
+				Spacer()
+			}
 		}
 		.padding()
 		.controlSize(.regular)
 		.colorScheme(.dark)
-		
-		
 		.frame(minWidth:240)
 	}
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-struct BXScriptStepsView : View
-{
-	@ObservedObject var controller:BXScriptWindowController
-	
-	public var body: some View
-	{
-		print("BXScriptStepsView.body")
-		
-		return HStack(alignment:.center, spacing:0)
-		{
-			ForEach(0...controller.stepCount-1, id:\.self)
-			{
-				i in
-				
-				BXScriptStepView(/*controller:controller,*/ name:controller.labels[i], isCurrent:controller.stepIndex==i)
-					.frame(width:10, height:10)
-					
-				if i < controller.stepCount-1
-				{
-					Rectangle()
-						.frame(width:4, height:1)
-						.opacity(0.5)
-				}
-			}
-		}
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-struct BXScriptStepView : View
-{
-	var name:String
-	var isCurrent:Bool
-	
-	public var body: some View
-	{
-		if isCurrent
-		{
-			Circle()
-				.fill(Color.primary)
-		}
-		else
-		{
-			Circle()
-				.stroke(lineWidth:1)
-				.opacity(0.5)
-		}
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
