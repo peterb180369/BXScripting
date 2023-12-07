@@ -9,7 +9,6 @@
 
 import AppKit
 import SwiftUI
-import BXSwiftUtils
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -187,7 +186,7 @@ extension CGPoint
 
 	/// Returns the topLeft point in a window (with specified inset)
 	
-	public static func topLeft(of window:NSWindow, inset:CGSize = CGSize(64,64)) -> CGPoint
+	public static func topLeft(of window:NSWindow, inset:CGSize = CGSize(width:64,height:64)) -> CGPoint
 	{
 		guard let view = window.contentView else { return .zero }
 		return self.topLeft(of:view, inset:inset)
@@ -195,7 +194,7 @@ extension CGPoint
 
 	/// Returns the top point in a window (with specified inset)
 	
-	public static func top(of window:NSWindow, inset:CGSize = CGSize(64,64)) -> CGPoint
+	public static func top(of window:NSWindow, inset:CGSize = CGSize(width:64,height:64)) -> CGPoint
 	{
 		guard let view = window.contentView else { return .zero }
 		return self.top(of:view, inset:inset)
@@ -203,7 +202,7 @@ extension CGPoint
 
 	/// Returns the topRight point in a window (with specified inset)
 	
-	public static func topRight(of window:NSWindow, inset:CGSize = CGSize(64,64)) -> CGPoint
+	public static func topRight(of window:NSWindow, inset:CGSize = CGSize(width:64,height:64)) -> CGPoint
 	{
 		guard let view = window.contentView else { return .zero }
 		return self.topRight(of:view, inset:inset)
@@ -211,7 +210,7 @@ extension CGPoint
 
 	/// Returns the left point in a window (with specified inset)
 	
-	public static func left(of window:NSWindow, inset:CGSize = CGSize(64,64)) -> CGPoint
+	public static func left(of window:NSWindow, inset:CGSize = CGSize(width:64,height:64)) -> CGPoint
 	{
 		guard let view = window.contentView else { return .zero }
 		return self.left(of:view, inset:inset)
@@ -227,7 +226,7 @@ extension CGPoint
 
 	/// Returns the right point in a window (with specified inset)
 	
-	public static func right(of window:NSWindow, inset:CGSize = CGSize(64,64)) -> CGPoint
+	public static func right(of window:NSWindow, inset:CGSize = CGSize(width:64,height:64)) -> CGPoint
 	{
 		guard let view = window.contentView else { return .zero }
 		return self.right(of:view, inset:inset)
@@ -235,7 +234,7 @@ extension CGPoint
 
 	/// Returns the bottomLeft point in a window (with specified inset)
 	
-	public static func bottomLeft(of window:NSWindow, inset:CGSize = CGSize(64,64)) -> CGPoint
+	public static func bottomLeft(of window:NSWindow, inset:CGSize = CGSize(width:64,height:64)) -> CGPoint
 	{
 		guard let view = window.contentView else { return .zero }
 		return self.bottomLeft(of:view, inset:inset)
@@ -243,7 +242,7 @@ extension CGPoint
 
 	/// Returns the bottom point in a window (with specified inset)
 	
-	public static func bottom(of window:NSWindow, inset:CGSize = CGSize(64,64)) -> CGPoint
+	public static func bottom(of window:NSWindow, inset:CGSize = CGSize(width:64,height:64)) -> CGPoint
 	{
 		guard let view = window.contentView else { return .zero }
 		return self.bottom(of:view, inset:inset)
@@ -251,7 +250,7 @@ extension CGPoint
 
 	/// Returns the bottomRight point in a window (with specified inset)
 	
-	public static func bottomRight(of window:NSWindow, inset:CGSize = CGSize(64,64)) -> CGPoint
+	public static func bottomRight(of window:NSWindow, inset:CGSize = CGSize(width:64,height:64)) -> CGPoint
 	{
 		guard let view = window.contentView else { return .zero }
 		return self.bottomRight(of:view, inset:inset)
