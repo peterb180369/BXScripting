@@ -49,6 +49,15 @@ extension NSImage
 	{
 		NSImage(systemName, primaryColor:primaryColor, secondaryColor:secondaryColor, size:size)
 	}
+
+
+	/// Returns a bitmap CGImage
+	
+	internal var CGImage:CGImage?
+	{
+		self.cgImage(forProposedRect:nil, context:nil, hints:nil)
+	}
+
 }
 
 
