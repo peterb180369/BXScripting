@@ -32,22 +32,23 @@ extension NSImage
 	}
 
 
-	@available(macOS 12,*) public convenience init?(_ systemName:String, primaryColor:Color = .white, secondaryColor:Color = .green, size:CGFloat = 32)
+	@available(macOS 13,*) public convenience init?(_ systemName:String, weight:Font.Weight? = .regular, primaryColor:Color = .white, secondaryColor:Color = .green, size:CGFloat = 32)
 	{
 		let view = SwiftUI.Image(systemName:systemName)
 			.symbolRenderingMode(.palette)
 			.foregroundStyle(primaryColor,secondaryColor)
 			.font(.system(size:size))
-    
+			.fontWeight(weight)
+   
 		guard let nsimage = view.renderImage() else { return nil }
 		guard let cgimage = nsimage.CGImage else { return nil }
 		self.init(cgImage:cgimage, size:nsimage.size)
 	}
 
 
-	@available(macOS 12,*) public static func symbolImage(_ systemName:String, primaryColor:Color = .white, secondaryColor:Color = .green, size:CGFloat = 32) -> NSImage?
+	@available(macOS 13,*) public static func symbolImage(_ systemName:String, weight:Font.Weight? = .regular, primaryColor:Color = .white, secondaryColor:Color = .green, size:CGFloat = 32) -> NSImage?
 	{
-		NSImage(systemName, primaryColor:primaryColor, secondaryColor:secondaryColor, size:size)
+		NSImage(systemName, weight:weight, primaryColor:primaryColor, secondaryColor:secondaryColor, size:size)
 	}
 
 
