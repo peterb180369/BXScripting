@@ -220,7 +220,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 			let inner = frame.safeInsetBy(dx:margin, dy:margin)
 			let outer = frame.insetBy(dx:-margin, dy:-margin)
 			let (p1,p2) = self.pointer(for:bounds, position:position, inner:inner, outer:outer)
-			let lineLength = (p2-p1).length
+			let lineLength = (p2-p1).length + lineWidth
 			let dx =  p2.x - p1.x
 			let dy =  p2.y - p1.y
 			let angle = atan2(dy,dx)

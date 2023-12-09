@@ -18,9 +18,9 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteToolbarItem
 {
 	/// Creates a command that shows or hides a highlight on the view with the specified identifier. You can also supply an optional view label.
 
-	public static func hiliteToolbarItem(withID id:String, visible:Bool = true, in window:@escaping @autoclosure ()->NSWindow?) -> BXScriptCommand
+	public static func hiliteToolbarItem(withID id:String, visible:Bool = true, in window:@escaping @autoclosure ()->NSWindow?, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0) -> BXScriptCommand
 	{
-		BXScriptCommand_hiliteToolbarItem(id:id, visible:visible, window:window)
+		BXScriptCommand_hiliteToolbarItem(id:id, visible:visible, window:window, inset:inset, cornerRadius:cornerRadius)
 	}
 }
 
@@ -35,6 +35,8 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 	var id:String
 	var visible:Bool
 	var window:(()->NSWindow?)? = nil
+	var inset:CGFloat = 0.0
+	var cornerRadius:CGFloat = 0.0
 	
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
@@ -52,20 +54,22 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 				guard let view = window.toolbarItemView(withIdentifier:id) else { return }
 				guard let layer = view.layer else { return }
 				let bounds = view.bounds
-			
-				let frameLayer = view.sublayer(named:frameLayerName) ?? CALayer()
-				frameLayer.name = frameLayerName
-				layer.addSublayer(frameLayer)
-					
+
+				let frameLayer:CALayer = view.createSublayer(named:frameLayerName)
+				{
+					return CALayer()
+				}
+
 				guard let environment = scriptEngine?.environment else { return }
 				let strokeColor:NSColor = environment[.hiliteStrokeColorKey] ?? .systemYellow
 				let fillColor:NSColor = environment[.hiliteFillColorKey] ?? .systemYellow.withAlphaComponent(0.1)
 
-				frameLayer.bounds = bounds
+				frameLayer.bounds = bounds.insetBy(dx:inset, dy:inset)
 				frameLayer.position = bounds.center
-				frameLayer.borderColor = strokeColor.cgColor
 				frameLayer.backgroundColor = fillColor.cgColor
+				frameLayer.borderColor = strokeColor.cgColor
 				frameLayer.borderWidth = 3
+				frameLayer.cornerRadius = cornerRadius
 				frameLayer.zPosition = 1000
 			}
 			else
