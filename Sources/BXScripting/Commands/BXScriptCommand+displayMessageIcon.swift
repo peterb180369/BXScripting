@@ -84,7 +84,7 @@ public struct BXScriptCommand_displayMessageIcon : BXScriptCommand, BXScriptComm
 	{
 		guard let view = window?.contentView else { return }
 		guard let layer = view.layer else { return }
-		guard let textLayer = view.sublayer(named:BXScriptCommand_displayMessage.sublayerName) as? CATextLayer else { return }
+		guard let textLayer = view.sublayer(named:BXScriptCommand_displayMessage.textLayerName) as? CATextLayer else { return }
 
 		let size = icon.size 
 		let textFrame = textLayer.frame
