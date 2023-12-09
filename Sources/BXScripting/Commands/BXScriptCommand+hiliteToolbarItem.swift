@@ -83,6 +83,7 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 	{
 		guard let view = window?.toolbarItemView(withIdentifier:id) else { return }
 		view.removeSublayer(named:frameLayerName)
+		window?.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
 	}
 
 

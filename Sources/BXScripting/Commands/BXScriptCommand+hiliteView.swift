@@ -113,6 +113,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 		guard let view = window?.contentView?.subviewWithIdentifier(id) else { return }
 		view.removeSublayer(named:frameLayerName)
 		view.removeSublayer(named:labelLayerName)
+		window?.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
 	}
 
 
