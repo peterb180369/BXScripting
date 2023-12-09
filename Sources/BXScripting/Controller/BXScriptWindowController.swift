@@ -192,7 +192,8 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	
 	public var currentStepName:String
 	{
-		self.labels[safe:stepIndex] ?? ""
+		guard stepIndex>=0 && stepIndex<stepCount else { return "" }
+		return self.labels[stepIndex]
 	}
 
 
