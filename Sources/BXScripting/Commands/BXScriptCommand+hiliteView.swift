@@ -71,7 +71,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	private func addHilite()
 	{
 		guard let window = self.window() else { return }
-		guard let view = window.contentView?.subviewWithIdentifier(id) else { return }
+		guard let view = window.subviewWithIdentifier(id) else { return }
 		guard let layer = view.layer else { return }
 		let bounds = view.bounds
 	
