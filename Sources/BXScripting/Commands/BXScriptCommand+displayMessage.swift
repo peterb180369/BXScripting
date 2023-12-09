@@ -8,7 +8,6 @@
 
 
 import AppKit
-import Accessibility
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -19,9 +18,9 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 	/// Creates a command that displays a text message in the specified window.
 
 //	public static func displayMessage(_ message:String, in window:NSWindow?, at position:CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), pointerWithLength:CGFloat? = nil) -> BXScriptCommand
-	public static func displayMessage(_ message:@escaping @autoclosure ()->String, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
+	public static func displayMessage(_ message:@escaping @autoclosure ()->String, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
 	{
-		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
+		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
 	}
 	
 	/// Creates a command that hides the text message in the specified window.
@@ -47,6 +46,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	var window:()->NSWindow?
 	var position:()->CGPoint
 	var backgroundPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:72, bottom:12, right:72)
+	var cornerRadius:CGFloat = 12.0
 	var pointerLength:CGFloat? = nil
 	var alignmentMode:CATextLayerAlignmentMode = .center
 	
@@ -96,28 +96,28 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
 		let attributes:[NSAttributedString.Key:Any] = [ .font:font, .foregroundColor:textColor.cgColor ]
 		let text = NSAttributedString(string:message, attributes:attributes)
+		let showsBackground = backgroundPadding != nil
 		
 		// Determine correct layout properties depending on position within the view
 		
 		let pos = position()
-		let bounds = view.bounds //.insetBy(dx:64, dy:64)
+		let bounds = view.bounds
 		let padding = backgroundPadding ?? NSEdgeInsets()
 		let margin = pointerLength ?? 0.0
-		let cornerRadius:CGFloat = 12.0
 		let lineWidth:CGFloat = 3.0
-		let anchorPoint = self.anchorPoint(for:bounds, position:pos)
-		let autoresizingMask = self.autoresizingMask(for:bounds, position:pos)
-		let position = self.adjustPosition(for:bounds, position:pos, t:margin+padding.top, l:margin+padding.left, b:margin+padding.bottom, r:margin+padding.right)
-
+		let anchorPoint = Self.anchorPoint(for:bounds, position:pos)
+		let autoresizingMask = Self.autoresizingMask(for:bounds, position:pos)
+		let position = Self.adjustPosition(for:bounds, position:pos, t:margin+padding.top, l:margin+padding.left, b:margin+padding.bottom, r:margin+padding.right)
+		
 		// Create and update a CATextLayer to display the message
 		
 		self.updateTextLayer(with:text, in:view, position:position, anchorPoint:anchorPoint, autoresizingMask:autoresizingMask)
 
 		// Create and update various other sublayers to display a frosted glass background and an optional pointer line
 		
-		self.updateBackgroundLayer(in:view, padding:padding, cornerRadius:cornerRadius)
+		Self.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius)
 		self.updatePointerLayer(in:view, bounds:bounds, position:position, margin:margin, lineWidth:lineWidth)
-		self.updateShadowLayer(in:view)
+		Self.updateShadowLayer(in:view)
 	}
 	
 	
@@ -184,11 +184,11 @@ extension BXScriptCommand_displayMessage
 	
 	/// Creates/Updates a background layer with a frosted glass look behind the CATextLayer
 		
-	func updateBackgroundLayer(in view:NSView, padding:NSEdgeInsets, cornerRadius:CGFloat)
+	static func updateBackgroundLayer(in view:NSView, visible:Bool, padding:NSEdgeInsets, cornerRadius:CGFloat)
 	{
 		guard let textLayer = view.sublayer(named:Self.textLayerName) as? CATextLayer else { return }
 		
-		if backgroundPadding != nil
+		if visible
 		{
 			let backgroundLayer:CALayer = view.createSublayer(named:Self.backgroundLayerName)
 			{
@@ -224,8 +224,11 @@ extension BXScriptCommand_displayMessage
 			bounds.size.width += padding.left + padding.right
 			bounds.size.height += padding.bottom + padding.top
 			
+			let dx = 0.5 * (padding.right - padding.left)
+			let dy = 0.5 * (padding.top - padding.bottom)
+			
 			backgroundLayer.bounds = bounds
-			backgroundLayer.position = textLayer.frame.center + .zero
+			backgroundLayer.position = textLayer.frame.center + CGPoint(dx,dy)
 			backgroundLayer.cornerRadius = cornerRadius
 
 //			let borderColor:NSColor = BXScriptEnvironment.shared[.hiliteStrokeColorKey] ?? .white
@@ -241,7 +244,7 @@ extension BXScriptCommand_displayMessage
 	
 	/// Creates/Updates a CALayer that draws a shadow for the frosted glass background
 		
-	func updateShadowLayer(in view:NSView)
+	static func updateShadowLayer(in view:NSView)
 	{
 		guard let backgroundLayer = view.sublayer(named:Self.backgroundLayerName) else { return }
 
@@ -286,12 +289,11 @@ extension BXScriptCommand_displayMessage
 		let frame = backgroundLayer.frame
 		let inner = frame.safeInsetBy(dx:margin, dy:margin)
 		let outer = frame.insetBy(dx:-margin, dy:-margin)
-		let (p1,p2) = self.pointer(for:bounds, position:position, inner:inner, outer:outer)
+		let (p1,p2) = Self.pointer(for:bounds, position:position, inner:inner, outer:outer)
 		let lineLength = (p2-p1).length + lineWidth
 		let dx =  p2.x - p1.x
 		let dy =  p2.y - p1.y
 		let angle = atan2(dy,dx)
-		let bounds = CGRect(x:0, y:0, width:lineLength, height:lineWidth)
 		let hiliteColor:NSColor = BXScriptEnvironment.shared[.hiliteStrokeColorKey] ?? .white
 		let white = CGColor(gray:1, alpha:1)
 		let color = hiliteColor.cgColor
@@ -332,7 +334,7 @@ extension BXScriptCommand_displayMessage
 {
 	/// Returns the "best" anchorPoint for the specified position within the view bounds.
 	
-	func anchorPoint(for bounds:CGRect, position:CGPoint) -> CGPoint
+	static func anchorPoint(for bounds:CGRect, position:CGPoint) -> CGPoint
 	{
 		var anchorPoint = CGPoint.zero
 
@@ -368,7 +370,7 @@ extension BXScriptCommand_displayMessage
 
 	/// Returns the "best" autoresizingMask for the specified position within the view bounds.
 	
-	func autoresizingMask(for bounds:CGRect, position:CGPoint) -> CAAutoresizingMask
+	static func autoresizingMask(for bounds:CGRect, position:CGPoint) -> CAAutoresizingMask
 	{
 		var autoresizingMask:CAAutoresizingMask = []
 		
@@ -406,7 +408,7 @@ extension BXScriptCommand_displayMessage
 	
 	/// Adjusts position within the view bounds, with the specified padding values.
 	
-	func adjustPosition(for bounds:CGRect, position:CGPoint, t:CGFloat, l:CGFloat, b:CGFloat, r:CGFloat) -> CGPoint
+	static func adjustPosition(for bounds:CGRect, position:CGPoint, t:CGFloat, l:CGFloat, b:CGFloat, r:CGFloat) -> CGPoint
 	{
 		var position = position
 
@@ -434,7 +436,7 @@ extension BXScriptCommand_displayMessage
 
 	/// Returns the "best" autoresizingMask for the specified position within the view bounds.
 	
-	func pointer(for bounds:CGRect, position:CGPoint, inner:CGRect, outer:CGRect) -> (CGPoint,CGPoint)
+	static func pointer(for bounds:CGRect, position:CGPoint, inner:CGRect, outer:CGRect) -> (CGPoint,CGPoint)
 	{
 		var p1 = inner.center
 		var p2 = outer.center
