@@ -34,7 +34,7 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 {
 	var id:String
 	var visible:Bool
-	var window:(()->NSWindow?)? = nil
+	var window:()->NSWindow?
 	var inset:CGFloat = 0.0
 	var cornerRadius:CGFloat = 0.0
 	
@@ -50,7 +50,7 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 			
 			if visible
 			{
-				guard let window = self.window?() else { return }
+				guard let window = self.window() else { return }
 				guard let view = window.toolbarItemView(withIdentifier:id) else { return }
 				guard let layer = view.layer else { return }
 				let bounds = view.bounds
@@ -86,7 +86,7 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 
 	private func cleanup()
 	{
-		guard let window = self.window?() else { return }
+		guard let window = self.window() else { return }
 		guard let view = window.toolbarItemView(withIdentifier:id) else { return }
 		view.removeSublayer(named:frameLayerName)
 		window.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)

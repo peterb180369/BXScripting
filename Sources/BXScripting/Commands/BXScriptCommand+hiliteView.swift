@@ -36,7 +36,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	var id:String
 	var visible:Bool
 	var label:String?
-	var window:(()->NSWindow?)? = nil
+	var window:()->NSWindow?
 	var inset:CGFloat = 0.0
 	var cornerRadius:CGFloat = 0.0
 	
@@ -70,7 +70,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	
 	private func addHilite()
 	{
-		guard let window = self.window?() else { return }
+		guard let window = self.window() else { return }
 		guard let view = window.contentView?.subviewWithIdentifier(id) else { return }
 		guard let layer = view.layer else { return }
 		let bounds = view.bounds
@@ -115,7 +115,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 
 	private func removeHilite()
 	{
-		guard let window = self.window?() else { return }
+		guard let window = self.window() else { return }
 		guard let view = window.contentView?.subviewWithIdentifier(id) else { return }
 		view.removeSublayer(named:frameLayerName)
 		view.removeSublayer(named:labelLayerName)

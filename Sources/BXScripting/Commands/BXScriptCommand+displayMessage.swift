@@ -28,7 +28,7 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 
 	public static func hideMessage(in window:@escaping @autoclosure ()->NSWindow?) -> BXScriptCommand
 	{
-		BXScriptCommand_displayMessage(message:nil, window:window, position:{.zero})
+		BXScriptCommand_displayMessage(message:{nil}, window:window, position:{.zero})
 	}
 }
 
@@ -36,15 +36,15 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// MARK: -
+// MARK: - Command
 
 
 /// This command displays a text message at the bottom of a window.
 
 public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandCancellable
 {
-	var message:(()->String)? = nil
-	var window:(()->NSWindow?)? = nil
+	var message:()->String?
+	var window:()->NSWindow?
 	var position:()->CGPoint
 	var backgroundPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:72, bottom:12, right:72)
 	var pointerLength:CGFloat? = nil
@@ -60,11 +60,10 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		{
 			DispatchQueue.main.asyncIfNeeded
 			{
-				if let message = message
+				if let message = message()
 				{
-					let window = self.window?()
-					window?.contentView?.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
-					self.updateTextLayer(with:message())
+					self.window()?.contentView?.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
+					self.updateTextLayer(with:message)
 				}
 				else
 				{
@@ -85,7 +84,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	
 	private func updateTextLayer(with message:String)
 	{
-		guard let window = self.window?() else { return }
+		guard let window = self.window() else { return }
 		guard let view = window.contentView else { return }
 
 //		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
@@ -124,7 +123,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	
 	private func cleanup()
 	{
-		guard let window = self.window?() else { return }
+		guard let window = self.window() else { return }
 		guard let view = window.contentView else { return }
 		
 		view.removeSublayer(named:Self.textLayerName)
@@ -146,7 +145,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// MARK: -
+// MARK: - Drawing
 
 
 extension BXScriptCommand_displayMessage
@@ -306,7 +305,7 @@ extension BXScriptCommand_displayMessage
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// MARK: -
+// MARK: - Layout
 
 
 /// The window is divided into 9 sectors like this:
