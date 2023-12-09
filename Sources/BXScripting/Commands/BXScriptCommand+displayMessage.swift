@@ -276,9 +276,9 @@ extension BXScriptCommand_displayMessage
 		guard pointerLength != nil else { return }
 		guard let backgroundLayer = view.sublayer(named:Self.backgroundLayerName) else { return }
 		
-		let lineLayer:CALayer = view.createSublayer(named:Self.pointerLayerName)
+		let pointerLayer:CAGradientLayer = view.createSublayer(named:Self.pointerLayerName)
 		{
-			let newLayer = CALayer()
+			let newLayer = CAGradientLayer()
 			newLayer.zPosition = 995
 			return newLayer
 		}
@@ -291,13 +291,20 @@ extension BXScriptCommand_displayMessage
 		let dx =  p2.x - p1.x
 		let dy =  p2.y - p1.y
 		let angle = atan2(dy,dx)
-		let color:NSColor = BXScriptEnvironment.shared[.hiliteStrokeColorKey] ?? .white
-
-		lineLayer.backgroundColor = color.cgColor
-		lineLayer.bounds = CGRect(x:0, y:0, width:lineLength, height:lineWidth)
-		lineLayer.anchorPoint = CGPoint(0,0.5)
-		lineLayer.transform = CATransform3DMakeRotation(angle,0,0,1)
-		lineLayer.position = p1
+		let bounds = CGRect(x:0, y:0, width:lineLength, height:lineWidth)
+		let hiliteColor:NSColor = BXScriptEnvironment.shared[.hiliteStrokeColorKey] ?? .white
+		let white = CGColor(gray:1, alpha:1)
+		let color = hiliteColor.cgColor
+		
+		pointerLayer.bounds = CGRect(x:0, y:0, width:lineLength, height:lineWidth)
+		pointerLayer.anchorPoint = CGPoint(0,0.5)
+		pointerLayer.transform = CATransform3DMakeRotation(angle,0,0,1)
+		pointerLayer.position = p1
+		
+//		pointerLayer.backgroundColor = color
+		pointerLayer.colors = [white,color]
+		pointerLayer.startPoint = CGPoint(0.5,0.5)
+		pointerLayer.endPoint = CGPoint(0.95,0.5)
 	}
 }
 
