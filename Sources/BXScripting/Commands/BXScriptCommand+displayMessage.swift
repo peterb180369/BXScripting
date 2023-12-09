@@ -19,14 +19,14 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 	/// Creates a command that displays a text message in the specified window.
 
 //	public static func displayMessage(_ message:String, in window:NSWindow?, at position:CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), pointerWithLength:CGFloat? = nil) -> BXScriptCommand
-	public static func displayMessage(_ message:String, in window:NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), pointerWithLength:CGFloat? = nil) -> BXScriptCommand
+	public static func displayMessage(_ message:String, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), pointerWithLength:CGFloat? = nil) -> BXScriptCommand
 	{
 		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, pointerLength:pointerWithLength)
 	}
 	
 	/// Creates a command that hides the text message in the specified window.
 
-	public static func hideMessage(in window:NSWindow?) -> BXScriptCommand
+	public static func hideMessage(in window:@escaping @autoclosure ()->NSWindow?) -> BXScriptCommand
 	{
 		BXScriptCommand_displayMessage(message:nil, window:window, position:{.zero})
 	}
@@ -41,7 +41,7 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandCancellable
 {
 	var message:String? = nil
-	var window:NSWindow? = nil
+	var window:(()->NSWindow?)? = nil
 	var position:()->CGPoint
 	var backgroundPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:72, bottom:12, right:72)
 	var pointerLength:CGFloat? = nil
@@ -58,6 +58,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 			{
 				if let message = message
 				{
+					let window = self.window?()
 					window?.contentView?.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
 					self.updateTextLayer(with:message)
 				}
@@ -80,7 +81,8 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	
 	private func updateTextLayer(with message:String)
 	{
-		guard let view = window?.contentView else { return }
+		guard let window = self.window?() else { return }
+		guard let view = window.contentView else { return }
 
 //		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
 
@@ -234,7 +236,9 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	
 	private func cleanup()
 	{
-		guard let view = window?.contentView else { return }
+		guard let window = self.window?() else { return }
+		guard let view = window.contentView else { return }
+		
 		view.removeSublayer(named:Self.textLayerName)
 		view.removeSublayer(named:Self.backgroundLayerName)
 		view.removeSublayer(named:Self.shadowLayerName)

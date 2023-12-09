@@ -18,15 +18,14 @@ extension BXScriptCommand where Self == BXScriptCommand_displayImage
 {
 	/// Creates a command that displays an NSImage in the specified window.
 
-//	public static func displayImage(_ image:NSImage?, in window:NSWindow?, at position:CGPoint, animation:BXScriptCommand_displayImage.Animation = []) -> BXScriptCommand
-	public static func displayImage(_ image:NSImage?, in window:NSWindow?, at position:@escaping @autoclosure ()->CGPoint, animation:BXScriptCommand_displayImage.Animation = []) -> BXScriptCommand
+	public static func displayImage(_ image:NSImage?, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, animation:BXScriptCommand_displayImage.Animation = []) -> BXScriptCommand
 	{
 		BXScriptCommand_displayImage(image:image, window:window, position:position, animation:animation)
 	}
 	
 	/// Creates a command that hides a NSImage in the specified window.
 
-	public static func hideImage(in window:NSWindow?) -> BXScriptCommand
+	public static func hideImage(in window:@escaping @autoclosure ()->NSWindow?) -> BXScriptCommand
 	{
 		BXScriptCommand_displayImage(image:nil, window:window, position:{.zero}, animation:[])
 	}
@@ -41,7 +40,7 @@ extension BXScriptCommand where Self == BXScriptCommand_displayImage
 public struct BXScriptCommand_displayImage : BXScriptCommand, BXScriptCommandCancellable
 {
 	var image:NSImage? = nil
-	var window:NSWindow? = nil
+	var window:(()->NSWindow?)? = nil
 	var position:()->CGPoint
 	var animation:Animation = []
 	
@@ -95,7 +94,8 @@ public struct BXScriptCommand_displayImage : BXScriptCommand, BXScriptCommandCan
 	
 	private func addImageLayer(with image:NSImage, position:CGPoint)
 	{
-		guard let view = window?.contentView else { return }
+		guard let window = self.window?() else { return }
+		guard let view = window.contentView else { return }
 		guard let layer = view.layer else { return }
 		
 		let imageLayer = CALayer()
@@ -127,7 +127,8 @@ public struct BXScriptCommand_displayImage : BXScriptCommand, BXScriptCommandCan
 	
 	private func removeImageLayer()
 	{
-		guard let view = window?.contentView else { return }
+		guard let window = self.window?() else { return }
+		guard let view = window.contentView else { return }
 		view.removeSublayer(named:sublayerName)
 	}
 	

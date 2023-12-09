@@ -19,7 +19,7 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteView
 {
 	/// Creates a command that shows or hides a highlight on the view with the specified identifier. You can also supply an optional view label.
 
-	public static func hiliteView(withID id:String, visible:Bool = true, label:String? = nil, in window:NSWindow?) -> BXScriptCommand
+	public static func hiliteView(withID id:String, visible:Bool = true, label:String? = nil, in window:@escaping @autoclosure ()->NSWindow?) -> BXScriptCommand
 	{
 		BXScriptCommand_hiliteView(id:id, visible:visible, label:label, window:window)
 	}
@@ -36,7 +36,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	var id:String
 	var visible:Bool
 	var label:String?
-	var window:NSWindow? = nil
+	var window:(()->NSWindow?)? = nil
 	
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
@@ -68,7 +68,8 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	
 	private func addHilite()
 	{
-		guard let view = window?.contentView?.subviewWithIdentifier(id) else { return }
+		guard let window = self.window?() else { return }
+		guard let view = window.contentView?.subviewWithIdentifier(id) else { return }
 		guard let layer = view.layer else { return }
 		let bounds = view.bounds
 	
@@ -110,10 +111,11 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 
 	private func removeHilite()
 	{
-		guard let view = window?.contentView?.subviewWithIdentifier(id) else { return }
+		guard let window = self.window?() else { return }
+		guard let view = window.contentView?.subviewWithIdentifier(id) else { return }
 		view.removeSublayer(named:frameLayerName)
 		view.removeSublayer(named:labelLayerName)
-		window?.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
+		window.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
 	}
 
 

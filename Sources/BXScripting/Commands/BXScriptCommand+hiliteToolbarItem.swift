@@ -18,7 +18,7 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteToolbarItem
 {
 	/// Creates a command that shows or hides a highlight on the view with the specified identifier. You can also supply an optional view label.
 
-	public static func hiliteToolbarItem(withID id:String, visible:Bool = true, in window:NSWindow?) -> BXScriptCommand
+	public static func hiliteToolbarItem(withID id:String, visible:Bool = true, in window:@escaping @autoclosure ()->NSWindow?) -> BXScriptCommand
 	{
 		BXScriptCommand_hiliteToolbarItem(id:id, visible:visible, window:window)
 	}
@@ -34,7 +34,7 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 {
 	var id:String
 	var visible:Bool
-	var window:NSWindow? = nil
+	var window:(()->NSWindow?)? = nil
 	
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
@@ -48,7 +48,8 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 			
 			if visible
 			{
-				guard let view = window?.toolbarItemView(withIdentifier:id) else { return }
+				guard let window = self.window?() else { return }
+				guard let view = window.toolbarItemView(withIdentifier:id) else { return }
 				guard let layer = view.layer else { return }
 				let bounds = view.bounds
 			
@@ -81,9 +82,10 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 
 	private func cleanup()
 	{
-		guard let view = window?.toolbarItemView(withIdentifier:id) else { return }
+		guard let window = self.window?() else { return }
+		guard let view = window.toolbarItemView(withIdentifier:id) else { return }
 		view.removeSublayer(named:frameLayerName)
-		window?.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
+		window.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
 	}
 
 

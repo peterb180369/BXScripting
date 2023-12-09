@@ -18,7 +18,7 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessageIcon
 {
 	/// Creates a command that displays an icon next to the text message in the specified window.
 
-	public static func displayMessageIcon(_ icon:NSImage? = nil, in window:NSWindow?, position:BXScriptCommand_displayMessageIcon.Position = .left) -> BXScriptCommand
+	public static func displayMessageIcon(_ icon:NSImage? = nil, in window:@escaping @autoclosure ()->NSWindow?, position:BXScriptCommand_displayMessageIcon.Position = .left) -> BXScriptCommand
 	{
 		BXScriptCommand_displayMessageIcon(icon:icon, window:window, position:position)
 	}
@@ -33,7 +33,7 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessageIcon
 public struct BXScriptCommand_displayMessageIcon : BXScriptCommand, BXScriptCommandCancellable
 {
 	var icon:NSImage? = nil
-	var window:NSWindow? = nil
+	var window:(()->NSWindow?)? = nil
 	var position:Position = .left
 	
 	public var queue:DispatchQueue = .main
@@ -82,7 +82,8 @@ public struct BXScriptCommand_displayMessageIcon : BXScriptCommand, BXScriptComm
 
 	private func setIcon(_ icon:NSImage)
 	{
-		guard let view = window?.contentView else { return }
+		guard let window = self.window?() else { return }
+		guard let view = window.contentView else { return }
 		guard let layer = view.layer else { return }
 		guard let textLayer = view.sublayer(named:BXScriptCommand_displayMessage.textLayerName) as? CATextLayer else { return }
 
@@ -121,7 +122,8 @@ public struct BXScriptCommand_displayMessageIcon : BXScriptCommand, BXScriptComm
 	
 	private func removeIcon()
 	{
-		guard let view = window?.contentView else { return }
+		guard let window = self.window?() else { return }
+		guard let view = window.contentView else { return }
 		view.removeSublayer(named:Self.sublayerName)
 	}
 	
