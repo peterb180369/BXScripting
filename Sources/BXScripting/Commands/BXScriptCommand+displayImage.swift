@@ -18,16 +18,17 @@ extension BXScriptCommand where Self == BXScriptCommand_displayImage
 {
 	/// Creates a command that displays an NSImage in the specified window.
 
-	public static func displayImage(_ image:NSImage?, in window:NSWindow?, at position:CGPoint, options:BXScriptCommand_displayImage.AnimationOptions = []) -> BXScriptCommand
+//	public static func displayImage(_ image:NSImage?, in window:NSWindow?, at position:CGPoint, animation:BXScriptCommand_displayImage.Animation = []) -> BXScriptCommand
+	public static func displayImage(_ image:NSImage?, in window:NSWindow?, at position:@escaping @autoclosure ()->CGPoint, animation:BXScriptCommand_displayImage.Animation = []) -> BXScriptCommand
 	{
-		BXScriptCommand_displayImage(image:image, window:window, position:position, options:options)
+		BXScriptCommand_displayImage(image:image, window:window, position:position, animation:animation)
 	}
 	
 	/// Creates a command that hides a NSImage in the specified window.
 
 	public static func hideImage(in window:NSWindow?) -> BXScriptCommand
 	{
-		BXScriptCommand_displayImage(image:nil, window:window, position:.zero, options:[])
+		BXScriptCommand_displayImage(image:nil, window:window, position:{.zero}, animation:[])
 	}
 }
 
@@ -41,25 +42,30 @@ public struct BXScriptCommand_displayImage : BXScriptCommand, BXScriptCommandCan
 {
 	var image:NSImage? = nil
 	var window:NSWindow? = nil
-	var position:CGPoint
-	var options:AnimationOptions = []
+	var position:()->CGPoint
+	var animation:Animation = []
 	
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
 	public weak var scriptEngine:BXScriptEngine? = nil
 	
-	public struct AnimationOptions: OptionSet
+	public struct Animation: OptionSet
 	{
 		public let rawValue: Int
 		public init(rawValue: Int) { self.rawValue = rawValue }
 		
-		public static let pulse = AnimationOptions(rawValue: 1 << 0)
-		public static let scale = AnimationOptions(rawValue: 1 << 1)
-		public static let wiggle = AnimationOptions(rawValue: 1 << 2)
-		public static let all: AnimationOptions = [.pulse,.scale,.wiggle]
+		public static let pulse = Animation(rawValue: 1 << 0)
+		public static let scale = Animation(rawValue: 1 << 1)
+		public static let wiggle = Animation(rawValue: 1 << 2)
+		public static let all: Animation = [.pulse,.scale,.wiggle]
 	}
 
-
+	public enum Options
+	{
+		case background
+		case pointer(length:CGFloat)
+	}
+	
 	public func execute()
 	{
 		self.queue.async
@@ -68,7 +74,7 @@ public struct BXScriptCommand_displayImage : BXScriptCommand, BXScriptCommandCan
 			{
 				if let image = image
 				{
-					self.addImageLayer(with:image, position:position)
+					self.addImageLayer(with:image, position:position())
 				}
 				else
 				{
@@ -101,17 +107,17 @@ public struct BXScriptCommand_displayImage : BXScriptCommand, BXScriptCommandCan
 		imageLayer.zPosition = 1000
 		layer.addSublayer(imageLayer)
 		
-		if options.contains(.pulse)
+		if animation.contains(.pulse)
 		{
 			imageLayer.addPulseAnimation()
 		}
 		
-		if options.contains(.scale)
+		if animation.contains(.scale)
 		{
 			imageLayer.addScaleAnimation()
 		}
 		
-		if options.contains(.wiggle)
+		if animation.contains(.wiggle)
 		{
 			imageLayer.addWiggleAnimation()
 		}
