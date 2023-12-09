@@ -36,6 +36,9 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// MARK: -
+
+
 /// This command displays a text message at the bottom of a window.
 
 public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandCancellable
@@ -97,18 +100,61 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		
 		// Determine correct layout properties depending on position within the view
 		
-		let p = position()
+		let pos = position()
 		let bounds = view.bounds //.insetBy(dx:64, dy:64)
 		let padding = backgroundPadding ?? NSEdgeInsets()
 		let margin = pointerLength ?? 0.0
 		let cornerRadius:CGFloat = 12.0
 		let lineWidth:CGFloat = 3.0
-		let alignmentMode = CATextLayerAlignmentMode.center
-		
-		let anchorPoint = self.anchorPoint(for:bounds, position:p)
-		let autoresizingMask = self.autoresizingMask(for:bounds, position:p)
-		let position = self.adjustPosition(for:bounds, position:p, t:margin+padding.top, l:margin+padding.left, b:margin+padding.bottom, r:margin+padding.right)
+		let anchorPoint = self.anchorPoint(for:bounds, position:pos)
+		let autoresizingMask = self.autoresizingMask(for:bounds, position:pos)
+		let position = self.adjustPosition(for:bounds, position:pos, t:margin+padding.top, l:margin+padding.left, b:margin+padding.bottom, r:margin+padding.right)
 
+		// Create and update a CATextLayer to display the message
+		
+		self.updateTextLayer(with:text, in:view, position:position, anchorPoint:anchorPoint, autoresizingMask:autoresizingMask)
+
+		// Create and update various other sublayers to display a frosted glass background and an optional pointer line
+		
+		self.updateBackgroundLayer(in:view, padding:padding, cornerRadius:cornerRadius)
+		self.updatePointerLayer(in:view, bounds:bounds, position:position, margin:margin, lineWidth:lineWidth)
+		self.updateShadowLayer(in:view)
+	}
+	
+	
+	private func cleanup()
+	{
+		guard let window = self.window?() else { return }
+		guard let view = window.contentView else { return }
+		
+		view.removeSublayer(named:Self.textLayerName)
+		view.removeSublayer(named:Self.backgroundLayerName)
+		view.removeSublayer(named:Self.shadowLayerName)
+		view.removeSublayer(named:Self.pointerLayerName)
+		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
+	}
+	
+
+	static let textLayerName = "\(Self.self).textLayer"
+	static let backgroundLayerName = "\(Self.self).backgroundLayer"
+	static let shadowLayerName = "\(Self.self).shadowLayer"
+	static let pointerLayerName = "\(Self.self).pointerLayer"
+	static let hiliteLayerName = "\(Self.self).hiliteLayer"
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: -
+
+
+extension BXScriptCommand_displayMessage
+{
+	/// Creates/Updates a CATextLayer with the specified text and layout parameters
+		
+	func updateTextLayer(with text:NSAttributedString, in view:NSView, position:CGPoint, anchorPoint:CGPoint, autoresizingMask:CAAutoresizingMask)
+	{
 		// Create a CATextLayer to display the message
 		
 		let textLayer:CATextLayer = view.createSublayer(named:Self.textLayerName)
@@ -123,6 +169,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 			return newLayer
 		}
 		
+
 		textLayer.string = text
 		textLayer.alignmentMode = alignmentMode
 
@@ -133,8 +180,14 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		
 //		textLayer.borderColor = NSColor.gray.cgColor
 //		textLayer.borderWidth = 1.0
-
-		// Create a background CALayer for the message text
+	}
+	
+	
+	/// Creates/Updates a background layer with a frosted glass look behind the CATextLayer
+		
+	func updateBackgroundLayer(in view:NSView, padding:NSEdgeInsets, cornerRadius:CGFloat)
+	{
+		guard let textLayer = view.sublayer(named:Self.textLayerName) as? CATextLayer else { return }
 		
 		if backgroundPadding != nil
 		{
@@ -184,78 +237,76 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		{
 			view.removeSublayer(named:Self.backgroundLayerName)
 		}
-
-//		let shadowLayer:CALayer = view.createSublayer(named:Self.shadowLayerName)
-//		{
-//			let newLayer = CALayer()
-//			newLayer.zPosition = 998
-//			newLayer.backgroundColor = CGColor(gray:0.0, alpha:0.25)
-//			newLayer.shadowColor = NSColor.black.cgColor
-//			newLayer.shadowOpacity = 4.0
-//			newLayer.shadowOffset = CGSize(0,-5)
-//			newLayer.shadowRadius = 5
-//
-//			if let compositing = CIFilter(name:"CIDarkenBlendMode")
-//			{
-//				newLayer.compositingFilter = compositing
-//			}
-//			
-//			return newLayer
-//		}
-//
-//		shadowLayer.bounds = backgroundLayer.bounds
-//		shadowLayer.position = backgroundLayer.position
-//		shadowLayer.cornerRadius = 12
-
-		if pointerLength != nil, let backgroundLayer = view.sublayer(named:Self.backgroundLayerName)
-		{
-			let lineLayer:CALayer = view.createSublayer(named:Self.pointerLayerName)
-			{
-				let newLayer = CALayer()
-				newLayer.zPosition = 995
-				return newLayer
-			}
-		
-			let frame = backgroundLayer.frame
-			let inner = frame.safeInsetBy(dx:margin, dy:margin)
-			let outer = frame.insetBy(dx:-margin, dy:-margin)
-			let (p1,p2) = self.pointer(for:bounds, position:position, inner:inner, outer:outer)
-			let lineLength = (p2-p1).length + lineWidth
-			let dx =  p2.x - p1.x
-			let dy =  p2.y - p1.y
-			let angle = atan2(dy,dx)
-			let color:NSColor = BXScriptEnvironment.shared[.hiliteStrokeColorKey] ?? .white
-
-			lineLayer.backgroundColor = color.cgColor
-			lineLayer.bounds = CGRect(x:0, y:0, width:lineLength, height:lineWidth)
-			lineLayer.anchorPoint = CGPoint(0,0.5)
-			lineLayer.transform = CATransform3DMakeRotation(angle,0,0,1)
-			lineLayer.position = p1
-		}
 	}
 	
 	
-	private func cleanup()
+	/// Creates/Updates a CALayer that draws a shadow for the frosted glass background
+		
+	func updateShadowLayer(in view:NSView)
 	{
-		guard let window = self.window?() else { return }
-		guard let view = window.contentView else { return }
-		
-		view.removeSublayer(named:Self.textLayerName)
-		view.removeSublayer(named:Self.backgroundLayerName)
-		view.removeSublayer(named:Self.shadowLayerName)
-		view.removeSublayer(named:Self.pointerLayerName)
-		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
+		guard let backgroundLayer = view.sublayer(named:Self.backgroundLayerName) else { return }
+
+		let shadowLayer:CALayer = view.createSublayer(named:Self.shadowLayerName)
+		{
+			let newLayer = CALayer()
+			newLayer.zPosition = 998
+			newLayer.backgroundColor = CGColor(gray:0.0, alpha:0.25)
+			newLayer.shadowColor = NSColor.black.cgColor
+			newLayer.shadowOpacity = 4.0
+			newLayer.shadowOffset = CGSize(0,-5)
+			newLayer.shadowRadius = 5
+
+			if let compositing = CIFilter(name:"CIDarkenBlendMode")
+			{
+				newLayer.compositingFilter = compositing
+			}
+			
+			return newLayer
+		}
+
+		shadowLayer.bounds = backgroundLayer.bounds
+		shadowLayer.position = backgroundLayer.position
+		shadowLayer.cornerRadius = 12
 	}
 	
+	
+	/// Creates/Updates a CALayer that draws a line from the glass background to the specified position
+		
+	func updatePointerLayer(in view:NSView, bounds:CGRect, position:CGPoint, margin:CGFloat, lineWidth:CGFloat)
+	{
+		guard pointerLength != nil else { return }
+		guard let backgroundLayer = view.sublayer(named:Self.backgroundLayerName) else { return }
+		
+		let lineLayer:CALayer = view.createSublayer(named:Self.pointerLayerName)
+		{
+			let newLayer = CALayer()
+			newLayer.zPosition = 995
+			return newLayer
+		}
+	
+		let frame = backgroundLayer.frame
+		let inner = frame.safeInsetBy(dx:margin, dy:margin)
+		let outer = frame.insetBy(dx:-margin, dy:-margin)
+		let (p1,p2) = self.pointer(for:bounds, position:position, inner:inner, outer:outer)
+		let lineLength = (p2-p1).length + lineWidth
+		let dx =  p2.x - p1.x
+		let dy =  p2.y - p1.y
+		let angle = atan2(dy,dx)
+		let color:NSColor = BXScriptEnvironment.shared[.hiliteStrokeColorKey] ?? .white
 
-	static let textLayerName = "\(Self.self).textLayer"
-	static let backgroundLayerName = "\(Self.self).backgroundLayer"
-	static let shadowLayerName = "\(Self.self).shadowLayer"
-	static let pointerLayerName = "\(Self.self).pointerLayer"
+		lineLayer.backgroundColor = color.cgColor
+		lineLayer.bounds = CGRect(x:0, y:0, width:lineLength, height:lineWidth)
+		lineLayer.anchorPoint = CGPoint(0,0.5)
+		lineLayer.transform = CATransform3DMakeRotation(angle,0,0,1)
+		lineLayer.position = p1
+	}
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: -
 
 
 /// The window is divided into 9 sectors like this:
