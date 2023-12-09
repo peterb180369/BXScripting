@@ -8,8 +8,8 @@
 
 
 import AppKit
-import Accessibility
-import Darwin
+//import Accessibility
+//import Darwin
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -127,102 +127,100 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 //----------------------------------------------------------------------------------------------------------------------
 
 
-class AccessibilityHelper
-{
-    
-    static func applicationElement() -> AXUIElement
-    {
-//		let pid = ProcessInfo.processInfo.processIdentifier
-		let pid = getpid()
-		let application = AXUIElementCreateApplication(pid)
-		return application
-    }
-    
-    
-    static func findElement(by identifier:String, in element:AXUIElement = applicationElement()) -> AXUIElement?
-    {
-		// Get the identifier of the current element and check if it matches the one we are looking for
-		
-		var elementIdentifier:CFTypeRef? = nil
-		AXUIElementCopyAttributeValue(element, kAXIdentifierAttribute as CFString, &elementIdentifier)
-print("ELEMENT IDENTIFIER = \(elementIdentifier)")
-
-		if let elementIdentifier = elementIdentifier as? String, elementIdentifier == identifier
-		{
-print("\n\nFOUND ELEMENT = \(element)\n\n")
-			return element
-		}
-
-		// Otherwise get the children of the current element
-
-        var attribute:CFTypeRef? = nil
-        let result = AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &attribute)
-        guard result == .success else { return nil }
-        guard let children = attribute as? [AXUIElement] else { return nil }
-
-		// Descend recursively into all children and look for the element with the desired ID
-		
-        for child in children
-        {
-            var childIdentifier:CFTypeRef? = nil
-            AXUIElementCopyAttributeValue(child, kAXIdentifierAttribute as CFString, &childIdentifier)
-            
-            if let found = self.findElement(by:identifier, in:child)
-            {
-				return found
-            }
-        }
-        
-        return nil
-    }
-
-
-	static func parentWindow(of element: AXUIElement) -> AXUIElement?
-	{
- 		var result:AXError
-        var currentElement = element
-
-        while true
-        {
-            var parent:CFTypeRef?
-            result = AXUIElementCopyAttributeValue(currentElement, kAXParentAttribute as CFString, &parent)
-            
-			guard result == .success else { return nil }
-			guard parent == nil else { return nil }
-			let parentElement = parent as! AXUIElement
-			
-			var role:CFTypeRef?
-			result = AXUIElementCopyAttributeValue(parentElement, kAXRoleAttribute as CFString, &role)
-
-			if let role = role as? String, role == kAXWindowRole as String
-			{
-				return parentElement
-            }
-
-			currentElement = parentElement
-        }
-    }
-    
-    
-	static func getFrame(of element:AXUIElement) -> CGRect?
-    {
- 		var result:AXError
-        var type:CFTypeRef? = nil
-		
-		var origin:CGPoint = .zero
-        result = AXUIElementCopyAttributeValue(element, kAXPositionAttribute as CFString, &type)
-        guard result == .success else { return nil }
-        AXValueGetValue(type as! AXValue, AXValueType.cgPoint, &origin)
-        
-        var size = CGSize()
-        result = AXUIElementCopyAttributeValue(element, kAXSizeAttribute as CFString, &type)
-        guard result == .success else { return nil }
-		AXValueGetValue(origin as! AXValue, AXValueType.cgSize, &size)
-		
-		return CGRect(origin:origin, size:size)
-    }
-
-}
+//class AccessibilityHelper
+//{
+//    
+//    static func applicationElement() -> AXUIElement
+//    {
+////		let pid = ProcessInfo.processInfo.processIdentifier
+//		let pid = getpid()
+//		let application = AXUIElementCreateApplication(pid)
+//		return application
+//    }
+//    
+//    
+//    static func findElement(by identifier:String, in element:AXUIElement = applicationElement()) -> AXUIElement?
+//    {
+//		// Get the identifier of the current element and check if it matches the one we are looking for
+//		
+//		var elementIdentifier:CFTypeRef? = nil
+//		AXUIElementCopyAttributeValue(element, kAXIdentifierAttribute as CFString, &elementIdentifier)
+//
+//		if let elementIdentifier = elementIdentifier as? String, elementIdentifier == identifier
+//		{
+//			return element
+//		}
+//
+//		// Otherwise get the children of the current element
+//
+//        var attribute:CFTypeRef? = nil
+//        let result = AXUIElementCopyAttributeValue(element, kAXChildrenAttribute as CFString, &attribute)
+//        guard result == .success else { return nil }
+//        guard let children = attribute as? [AXUIElement] else { return nil }
+//
+//		// Descend recursively into all children and look for the element with the desired ID
+//		
+//        for child in children
+//        {
+//            var childIdentifier:CFTypeRef? = nil
+//            AXUIElementCopyAttributeValue(child, kAXIdentifierAttribute as CFString, &childIdentifier)
+//            
+//            if let found = self.findElement(by:identifier, in:child)
+//            {
+//				return found
+//            }
+//        }
+//        
+//        return nil
+//    }
+//
+//
+//	static func parentWindow(of element: AXUIElement) -> AXUIElement?
+//	{
+// 		var result:AXError
+//        var currentElement = element
+//
+//        while true
+//        {
+//            var parent:CFTypeRef?
+//            result = AXUIElementCopyAttributeValue(currentElement, kAXParentAttribute as CFString, &parent)
+//            
+//			guard result == .success else { return nil }
+//			guard parent == nil else { return nil }
+//			let parentElement = parent as! AXUIElement
+//			
+//			var role:CFTypeRef?
+//			result = AXUIElementCopyAttributeValue(parentElement, kAXRoleAttribute as CFString, &role)
+//
+//			if let role = role as? String, role == kAXWindowRole as String
+//			{
+//				return parentElement
+//            }
+//
+//			currentElement = parentElement
+//        }
+//    }
+//    
+//    
+//	static func getFrame(of element:AXUIElement) -> CGRect?
+//    {
+// 		var result:AXError
+//        var type:CFTypeRef? = nil
+//		
+//		var origin:CGPoint = .zero
+//        result = AXUIElementCopyAttributeValue(element, kAXPositionAttribute as CFString, &type)
+//        guard result == .success else { return nil }
+//        AXValueGetValue(type as! AXValue, AXValueType.cgPoint, &origin)
+//        
+//        var size = CGSize()
+//        result = AXUIElementCopyAttributeValue(element, kAXSizeAttribute as CFString, &type)
+//        guard result == .success else { return nil }
+//		AXValueGetValue(origin as! AXValue, AXValueType.cgSize, &size)
+//		
+//		return CGRect(origin:origin, size:size)
+//    }
+//
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
