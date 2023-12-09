@@ -64,7 +64,7 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 				frameLayer.position = bounds.center
 				frameLayer.borderColor = strokeColor.cgColor
 				frameLayer.backgroundColor = fillColor.cgColor
-				frameLayer.borderWidth = 2
+				frameLayer.borderWidth = 3
 				frameLayer.zPosition = 1000
 			}
 			else
