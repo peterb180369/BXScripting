@@ -52,8 +52,6 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 			{
 				guard let window = self.window() else { return }
 				guard let view = window.toolbarItemView(withIdentifier:id) else { return }
-				guard let layer = view.layer else { return }
-				let bounds = view.bounds
 
 				let frameLayer:CALayer = view.createSublayer(named:frameLayerName)
 				{
@@ -63,6 +61,7 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 				guard let environment = scriptEngine?.environment else { return }
 				let strokeColor:NSColor = environment[.hiliteStrokeColorKey] ?? .systemYellow
 				let fillColor:NSColor = environment[.hiliteFillColorKey] ?? .systemYellow.withAlphaComponent(0.1)
+				let bounds = view.bounds
 
 				frameLayer.bounds = bounds.insetBy(dx:inset, dy:inset)
 				frameLayer.position = bounds.center
