@@ -43,7 +43,20 @@ extension NSWindow
 	
     public func subviewWithIdentifier(_ identifier:String) -> NSView?
     {
-		self.contentView?.subviewWithIdentifier(identifier)
+		if let subview = self.contentView?.subviewWithIdentifier(identifier)
+		{
+			return subview
+		}
+		
+		for childWindow in self.childWindows ?? []
+		{
+			if let subview = childWindow.contentView?.subviewWithIdentifier(identifier)
+			{
+				return subview
+			}
+		}
+		
+		return nil
     }
 }
 
