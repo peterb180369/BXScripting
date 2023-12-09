@@ -19,9 +19,9 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 	/// Creates a command that displays a text message in the specified window.
 
 //	public static func displayMessage(_ message:String, in window:NSWindow?, at position:CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), pointerWithLength:CGFloat? = nil) -> BXScriptCommand
-	public static func displayMessage(_ message:String, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), pointerWithLength:CGFloat? = nil) -> BXScriptCommand
+	public static func displayMessage(_ message:@escaping @autoclosure ()->String, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
 	{
-		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, pointerLength:pointerWithLength)
+		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
 	}
 	
 	/// Creates a command that hides the text message in the specified window.
@@ -40,11 +40,12 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 
 public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandCancellable
 {
-	var message:String? = nil
+	var message:(()->String)? = nil
 	var window:(()->NSWindow?)? = nil
 	var position:()->CGPoint
 	var backgroundPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:72, bottom:12, right:72)
 	var pointerLength:CGFloat? = nil
+	var alignmentMode:CATextLayerAlignmentMode = .center
 	
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
@@ -60,7 +61,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 				{
 					let window = self.window?()
 					window?.contentView?.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
-					self.updateTextLayer(with:message)
+					self.updateTextLayer(with:message())
 				}
 				else
 				{
@@ -102,7 +103,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		let margin = pointerLength ?? 0.0
 		let cornerRadius:CGFloat = 12.0
 		let lineWidth:CGFloat = 3.0
-		let alignmentMode = CATextLayerAlignmentMode.left
+		let alignmentMode = CATextLayerAlignmentMode.center
 		
 		let anchorPoint = self.anchorPoint(for:bounds, position:p)
 		let autoresizingMask = self.autoresizingMask(for:bounds, position:p)
