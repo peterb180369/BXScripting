@@ -62,8 +62,8 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 			{
 				if let message = message()
 				{
-					self.window()?.contentView?.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
-					self.updateTextLayer(with:message)
+					self.prepareForUpdates()
+					self.updateLayers(with:message)
 				}
 				else
 				{
@@ -76,13 +76,15 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	}
 	
 	
-	public func cancel()
+	private func prepareForUpdates()
 	{
-		self.cleanup()
+		guard let view = self.window()?.contentView else { return }
+		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName) // Remove previous message icon
+		view.removeSublayer(named:BXScriptCommand_hiliteMessage.hiliteLayerName) 	// Remove previous hilite
 	}
 	
 	
-	private func updateTextLayer(with message:String)
+	private func updateLayers(with message:String)
 	{
 		guard let window = self.window() else { return }
 		guard let view = window.contentView else { return }
@@ -121,6 +123,12 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	}
 	
 	
+	public func cancel()
+	{
+		self.cleanup()
+	}
+	
+	
 	private func cleanup()
 	{
 		guard let window = self.window() else { return }
@@ -130,7 +138,9 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		view.removeSublayer(named:Self.backgroundLayerName)
 		view.removeSublayer(named:Self.shadowLayerName)
 		view.removeSublayer(named:Self.pointerLayerName)
+		
 		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
+		view.removeSublayer(named:BXScriptCommand_hiliteMessage.hiliteLayerName)
 	}
 	
 
@@ -138,7 +148,6 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	static let backgroundLayerName = "\(Self.self).backgroundLayer"
 	static let shadowLayerName = "\(Self.self).shadowLayer"
 	static let pointerLayerName = "\(Self.self).pointerLayer"
-	static let hiliteLayerName = "\(Self.self).hiliteLayer"
 }
 
 
@@ -193,7 +202,7 @@ extension BXScriptCommand_displayMessage
 			let backgroundLayer:CALayer = view.createSublayer(named:Self.backgroundLayerName)
 			{
 				let newLayer = CALayer()
-				newLayer.zPosition = 999
+				newLayer.zPosition = 990
 
 				newLayer.backgroundColor = CGColor(gray:0.4, alpha:0.9)
 				newLayer.borderColor = CGColor(gray:1, alpha:0.35)
@@ -251,7 +260,7 @@ extension BXScriptCommand_displayMessage
 		let shadowLayer:CALayer = view.createSublayer(named:Self.shadowLayerName)
 		{
 			let newLayer = CALayer()
-			newLayer.zPosition = 998
+			newLayer.zPosition = 980
 			newLayer.backgroundColor = CGColor(gray:0.0, alpha:0.25)
 			newLayer.shadowColor = NSColor.black.cgColor
 			newLayer.shadowOpacity = 4.0
@@ -282,7 +291,7 @@ extension BXScriptCommand_displayMessage
 		let pointerLayer:CAGradientLayer = view.createSublayer(named:Self.pointerLayerName)
 		{
 			let newLayer = CAGradientLayer()
-			newLayer.zPosition = 995
+			newLayer.zPosition = 970
 			return newLayer
 		}
 	
