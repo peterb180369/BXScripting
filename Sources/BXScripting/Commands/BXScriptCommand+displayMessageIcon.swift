@@ -104,12 +104,12 @@ public struct BXScriptCommand_displayMessageIcon : BXScriptCommand, BXScriptComm
 		if position == .left
 		{
 			iconPos = textFrame.left
-			iconPos.x -= 14 + 0.5 * size.width
+			iconPos.x -= 6 + 0.5 * size.width
 		}
 		else
 		{
 			iconPos = textFrame.right
-			iconPos.x += 14 + 0.5 * size.width
+			iconPos.x += 6 + 0.5 * size.width
 		}
 		
 
