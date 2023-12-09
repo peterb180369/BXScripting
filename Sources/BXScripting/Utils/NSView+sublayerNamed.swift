@@ -15,6 +15,16 @@ import AppKit
 
 extension NSView
 {
+	/// Checks if a sublayer with the specified name already exists. If not it will be created with the supplied createClosure.
+	
+	public func createSublayer<L:CALayer>(named name:String, createClosure:()->L) -> L
+	{
+		let sublayer = (self.sublayer(named:name) as? L) ?? createClosure()
+		sublayer.name = name
+		self.layer?.addSublayer(sublayer)
+		return sublayer
+	}
+
 	/// Returns the sublayer with the specified name
 	
 	public func sublayer(named:String) -> CALayer?
