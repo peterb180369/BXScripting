@@ -32,6 +32,14 @@ extension CGPoint
 	{
 		l = CGPoint(x:l.x+r.x,y:l.y+r.y)
 	}
+
+	/// Returns the length of a vector
+	
+	var length: CGFloat
+	{
+		return sqrt(self.x*self.x + self.y*self.y)
+	}
+	
 }
 
 
