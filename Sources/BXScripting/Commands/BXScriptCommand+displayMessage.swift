@@ -18,7 +18,7 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 	/// Creates a command that displays a text message in the specified window.
 
 //	public static func displayMessage(_ message:String, in window:NSWindow?, at position:CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), pointerWithLength:CGFloat? = nil) -> BXScriptCommand
-	public static func displayMessage(_ message:@escaping @autoclosure ()->String, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
+	public static func displayMessage(_ message:@escaping @autoclosure ()->String, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
 	{
 		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
 	}
@@ -98,6 +98,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
 		let attributes:[NSAttributedString.Key:Any] = [ .font:font, .foregroundColor:textColor.cgColor ]
 		let text = NSAttributedString(string:message, attributes:attributes)
+		let size = text.size()
 		let showsBackground = backgroundPadding != nil
 		
 		// Determine correct layout properties depending on position within the view
@@ -109,7 +110,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		let lineWidth:CGFloat = 3.0
 		let anchorPoint = Self.anchorPoint(for:bounds, position:pos)
 		let autoresizingMask = Self.autoresizingMask(for:bounds, position:pos)
-		let position = Self.adjustPosition(for:bounds, position:pos, t:margin+padding.top, l:margin+padding.left, b:margin+padding.bottom, r:margin+padding.right)
+		let position = Self.adjustPosition(for:bounds, position:pos, size:size, t:margin+padding.top, l:margin+padding.left, b:margin+padding.bottom, r:margin+padding.right)
 		
 		// Create and update a CATextLayer to display the message
 		
@@ -345,35 +346,37 @@ extension BXScriptCommand_displayMessage
 	
 	static func anchorPoint(for bounds:CGRect, position:CGPoint) -> CGPoint
 	{
-		var anchorPoint = CGPoint.zero
-
-		if position.x < bounds.width*0.33
-		{
-			anchorPoint.x = 0.0
-		}
-		else if position.x < bounds.width*0.66
-		{
-			anchorPoint.x = 0.5
-		}
-		else
-		{
-			anchorPoint.x = 1.0
-		}
-
-		if position.y < bounds.height*0.33
-		{
-			anchorPoint.y = 0.0
-		}
-		else if position.y < bounds.height*0.66
-		{
-			anchorPoint.y = 0.5
-		}
-		else
-		{
-			anchorPoint.y = 1.0
-		}
+		return CGPoint(0.5,0.5)
 		
-		return anchorPoint
+//		var anchorPoint = CGPoint.zero
+//
+//		if position.x < bounds.width*0.33
+//		{
+//			anchorPoint.x = 0.0
+//		}
+//		else if position.x < bounds.width*0.66
+//		{
+//			anchorPoint.x = 0.5
+//		}
+//		else
+//		{
+//			anchorPoint.x = 1.0
+//		}
+//
+//		if position.y < bounds.height*0.33
+//		{
+//			anchorPoint.y = 0.0
+//		}
+//		else if position.y < bounds.height*0.66
+//		{
+//			anchorPoint.y = 0.5
+//		}
+//		else
+//		{
+//			anchorPoint.y = 1.0
+//		}
+//		
+//		return anchorPoint
 	}
 
 
@@ -417,26 +420,26 @@ extension BXScriptCommand_displayMessage
 	
 	/// Adjusts position within the view bounds, with the specified padding values.
 	
-	static func adjustPosition(for bounds:CGRect, position:CGPoint, t:CGFloat, l:CGFloat, b:CGFloat, r:CGFloat) -> CGPoint
+	static func adjustPosition(for bounds:CGRect, position:CGPoint, size:CGSize, t:CGFloat, l:CGFloat, b:CGFloat, r:CGFloat) -> CGPoint
 	{
 		var position = position
 
 		if position.x < bounds.width*0.33
 		{
-			position.x += l
+			position.x += l + 0.5 * size.width
 		}
 		else if position.x > bounds.width*0.66
 		{
-			position.x -= r
+			position.x -= r + 0.5 * size.width
 		}
 
 		if position.y < bounds.height*0.33
 		{
-			position.y += b
+			position.y += b + 0.5 * size.height
 		}
 		else if position.y > bounds.height*0.66
 		{
-			position.y -= t
+			position.y -= t + 0.5 * size.height
 		}
 		
 		return position

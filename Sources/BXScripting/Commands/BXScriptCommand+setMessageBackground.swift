@@ -17,7 +17,7 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 {
 	/// Creates a command that displays a text message in the specified window.
 
-	public static func setMessageBackground(in window:@escaping @autoclosure ()->NSWindow?, padding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), cornerRadius:CGFloat = 12.0) -> BXScriptCommand
+	public static func setMessageBackground(in window:@escaping @autoclosure ()->NSWindow?, padding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0) -> BXScriptCommand
 	{
 		BXScriptCommand_setMessageBackground(window:window, backgroundPadding:padding, cornerRadius:cornerRadius)
 	}
