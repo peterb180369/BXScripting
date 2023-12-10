@@ -1,0 +1,129 @@
+//**********************************************************************************************************************
+//
+//  BXScriptCommand+displayLottie.swift
+//	Adds a displayLottie command to BXScriptCommand
+//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//
+//**********************************************************************************************************************
+
+
+import AppKit
+import Lottie
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+extension BXScriptCommand where Self == BXScriptCommand_displayImage
+{
+	/// Creates a command that displays an Lottie animation in the specified window.
+
+	public static func displayLottie(_ animation:LottieAnimation?, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, size:@escaping @autoclosure ()->CGSize) -> BXScriptCommand
+	{
+		BXScriptCommand_displayLottie(animation:animation, window:window, position:position, size:size)
+	}
+	
+	/// Creates a command that hides a Lottie animation in the specified window.
+
+	public static func hideLottie(in window:@escaping @autoclosure ()->NSWindow?) -> BXScriptCommand
+	{
+		BXScriptCommand_displayLottie(animation:nil, window:window, position:{.zero}, size:{.zero})
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+/// This command displays a text message at the bottom of a window.
+
+public struct BXScriptCommand_displayLottie : BXScriptCommand, BXScriptCommandCancellable
+{
+	var animation:LottieAnimation? = nil
+	var window:(()->NSWindow?)? = nil
+	var position:()->CGPoint
+	var size:()->CGSize
+	
+	public var queue:DispatchQueue = .main
+	public var completionHandler:(()->Void)? = nil
+	public weak var scriptEngine:BXScriptEngine? = nil
+	
+	public func execute()
+	{
+		self.queue.async
+		{
+			DispatchQueue.main.asyncIfNeeded
+			{
+				if let animation = animation
+				{
+					self.addLottieLayer(with:animation)
+				}
+				else
+				{
+					self.removeLottieLayer()
+				}
+				
+				self.completionHandler?()
+			}
+		}
+	}
+	
+	public func cancel()
+	{
+		self.removeLottieLayer()
+	}
+	
+	private func addLottieLayer(with animation:LottieAnimation)
+	{
+		guard let window = self.window?() else { return }
+		guard let view = window.contentView else { return }
+		
+		let lottieLayer:LottieAnimationLayer = view.createSublayer(named:Self.lottieLayerName)
+		{
+			let newLayer = LottieAnimationLayer(animation:animation)
+			newLayer.zPosition = 2000
+			newLayer.borderColor = NSColor.systemGreen.cgColor
+			newLayer.borderWidth = 1.0
+			return newLayer
+		}
+
+//		lottieLayer.animation = animation
+		lottieLayer.bounds = CGRect(origin:.zero, size:size())
+		lottieLayer.position = position()
+		
+		lottieLayer.play()
+		{
+			_ in self.removeLottieLayer()
+		}
+	}
+	
+	private func removeLottieLayer()
+	{
+		guard let window = self.window?() else { return }
+		guard let view = window.contentView else { return }
+		view.removeSublayer(named:Self.lottieLayerName)
+	}
+
+	static let lottieLayerName = "\(Self.self).lottieLayer"
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+//
+//@objc public class LottieAnimationLayer : CALayer {
+//
+//    /// Initializes a LottieAnimationLayer with an animation.
+//    public init(animation: Lottie.LottieAnimation?, imageProvider: Lottie.AnimationImageProvider? = nil, textProvider: Lottie.AnimationKeypathTextProvider = DefaultTextProvider(), fontProvider: Lottie.AnimationFontProvider = DefaultFontProvider(), configuration: Lottie.LottieConfiguration = .shared, logger: Lottie.LottieLogger = .shared)
+//
+//    /// Initializes an LottieAnimationLayer with a .lottie file.
+//    public init(dotLottie: Lottie.DotLottieFile?, animationId: String? = nil, textProvider: Lottie.AnimationKeypathTextProvider = DefaultTextProvider(), fontProvider: Lottie.AnimationFontProvider = DefaultFontProvider(), configuration: Lottie.LottieConfiguration = .shared, logger: Lottie.LottieLogger = .shared)
+//
+//    public init(configuration: Lottie.LottieConfiguration = .shared, logger: Lottie.LottieLogger = .shared)
+//
+//    /// Plays the animation from its current state to the end.
+//    ///
+//    /// - Parameter completion: An optional completion closure to be called when the animation completes playing.
+//    open func play(completion: Lottie.LottieCompletionBlock? = nil)
+//
+
