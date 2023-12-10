@@ -23,6 +23,13 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
 	}
 	
+	/// Creates a command that displays a styled text message in the specified window.
+	
+	public static func displayMessage(_ message:@escaping @autoclosure ()->NSAttributedString, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
+	{
+		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
+	}
+	
 	/// Creates a command that hides the text message in the specified window.
 
 	public static func hideMessage(in window:@escaping @autoclosure ()->NSWindow?) -> BXScriptCommand
@@ -42,7 +49,7 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 
 public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandCancellable
 {
-	var message:()->String?
+	var message:()->Any?
 	var window:()->NSWindow?
 	var position:()->CGPoint
 	var backgroundPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:72, bottom:12, right:72)
@@ -60,7 +67,18 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		{
 			DispatchQueue.main.asyncIfNeeded
 			{
-				if let message = message()
+				var message = message()
+				
+				if let string = message as? String
+				{
+					guard let environment = scriptEngine?.environment else { return }
+					let font = environment[.fontKey] ?? NSFont.boldSystemFont(ofSize:36)
+					let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
+					let attributes:[NSAttributedString.Key:Any] = [ .font:font, .foregroundColor:textColor.cgColor ]
+					message = NSAttributedString(string:string, attributes:attributes)
+				}
+				
+				if let message = message as? NSAttributedString
 				{
 					self.prepareForUpdates()
 					self.updateLayers(with:message)
@@ -84,23 +102,11 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	}
 	
 	
-	private func updateLayers(with message:String)
+	private func updateLayers(with text:NSAttributedString)
 	{
 		guard let window = self.window() else { return }
 		guard let view = window.contentView else { return }
 
-//		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
-
-		// Get text and styling properties
-		
-		guard let environment = scriptEngine?.environment else { return }
-		let font = environment[.fontKey] ?? NSFont.boldSystemFont(ofSize:36)
-		let textColor:NSColor = environment[.hiliteTextColorKey] ?? .systemYellow
-		let attributes:[NSAttributedString.Key:Any] = [ .font:font, .foregroundColor:textColor.cgColor ]
-		let text = NSAttributedString(string:message, attributes:attributes)
-		let size = text.size()
-		let showsBackground = backgroundPadding != nil
-		
 		// Determine correct layout properties depending on position within the view
 		
 		let pos = position()
@@ -110,7 +116,9 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		let lineWidth:CGFloat = 3.0
 		let anchorPoint = Self.anchorPoint(for:bounds, position:pos)
 		let autoresizingMask = Self.autoresizingMask(for:bounds, position:pos)
+		let size = text.size()
 		let position = Self.adjustPosition(for:bounds, position:pos, size:size, t:margin+padding.top, l:margin+padding.left, b:margin+padding.bottom, r:margin+padding.right)
+		let showsBackground = backgroundPadding != nil
 		
 		// Create and update a CATextLayer to display the message
 		
@@ -305,7 +313,7 @@ extension BXScriptCommand_displayMessage
 		let dy =  p2.y - p1.y
 		let angle = atan2(dy,dx)
 		let hiliteColor:NSColor = BXScriptEnvironment.shared[.hiliteStrokeColorKey] ?? .white
-		let white = CGColor(gray:1, alpha:1)
+		let white = CGColor(gray:0.6, alpha:1)
 		let color = hiliteColor.cgColor
 		
 		pointerLayer.bounds = CGRect(x:0, y:0, width:lineLength, height:lineWidth)
@@ -314,7 +322,7 @@ extension BXScriptCommand_displayMessage
 		pointerLayer.position = p1
 		
 //		pointerLayer.backgroundColor = color
-		pointerLayer.colors = [white,color]
+		pointerLayer.colors = [color,color]
 		pointerLayer.startPoint = CGPoint(0.5,0.5)
 		pointerLayer.endPoint = CGPoint(0.95,0.5)
 	}
