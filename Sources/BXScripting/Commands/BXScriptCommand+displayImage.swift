@@ -59,12 +59,6 @@ public struct BXScriptCommand_displayImage : BXScriptCommand, BXScriptCommandCan
 		public static let all: Animation = [.pulse,.scale,.wiggle]
 	}
 
-	public enum Options
-	{
-		case background
-		case pointer(length:CGFloat)
-	}
-	
 	public func execute()
 	{
 		self.queue.async
