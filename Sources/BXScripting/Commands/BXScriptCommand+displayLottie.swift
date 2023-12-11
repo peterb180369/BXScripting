@@ -18,16 +18,16 @@ extension BXScriptCommand where Self == BXScriptCommand_displayImage
 {
 	/// Creates a command that displays an Lottie animation in the specified window.
 
-	public static func displayLottie(_ animation:LottieAnimation?, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, size:@escaping @autoclosure ()->CGSize) -> BXScriptCommand
+	public static func displayLottie(_ animation:LottieAnimation?, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, size:@escaping @autoclosure ()->CGSize, wait:Bool = true) -> BXScriptCommand
 	{
-		BXScriptCommand_displayLottie(animation:animation, window:window, position:position, size:size)
+		BXScriptCommand_displayLottie(animation:animation, window:window, position:position, size:size, wait:wait)
 	}
 	
 	/// Creates a command that hides a Lottie animation in the specified window.
 
 	public static func hideLottie(in window:@escaping @autoclosure ()->NSWindow?) -> BXScriptCommand
 	{
-		BXScriptCommand_displayLottie(animation:nil, window:window, position:{.zero}, size:{.zero})
+		BXScriptCommand_displayLottie(animation:nil, window:window, position:{.zero}, size:{.zero}, wait:false)
 	}
 }
 
@@ -43,6 +43,7 @@ public struct BXScriptCommand_displayLottie : BXScriptCommand, BXScriptCommandCa
 	var window:(()->NSWindow?)? = nil
 	var position:()->CGPoint
 	var size:()->CGSize
+	var wait:Bool
 	
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
@@ -63,7 +64,10 @@ public struct BXScriptCommand_displayLottie : BXScriptCommand, BXScriptCommandCa
 					self.removeLottieLayer()
 				}
 				
-				self.completionHandler?()
+				if !wait
+				{
+					self.completionHandler?()
+				}
 			}
 		}
 	}
@@ -82,8 +86,8 @@ public struct BXScriptCommand_displayLottie : BXScriptCommand, BXScriptCommandCa
 		{
 			let newLayer = LottieAnimationLayer(animation:animation)
 			newLayer.zPosition = 2000
-			newLayer.borderColor = NSColor.systemGreen.cgColor
-			newLayer.borderWidth = 1.0
+//			newLayer.borderColor = NSColor.systemGreen.cgColor
+//			newLayer.borderWidth = 1.0
 			return newLayer
 		}
 
@@ -93,7 +97,9 @@ public struct BXScriptCommand_displayLottie : BXScriptCommand, BXScriptCommandCa
 		
 		lottieLayer.play()
 		{
-			_ in self.removeLottieLayer()
+			_ in
+			self.removeLottieLayer()
+			if wait { self.completionHandler?() }
 		}
 	}
 	
