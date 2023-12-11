@@ -266,27 +266,35 @@ extension BXScriptCommand_displayMessage
 	{
 		guard let backgroundLayer = view.sublayer(named:Self.backgroundLayerName) else { return }
 
+		let bounds = backgroundLayer.bounds
+		let r:CGFloat = 6.0
+		let d:CGFloat = 0.75 * r
+		
 		let shadowLayer:CALayer = view.createSublayer(named:Self.shadowLayerName)
 		{
 			let newLayer = CALayer()
 			newLayer.zPosition = 980
-			newLayer.backgroundColor = CGColor(gray:0.0, alpha:0.25)
-			newLayer.shadowColor = NSColor.black.cgColor
-			newLayer.shadowOpacity = 4.0
-			newLayer.shadowOffset = CGSize(0,-5)
-			newLayer.shadowRadius = 5
-
-			if let compositing = CIFilter(name:"CIDarkenBlendMode")
-			{
-				newLayer.compositingFilter = compositing
-			}
-			
 			return newLayer
 		}
 
-		shadowLayer.bounds = backgroundLayer.bounds
+		let path1 = CGPath(roundedRect:bounds, cornerWidth:12, cornerHeight:12, transform:nil)
+		let path2 = CGPath(rect:bounds.insetBy(dx:d, dy:0).offsetBy(dx:0, dy:d), transform:nil)
+		var path = path1
+		
+		if #available(macOS 13.0,*)
+		{
+			path = path1.subtracting(path2)
+		}
+
+		shadowLayer.bounds = bounds
+//		shadowLayer.cornerRadius = 12
 		shadowLayer.position = backgroundLayer.position
-		shadowLayer.cornerRadius = 12
+
+		shadowLayer.shadowPath = path
+		shadowLayer.shadowColor = NSColor.black.cgColor
+		shadowLayer.shadowOpacity = 1.5
+		shadowLayer.shadowRadius = r
+		shadowLayer.shadowOffset = CGSize(0,-r)
 	}
 	
 	
