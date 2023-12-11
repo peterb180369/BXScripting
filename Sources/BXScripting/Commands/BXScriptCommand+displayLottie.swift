@@ -95,6 +95,11 @@ public struct BXScriptCommand_displayLottie : BXScriptCommand, BXScriptCommandCa
 		lottieLayer.bounds = CGRect(origin:.zero, size:size())
 		lottieLayer.position = position()
 		
+		let size = size()
+		var transform = CATransform3DMakeScale(1,-1,1)
+		transform = CATransform3DTranslate(transform,0.5*size.width,0.5*size.height,0)
+		lottieLayer.transform = transform
+
 		lottieLayer.play()
 		{
 			_ in
