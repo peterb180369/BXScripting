@@ -55,6 +55,14 @@ extension NSWindow
 				return subview
 			}
 		}
+
+		if let sheet = self.attachedSheet
+		{
+			if let subview = sheet.contentView?.subviewWithIdentifier(identifier)
+			{
+				return subview
+			}
+		}
 		
 		return nil
     }
