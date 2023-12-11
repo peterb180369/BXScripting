@@ -116,7 +116,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	private func removeHilite()
 	{
 		guard let window = self.window() else { return }
-		guard let view = window.contentView?.subviewWithIdentifier(id) else { return }
+		guard let view = window.subviewWithIdentifier(id) else { return }
 		view.removeSublayer(named:frameLayerName)
 		view.removeSublayer(named:labelLayerName)
 		window.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
