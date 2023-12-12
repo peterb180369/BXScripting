@@ -64,6 +64,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 				self.delegate.completionHandler = completionHandler
 
 				let utterance = AVSpeechUtterance(string:text)
+				utterance.voice = AVSpeechSynthesisVoice.bestAvailableVoice
 				self.synthesizer.delegate = self.delegate
 				self.synthesizer.speak(utterance)
 				
@@ -110,3 +111,25 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
  
  
 //----------------------------------------------------------------------------------------------------------------------
+
+
+extension AVSpeechSynthesisVoice
+{
+	/// Tries to find the best available voice for the current language. Returns nil if not available. In this case the default system voice will be used.
+	
+	static var bestAvailableVoice:AVSpeechSynthesisVoice?
+	{
+		let code = Self.currentLanguageCode()
+		
+		let voices = Self.speechVoices()
+			.filter { $0.language == code }
+			.filter { $0.quality != .default }
+			.sorted { $0.quality.rawValue < $1.quality.rawValue }
+		
+		return voices.last
+	}
+}
+ 
+ 
+//----------------------------------------------------------------------------------------------------------------------
+
