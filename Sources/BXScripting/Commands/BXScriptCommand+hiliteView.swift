@@ -110,6 +110,9 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 			textLayer.position = bounds.center
 			textLayer.zPosition = 1000
 		}
+		
+		let critical = view.screenRect(for:frameLayer.frame)
+		BXScriptWindowController.shared?.setCriticalRegion(critical)
 	}
 
 
@@ -120,6 +123,8 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 		view.removeSublayer(named:frameLayerName)
 		view.removeSublayer(named:labelLayerName)
 		window.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
+
+		BXScriptWindowController.shared?.setCriticalRegion(.zero)
 	}
 
 

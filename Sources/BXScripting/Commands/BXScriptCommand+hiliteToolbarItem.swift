@@ -70,6 +70,9 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 				frameLayer.borderWidth = 3
 				frameLayer.cornerRadius = cornerRadius
 				frameLayer.zPosition = 1000
+		
+				let critical = view.screenRect(for:frameLayer.frame)
+				BXScriptWindowController.shared?.setCriticalRegion(critical)
 			}
 			else
 			{
@@ -89,6 +92,8 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 		guard let view = window.toolbarItemView(withIdentifier:id) else { return }
 		view.removeSublayer(named:frameLayerName)
 		window.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
+
+		BXScriptWindowController.shared?.setCriticalRegion(.zero)
 	}
 
 

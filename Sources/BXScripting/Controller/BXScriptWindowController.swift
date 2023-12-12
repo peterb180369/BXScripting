@@ -222,16 +222,108 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 		"\(stepIndex+1)/\(stepCount)"
 	}
 
-	
+
 //----------------------------------------------------------------------------------------------------------------------
 	
 	
-	public func windowWillClose(_ notification:Notification)
+	// MARK: - Auto-Move
+	
+	/// This function automatically moves the controller window if it covers a critical region (specified in screen coordinates).
+	///
+	/// Script authors can set this critical region to make sure that parts of the UI that must be visible are not covered by the controller window.
+	/// The window is automatically moved in a way that the critical region no longer overlaps the window frame.
+	
+	public func setCriticalRegion(_ rect:CGRect)
 	{
-		BXScriptEngine.cancel(scriptID:scriptID)
-		Self.shared = nil
-	}
+		self.criticalRegion = rect
+		
+		guard let window = self.window else { return }
+		guard let screen = window.screen else { return }
+		
+		let screenFrame = screen.frame
+		let windowFrame = window.frame
+		let criticalFrame = criticalRegion.insetBy(dx:-32, dy:-32)
+		let windowPos = windowFrame.center
+		
+		// We only need to do something if the window actually overlaps the critical region
+		
+		guard windowFrame.intersects(criticalFrame) else { return }
+		
+		// Window in top half of screen => try to move down
+		
+		if windowPos.y >= screenFrame.midY
+		{
+			let dy = -abs(windowFrame.maxY - criticalFrame.minY)
+			let newFrame = windowFrame.offsetBy(dx:0, dy:dy)
 
+			if screenFrame.contains(newFrame)
+			{
+				window.setFrame(newFrame, display:true, animate:true)
+				return
+			}
+		}
+
+		// Window in bottom half of screen => try to move up
+		
+		if windowPos.y < screenFrame.midY
+		{
+			let dy = abs(windowFrame.minY - criticalFrame.maxY)
+			let newFrame = windowFrame.offsetBy(dx:0, dy:dy)
+
+			if screenFrame.contains(newFrame)
+			{
+				window.setFrame(newFrame, display:true, animate:true)
+				return
+			}
+		}
+
+		// Window in left half of screen => try to move right
+		
+		if windowPos.x < screenFrame.midX
+		{
+			let dx = abs(windowFrame.minX - criticalFrame.maxX)
+			let newFrame = windowFrame.offsetBy(dx:dx, dy:0)
+
+			if screenFrame.contains(newFrame)
+			{
+				window.setFrame(newFrame, display:true, animate:true)
+				return
+			}
+		}
+
+		// Window in right half of screen => try to move left
+		
+		if windowPos.x >= screenFrame.midX
+		{
+			let dx = -abs(windowFrame.maxX - criticalFrame.minX)
+			let newFrame = windowFrame.offsetBy(dx:dx, dy:0)
+
+			if screenFrame.contains(newFrame)
+			{
+				window.setFrame(newFrame, display:true, animate:true)
+				return
+			}
+		}
+		
+		// Oops, couldn't find any place to move window, so leave it were it is
+	}
+	
+	private var criticalRegion = CGRect.zero
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+extension NSView
+{
+	func screenRect(for viewRect:CGRect) -> CGRect
+	{
+		guard let window = self.window else { return .zero }
+		let windowRect = self.convert(viewRect, to:nil)
+		let screenRect = window.convertToScreen(windowRect)
+		return screenRect
+	}
 }
 
 
