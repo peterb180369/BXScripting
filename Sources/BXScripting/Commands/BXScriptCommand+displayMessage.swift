@@ -30,6 +30,13 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
 	}
 	
+	/// Creates a command that displays a styled text message in the specified window.
+	
+	@available(macOS 12,*) public static func displayMessage(_ message:@escaping @autoclosure ()->AttributedString, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
+	{
+		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
+	}
+	
 	/// Creates a command that hides the text message in the specified window.
 
 	public static func hideMessage(in window:@escaping @autoclosure ()->NSWindow?) -> BXScriptCommand
@@ -77,7 +84,15 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 					let attributes:[NSAttributedString.Key:Any] = [ .font:font, .foregroundColor:textColor.cgColor ]
 					message = NSAttributedString(string:string, attributes:attributes)
 				}
-				
+
+				if #available(macOS 12,*)
+				{
+					if let attributedString = message as? AttributedString
+					{
+						message = NSAttributedString(attributedString)
+					}
+				}
+
 				if let message = message as? NSAttributedString
 				{
 					self.prepareForUpdates()
