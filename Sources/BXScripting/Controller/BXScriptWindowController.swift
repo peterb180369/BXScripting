@@ -268,7 +268,7 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 
 		// Window in bottom half of screen => try to move up
 		
-		if windowPos.y < screenFrame.midY
+		if true // windowPos.y < screenFrame.midY
 		{
 			let dy = abs(windowFrame.minY - criticalFrame.maxY)
 			let newFrame = windowFrame.offsetBy(dx:0, dy:dy)
@@ -296,7 +296,7 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 
 		// Window in right half of screen => try to move left
 		
-		if windowPos.x >= screenFrame.midX
+		if true // windowPos.x >= screenFrame.midX
 		{
 			let dx = -abs(windowFrame.maxX - criticalFrame.minX)
 			let newFrame = windowFrame.offsetBy(dx:dx, dy:0)
