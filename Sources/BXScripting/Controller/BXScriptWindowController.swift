@@ -60,6 +60,9 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 //----------------------------------------------------------------------------------------------------------------------
 
 
+	// MARK: - Lifecycle
+	
+	
 	@discardableResult public class func run(_ engine:BXScriptEngine, title:String = "", on queue:DispatchQueue = .main) -> String
 	{
 		if shared == nil
@@ -158,10 +161,20 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 			self.stepIndexes += stepCount-1
 		}
 	}
+
+	// Stop the script when the controller window is closed
+	
+	public func windowWillClose(_ notification:Notification)
+	{
+		self.engine.cancel()
+		Self.shared = nil
+	}
 	
 	
 //----------------------------------------------------------------------------------------------------------------------
 	
+	
+	// MARK: - Actions
 	
 	public func willExecuteCommand()
 	{
@@ -181,7 +194,14 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	{
 		engine.cancel()
 		self.close()
+		Self.shared = nil
 	}
+	
+	
+//----------------------------------------------------------------------------------------------------------------------
+	
+	
+	// MARK: - Progress
 	
 	
 	public var progressFraction:Float
