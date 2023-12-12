@@ -27,11 +27,11 @@ struct BXScriptControllerView : View
 		{
 			// Name
 			
-			HStack
+			HStack(spacing:8)
 			{
 				Spacer()
 				Text(controller.currentStepNumber).opacity(0.33)
-				Text(controller.currentStepName)
+				Text(controller.currentStepName).opacity(0.66)
 				Spacer()
 			}
 			
@@ -49,63 +49,56 @@ struct BXScriptControllerView : View
 					BXProgressBar(value:Double(controller.stepIndex+1), maxValue:Double(controller.stepCount))
 					#endif
 				}
-
-//				Button(action:controller.abort)
-//				{
-//					SwiftUI.Image(systemName:"xmark.circle")
-//				}
-//				.buttonStyle(.borderless)
-//				.controlSize(.large)
 			}
 			
 			// Repeat Button
 			
-			HStack
+			Button(action:controller.repeatCurrentStep)
 			{
-				Spacer()
-				
-				if #available(macOS 11,*)
+				HStack
 				{
-					Button("Repeat", systemImage:"arrow.counterclockwise")
-					{
-						controller.repeatCurrentStep()
-					}
-					#if canImport(BXSwiftUI)
-					.buttonStyle(BXStrokedButtonStyle())
-					#endif
-				}
-				else
-				{
-					#if canImport(BXSwiftUI)
-
-					Button(action:controller.repeatCurrentStep)
-					{
-						HStack
-						{
-							BXImage(systemName:"arrow.counterclockwise")
-							Text("Repeat")
-						}
-					}
-					.buttonStyle(BXStrokedButtonStyle())
-
-					#endif
-				}
-
-				Button("Stop Tutorial")
-				{
-					controller.abort()
-				}
-				#if canImport(BXSwiftUI)
-				.buttonStyle(BXStrokedButtonStyle())
-				#endif
+					Spacer()
 					
-				Spacer()
+					if #available(macOS 11,*)
+					{
+						SwiftUI.Image(systemName:"arrow.counterclockwise")
+					}
+					else
+					{
+						BXImage(systemName:"arrow.counterclockwise")
+					}
+
+					Text("Repeat")
+					Spacer()
+				}
 			}
+			.opacity(0.6)
+			
+			// Stop Button
+			
+			Button(action:controller.abort)
+			{
+				HStack
+				{
+					Spacer()
+					Text("Stop Tutorial")
+					Spacer()
+				}
+			}
+			.opacity(0.6)
 		}
+		
 		.padding()
-		.controlSize(.regular)
+		.frame(minWidth:160)
+		.border(Color.primary.opacity(0.07))
+
 		.colorScheme(.dark)
-		.frame(minWidth:240)
+		.controlSize(.small)
+		
+		#if canImport(BXSwiftUI)
+		.buttonStyle(BXStrokedButtonStyle())
+		#endif
+		
 	}
 }
 

@@ -131,13 +131,16 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 		// Create window
 
 		let frame = CGRect(origin:.zero, size:size)
-		let style:NSWindow.StyleMask = [.hudWindow,.titled,.closable,.nonactivatingPanel,.fullSizeContentView]
+		let style:NSWindow.StyleMask = [.hudWindow,.nonactivatingPanel,.fullSizeContentView]
 		let window = BXScriptControllerPanel(contentRect:frame, styleMask:style, backing:.buffered, defer:true)
-//        window.title = "Settings".localized(from:"MMPrefsWindowController")
-		window.title = title
+		window.titlebarAppearsTransparent = true
+		window.isMovableByWindowBackground = true
+		window.isExcludedFromWindowsMenu = true 
 		window.collectionBehavior.insert(.fullScreenAuxiliary)
 		window.isFloatingPanel = true
-		window.becomesKeyOnlyIfNeeded = true 
+		window.becomesKeyOnlyIfNeeded = true
+		window.hasShadow = true
+		
 		window.contentView = hostview
 		window.delegate = self
 		
