@@ -185,6 +185,14 @@ extension CGPoint
 		return self.relativePoint(relative, in:view)
 	}
 
+	/// Returns the mouse location in a window.
+	
+	public static func mousePoint(in window:@escaping @autoclosure ()->NSWindow?, offset:CGPoint = .zero) -> CGPoint
+	{
+		guard let window = window() else { return .zero }
+		return window.convertPoint(fromScreen:NSEvent.mouseLocation) + offset
+	}
+
 	/// Returns the topLeft point in a window (with specified inset)
 	
 	public static func topLeft(of window:@escaping @autoclosure ()->NSWindow?, inset:CGSize = CGSize(width:64,height:64)) -> CGPoint
