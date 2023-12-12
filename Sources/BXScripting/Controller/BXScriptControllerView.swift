@@ -65,7 +65,9 @@ struct BXScriptControllerView : View
 					}
 					else
 					{
+						#if canImport(BXSwiftUI)
 						BXImage(systemName:"arrow.counterclockwise")
+						#endif
 					}
 
 					Text("Repeat")
