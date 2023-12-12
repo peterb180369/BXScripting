@@ -91,6 +91,14 @@ struct BXScriptControllerView : View
 					#endif
 				}
 
+				Button("Stop Tutorial")
+				{
+					controller.abort()
+				}
+				#if canImport(BXSwiftUI)
+				.buttonStyle(BXStrokedButtonStyle())
+				#endif
+					
 				Spacer()
 			}
 		}
