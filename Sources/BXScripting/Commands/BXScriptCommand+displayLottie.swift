@@ -102,9 +102,17 @@ public struct BXScriptCommand_displayLottie : BXScriptCommand, BXScriptCommandCa
 
 		lottieLayer.play()
 		{
-			_ in
-			self.removeLottieLayer()
-			if wait { self.completionHandler?() }
+			didFinish in
+			
+			if didFinish
+			{
+				self.removeLottieLayer()
+			}
+			
+			if wait
+			{
+				self.completionHandler?()
+			}
 		}
 	}
 	
@@ -120,21 +128,3 @@ public struct BXScriptCommand_displayLottie : BXScriptCommand, BXScriptCommandCa
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-//
-//@objc public class LottieAnimationLayer : CALayer {
-//
-//    /// Initializes a LottieAnimationLayer with an animation.
-//    public init(animation: Lottie.LottieAnimation?, imageProvider: Lottie.AnimationImageProvider? = nil, textProvider: Lottie.AnimationKeypathTextProvider = DefaultTextProvider(), fontProvider: Lottie.AnimationFontProvider = DefaultFontProvider(), configuration: Lottie.LottieConfiguration = .shared, logger: Lottie.LottieLogger = .shared)
-//
-//    /// Initializes an LottieAnimationLayer with a .lottie file.
-//    public init(dotLottie: Lottie.DotLottieFile?, animationId: String? = nil, textProvider: Lottie.AnimationKeypathTextProvider = DefaultTextProvider(), fontProvider: Lottie.AnimationFontProvider = DefaultFontProvider(), configuration: Lottie.LottieConfiguration = .shared, logger: Lottie.LottieLogger = .shared)
-//
-//    public init(configuration: Lottie.LottieConfiguration = .shared, logger: Lottie.LottieLogger = .shared)
-//
-//    /// Plays the animation from its current state to the end.
-//    ///
-//    /// - Parameter completion: An optional completion closure to be called when the animation completes playing.
-//    open func play(completion: Lottie.LottieCompletionBlock? = nil)
-//
-
