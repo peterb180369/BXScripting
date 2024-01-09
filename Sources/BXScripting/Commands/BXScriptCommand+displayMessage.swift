@@ -124,8 +124,10 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 
 		// Determine correct layout properties depending on position within the view
 		
-		let pos = position()
+		var pos = position()
 		let bounds = view.bounds
+		if view.isFlipped { pos.y = bounds.maxY - pos.y }
+		
 		let padding = backgroundPadding ?? NSEdgeInsets()
 		let margin = pointerLength ?? 0.0
 		let lineWidth:CGFloat = 3.0
@@ -284,6 +286,9 @@ extension BXScriptCommand_displayMessage
 		let bounds = backgroundLayer.bounds
 		let r:CGFloat = 6.0
 		let d:CGFloat = 0.75 * r
+		let inner = view.isFlipped ?
+			bounds.insetBy(dx:d, dy:0).offsetBy(dx:0, dy:-d) :
+			bounds.insetBy(dx:d, dy:0).offsetBy(dx:0, dy:d)
 		
 		let shadowLayer:CALayer = view.createSublayer(named:Self.shadowLayerName)
 		{
@@ -293,7 +298,7 @@ extension BXScriptCommand_displayMessage
 		}
 
 		let path1 = CGPath(roundedRect:bounds, cornerWidth:12, cornerHeight:12, transform:nil)
-		let path2 = CGPath(rect:bounds.insetBy(dx:d, dy:0).offsetBy(dx:0, dy:d), transform:nil)
+		let path2 = CGPath(rect:inner, transform:nil)
 		var path = path1
 		
 		if #available(macOS 13.0,*)
@@ -309,7 +314,7 @@ extension BXScriptCommand_displayMessage
 		shadowLayer.shadowColor = NSColor.black.cgColor
 		shadowLayer.shadowOpacity = 1.5
 		shadowLayer.shadowRadius = r
-		shadowLayer.shadowOffset = CGSize(0,-r)
+		shadowLayer.shadowOffset = CGSize(0,view.isFlipped ? r : -r)
 	}
 	
 	
