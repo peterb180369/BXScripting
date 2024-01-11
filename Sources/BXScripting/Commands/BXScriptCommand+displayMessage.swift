@@ -17,24 +17,23 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 {
 	/// Creates a command that displays a text message in the specified window.
 
-//	public static func displayMessage(_ message:String, in window:NSWindow?, at position:CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:60, bottom:12, right:60), pointerWithLength:CGFloat? = nil) -> BXScriptCommand
-	public static func displayMessage(_ message:@escaping @autoclosure ()->String, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
+	public static func displayMessage(_ message:@escaping @autoclosure ()->String, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, autoPosition:Bool = true, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
 	{
-		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
+		BXScriptCommand_displayMessage(message:message, window:window, position:position, autoPosition:autoPosition, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
 	}
 	
 	/// Creates a command that displays a styled text message in the specified window.
 	
-	public static func displayMessage(_ message:@escaping @autoclosure ()->NSAttributedString, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
+	public static func displayMessage(_ message:@escaping @autoclosure ()->NSAttributedString, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, autoPosition:Bool = true, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
 	{
-		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
+		BXScriptCommand_displayMessage(message:message, window:window, position:position, autoPosition:autoPosition, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
 	}
 	
 	/// Creates a command that displays a styled text message in the specified window.
 	
-	@available(macOS 12,*) public static func displayMessage(_ message:@escaping @autoclosure ()->AttributedString, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
+	@available(macOS 12,*) public static func displayMessage(_ message:@escaping @autoclosure ()->AttributedString, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, autoPosition:Bool = true, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
 	{
-		BXScriptCommand_displayMessage(message:message, window:window, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
+		BXScriptCommand_displayMessage(message:message, window:window, position:position, autoPosition:autoPosition, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
 	}
 	
 	/// Creates a command that hides the text message in the specified window.
@@ -59,6 +58,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	var message:()->Any?
 	var window:()->NSWindow?
 	var position:()->CGPoint
+	var autoPosition:Bool = true
 	var backgroundPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:72, bottom:12, right:72)
 	var cornerRadius:CGFloat = 12.0
 	var pointerLength:CGFloat? = nil
@@ -134,7 +134,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		let anchorPoint = Self.anchorPoint(for:bounds, position:pos)
 		let autoresizingMask = Self.autoresizingMask(for:bounds, position:pos)
 		let size = text.size()
-		let position = Self.adjustPosition(for:bounds, position:pos, size:size, t:margin+padding.top, l:margin+padding.left, b:margin+padding.bottom, r:margin+padding.right)
+		let position = Self.adjustPosition(condition:autoPosition, bounds:bounds, position:pos, size:size, t:margin+padding.top, l:margin+padding.left, b:margin+padding.bottom, r:margin+padding.right)
 		let showsBackground = backgroundPadding != nil
 		
 		// Create and update a CATextLayer to display the message
@@ -456,26 +456,29 @@ extension BXScriptCommand_displayMessage
 	
 	/// Adjusts position within the view bounds, with the specified padding values.
 	
-	static func adjustPosition(for bounds:CGRect, position:CGPoint, size:CGSize, t:CGFloat, l:CGFloat, b:CGFloat, r:CGFloat) -> CGPoint
+	static func adjustPosition(condition:Bool, bounds:CGRect, position:CGPoint, size:CGSize, t:CGFloat, l:CGFloat, b:CGFloat, r:CGFloat) -> CGPoint
 	{
 		var position = position
 
-		if position.x < bounds.width*0.33
+		if condition
 		{
-			position.x += l + 0.5 * size.width
-		}
-		else if position.x > bounds.width*0.66
-		{
-			position.x -= r + 0.5 * size.width
-		}
+			if position.x < bounds.width*0.33
+			{
+				position.x += l + 0.5 * size.width
+			}
+			else if position.x > bounds.width*0.66
+			{
+				position.x -= r + 0.5 * size.width
+			}
 
-		if position.y < bounds.height*0.33
-		{
-			position.y += b + 0.5 * size.height
-		}
-		else if position.y > bounds.height*0.66
-		{
-			position.y -= t + 0.5 * size.height
+			if position.y < bounds.height*0.33
+			{
+				position.y += b + 0.5 * size.height
+			}
+			else if position.y > bounds.height*0.66
+			{
+				position.y -= t + 0.5 * size.height
+			}
 		}
 		
 		return position
