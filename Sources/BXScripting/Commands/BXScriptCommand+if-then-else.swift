@@ -15,12 +15,12 @@ import Foundation
 
 extension BXScriptCommand where Self == BXScriptCommand_if
 {
-	public static func `if`(_ condition:@escaping ()->Bool, label:String) -> BXScriptCommand
+	public static func `if`(_ condition:@autoclosure @escaping ()->Bool, label:String) -> BXScriptCommand
 	{
 		BXScriptCommand_if(condition:condition, label:label)
 	}
 
-	public static func `if`(_ condition:@escaping ()->Bool, label:any RawRepresentable<String>) -> BXScriptCommand
+	public static func `if`(_ condition:@autoclosure @escaping ()->Bool, label:any RawRepresentable<String>) -> BXScriptCommand
 	{
 		BXScriptCommand_if(condition:condition, label:label.rawValue)
 	}
