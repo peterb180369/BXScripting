@@ -252,6 +252,31 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 		
 		guard windowFrame.intersects(criticalFrame) else { return }
 		
+		// If we window overlaps the critical region, then try to move vertically, whichever direction is closer
+		
+		if windowFrame.intersects(criticalFrame)
+		{
+			let dy1 = -abs(windowFrame.maxY - criticalFrame.minY)
+			let dy2 = abs(windowFrame.minY - criticalFrame.maxY)
+			
+			var newFrame = windowFrame
+			
+			if abs(dy1) < abs(dy2)
+			{
+				newFrame = windowFrame.offsetBy(dx:0, dy:dy1)
+			}
+			else
+			{
+				newFrame = windowFrame.offsetBy(dx:0, dy:dy2)
+			}
+
+			if screenFrame.contains(newFrame)
+			{
+				window.setFrame(newFrame, display:true, animate:true)
+				return
+			}
+		}
+		
 		// Window in top half of screen => try to move down
 		
 		if windowPos.y >= screenFrame.midY
@@ -280,6 +305,31 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 			}
 		}
 
+		// If we window overlaps the critical region, then try to move horizontally, whichever direction is closer
+		
+		if windowFrame.intersects(criticalFrame)
+		{
+			let dx1 = abs(windowFrame.minX - criticalFrame.maxX)
+			let dx2 = -abs(windowFrame.maxX - criticalFrame.minX)
+			
+			var newFrame = windowFrame
+			
+			if abs(dx1) < abs(dx2)
+			{
+				newFrame = windowFrame.offsetBy(dx:dx1, dy:0)
+			}
+			else
+			{
+				newFrame = windowFrame.offsetBy(dx:dx2, dy:0)
+			}
+
+			if screenFrame.contains(newFrame)
+			{
+				window.setFrame(newFrame, display:true, animate:true)
+				return
+			}
+		}
+		
 		// Window in left half of screen => try to move right
 		
 		if windowPos.x < screenFrame.midX
