@@ -137,6 +137,13 @@ extension CGPoint
 		return view.convert(p, to:nil)
 	}
 
+	/// Returns the center point of the specified screen
+	
+	public static func center(of screen:NSScreen?) -> CGPoint
+	{
+		screen?.frame.center ?? .zero
+	}
+
 	/// Returns the right point in a view in window coordinates (with specified inset)
 	
 	public static func right(of view:@escaping @autoclosure ()->NSView?, inset:CGSize = .zero) -> CGPoint
