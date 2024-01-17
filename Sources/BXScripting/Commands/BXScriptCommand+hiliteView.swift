@@ -17,7 +17,7 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteView
 {
 	/// Creates a command that shows or hides a highlight on the view with the specified identifier. You can also supply an optional view label.
 
-	public static func hiliteView(withID id:String, visible:Bool = true, label:String? = nil, in window:@escaping @autoclosure ()->NSWindow?, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0) -> BXScriptCommand
+	public static func hiliteView(withID id:String, in window:@escaping @autoclosure ()->NSWindow?, label:String? = nil, visible:Bool = true, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0) -> BXScriptCommand
 	{
 		BXScriptCommand_hiliteView(id:id, visible:visible, label:label, window:window, inset:inset, cornerRadius:cornerRadius)
 	}

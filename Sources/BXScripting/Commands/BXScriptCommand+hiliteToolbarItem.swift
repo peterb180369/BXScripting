@@ -18,7 +18,7 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteToolbarItem
 {
 	/// Creates a command that shows or hides a highlight on the view with the specified identifier. You can also supply an optional view label.
 
-	public static func hiliteToolbarItem(withID id:String, visible:Bool = true, in window:@escaping @autoclosure ()->NSWindow?, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0) -> BXScriptCommand
+	public static func hiliteToolbarItem(withID id:String, in window:@escaping @autoclosure ()->NSWindow?, visible:Bool = true, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0) -> BXScriptCommand
 	{
 		BXScriptCommand_hiliteToolbarItem(id:id, visible:visible, window:window, inset:inset, cornerRadius:cornerRadius)
 	}
