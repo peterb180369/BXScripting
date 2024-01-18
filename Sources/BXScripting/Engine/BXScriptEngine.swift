@@ -31,9 +31,15 @@ public class BXScriptEngine
 	public private(set) var queue:DispatchQueue = .main
 
 	/// The optional completionHandler will be executed after the last step on the specified queue.
+	///
+	/// Please note that this handler will only be executed if the script was NOT cancelled by the user.
 	
 	public var completionHandler:(()->Void)? = nil
 	
+	/// The optional cleanupHandler will be executed once script execution stops, either after the end of the last command, or when the user cancelled the script.
+	
+	public var cleanupHandler:(()->Void)? = nil
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -79,11 +85,12 @@ public class BXScriptEngine
 	
 	/// Creates a new BXScriptEngine with the specified command and completionHandler.
 	
-	public init(_ scriptCommands:BXScriptCommands, environment:BXScriptEnvironment = .shared, completionHandler:(()->Void)? = nil)
+	public init(_ scriptCommands:BXScriptCommands, environment:BXScriptEnvironment = .shared, completionHandler:(()->Void)? = nil, cleanupHandler:(()->Void)? = nil)
 	{
 		self.scriptCommands = scriptCommands
 		self.environment = environment
 		self.completionHandler = completionHandler
+		self.cleanupHandler = cleanupHandler
 	}
 	
 	
@@ -94,9 +101,9 @@ public class BXScriptEngine
 	///
 	/// - Returns: The ID of the script.
 	
-	@discardableResult public static func run(on queue:DispatchQueue = .main, environment:BXScriptEnvironment = .shared, _ scriptCommands:BXScriptCommands, completionHandler:(()->Void)? = nil) -> String
+	@discardableResult public static func run(on queue:DispatchQueue = .main, environment:BXScriptEnvironment = .shared, _ scriptCommands:BXScriptCommands, completionHandler:(()->Void)? = nil, cleanupHandler:(()->Void)? = nil) -> String
 	{
-		let engine = BXScriptEngine(scriptCommands, environment:environment, completionHandler:completionHandler)
+		let engine = BXScriptEngine(scriptCommands, environment:environment, completionHandler:completionHandler, cleanupHandler:cleanupHandler)
 		return engine.run(on:queue)
 	}
 
@@ -167,6 +174,7 @@ public class BXScriptEngine
 			self.queue.async
 			{
 				self.completionHandler?()
+				self.cleanupHandler?()
 				Self.runningScripts[self.id] = nil
 				NotificationCenter.default.post(name:Self.didEndNotification, object:self, userInfo:nil)
 			}
@@ -213,6 +221,7 @@ public class BXScriptEngine
 	{
 		self.cancelAllCommands()
 		self.isCancelled = true
+		self.cleanupHandler?()
 	}
 
 
