@@ -22,56 +22,48 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 
 	public static func displayMessage(_ message:@escaping @autoclosure ()->String, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, autoPosition:Bool = true, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
 	{
-		if window() != nil
-		{
-			BXScriptCommand_displayMessage(message:message, window:window, position:position, autoPosition:autoPosition, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
-		}
-		else
-		{
-			BXScriptCommand_displayMessageWindow(message:message, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, alignmentMode:alignmentMode)
-		}
+		BXScriptCommand_displayMessage(message:message, window:window, position:position, autoPosition:autoPosition, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
 	}
-	
+
+	public static func displayMessage(_ message:@escaping @autoclosure ()->String, at position:@escaping @autoclosure ()->CGPoint, autoPosition:Bool = true, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
+	{
+		BXScriptCommand_displayMessageWindow(message:message, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, alignmentMode:alignmentMode)
+	}
+
 	/// Creates a command that displays a styled text message in the specified window.
 	
 	public static func displayMessage(_ message:@escaping @autoclosure ()->NSAttributedString, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, autoPosition:Bool = true, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
 	{
-		if window() != nil
-		{
-			BXScriptCommand_displayMessage(message:message, window:window, position:position, autoPosition:autoPosition, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
-		}
-		else
-		{
-			BXScriptCommand_displayMessageWindow(message:message, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, alignmentMode:alignmentMode)
-		}
+		BXScriptCommand_displayMessage(message:message, window:window, position:position, autoPosition:autoPosition, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
 	}
-	
+
+	public static func displayMessage(_ message:@escaping @autoclosure ()->NSAttributedString, at position:@escaping @autoclosure ()->CGPoint, autoPosition:Bool = true, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
+	{
+		BXScriptCommand_displayMessageWindow(message:message, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, alignmentMode:alignmentMode)
+	}
+
 	/// Creates a command that displays a styled text message in the specified window.
 	
 	@available(macOS 12,*) public static func displayMessage(_ message:@escaping @autoclosure ()->AttributedString, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, autoPosition:Bool = true, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
 	{
-		if window() != nil
-		{
-			BXScriptCommand_displayMessage(message:message, window:window, position:position, autoPosition:autoPosition, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
-		}
-		else
-		{
-			BXScriptCommand_displayMessageWindow(message:message, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, alignmentMode:alignmentMode)
-		}
+		BXScriptCommand_displayMessage(message:message, window:window, position:position, autoPosition:autoPosition, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength, alignmentMode:alignmentMode)
 	}
-	
+
+	@available(macOS 12,*) public static func displayMessage(_ message:@escaping @autoclosure ()->AttributedString, at position:@escaping @autoclosure ()->CGPoint, autoPosition:Bool = true, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil, alignmentMode:CATextLayerAlignmentMode = .center) -> BXScriptCommand
+	{
+		BXScriptCommand_displayMessageWindow(message:message, position:position, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, alignmentMode:alignmentMode)
+	}
+
 	/// Creates a command that hides the text message in the specified window.
 
 	public static func hideMessage(in window:@escaping @autoclosure ()->NSWindow?) -> BXScriptCommand
 	{
-		if window() != nil
-		{
-			BXScriptCommand_displayMessage(message:{nil}, window:window, position:{.zero})
-		}
-		else
-		{
-			BXScriptCommand_displayMessageWindow(message:{nil}, position:{.zero})
-		}
+		BXScriptCommand_displayMessage(message:{nil}, window:window, position:{.zero})
+	}
+
+	public static func hideMessage() -> BXScriptCommand
+	{
+		BXScriptCommand_displayMessageWindow(message:{nil}, position:{.zero})
 	}
 }
 
