@@ -22,9 +22,13 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	
 	public static var shared:BXScriptWindowController? = nil
 	
-	/// The BXScriptEngine that is being controlled by this window
+	/// The root BXScriptEngine that is being controlled by this window
 
-	private var engine:BXScriptEngine
+	private var rootEngine:BXScriptEngine
+
+	/// The BXScriptEngine that is currently active. In case of sub-engines (run command) this can be different from the rootEngine.
+
+	internal var currentEngine:BXScriptEngine? = nil
 
 	/// The controller window title
 	
@@ -37,21 +41,18 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	/// The number of the current step (useful for progress info)
 
 	@Published public var stepIndex = 0
+	{
+		didSet { print("stepIndex = \(stepIndex)") }
+	}
 	
 	/// The total number of steps (useful for progress info)
 
 	public private(set) var stepCount = 0
 	
-	/// The labels for all steps
+	/// A reference to the current step in the script. If the script contains run commands (sub-scripts) then all steps in sub-script are included here.
 	
-	public private(set) var labels:[String] = []
-	
-	/// A lookup table to find first command index for a step
-	
-	private var commandIndexes:[Int] = []
-	
-	private var stepIndexes:[Int] = []
-	
+	var currentStep:BXScriptCommand_step? = nil
+
 	/// Subscribers
 	
 	private var subscribers:[Any] = []
@@ -90,19 +91,20 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	
 	public init(engine:BXScriptEngine, title:String = "")
 	{
-		self.engine = engine
+		self.rootEngine = engine
+		self.currentEngine = engine
 		self.title = title
 		
 		super.init(window:nil)
 
 		// Analyze the script and load the window
 		
-		self.prepare()
+		self.prepare(engine.scriptCommands)
 		self.loadWindow()
 		
 		// Listen to engine notifications
 		
-		self.subscribers += NotificationCenter.default.publisher(for:BXScriptEngine.willExecuteCommandNotification, object:engine).sink
+		self.subscribers += NotificationCenter.default.publisher(for:BXScriptEngine.willExecuteCommandNotification, object:nil).sink
 		{
 			[weak self] _ in self?.willExecuteCommand()
 		}
@@ -148,20 +150,22 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	}
 	
 	
-	private func prepare()
+	private func prepare(_ commands:BXScriptCommands)
 	{
 		// Gather all steps, build the label array, and the lookup table for their command indexes
 		
-		for (i,command) in engine.scriptCommands.enumerated()
+		for (i,command) in commands.enumerated()
 		{
 			if let step = command as? BXScriptCommand_step
 			{
-				self.commandIndexes += i
-				self.labels += step.label
+				step.helper.globalStepIndex = stepCount
+				step.helper.localCommandIndex = i
 				self.stepCount += 1
 			}
-			
-			self.stepIndexes += stepCount-1
+			else if let run = command as? BXScriptCommand_run
+			{
+				self.prepare(run.scriptCommands)
+			}
 		}
 	}
 
@@ -169,7 +173,7 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	
 	public func windowWillClose(_ notification:Notification)
 	{
-		self.engine.cancel()
+		self.rootEngine.cancel()
 		Self.shared = nil
 	}
 	
@@ -181,21 +185,25 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	
 	public func willExecuteCommand()
 	{
-		self.stepIndex = stepIndexes[engine.commandIndex]
+		guard let currentStep = currentStep else { return }
+		self.stepIndex = currentStep.helper.globalStepIndex
 	}
 	
 	
 	public func repeatCurrentStep()
 	{
+		guard let engine = currentEngine else { return }
+		guard let currentStep = currentStep else { return }
+		
 		engine.cancelAllCommands()
-		engine.commandIndex = commandIndexes[stepIndex]
+		engine.commandIndex = currentStep.helper.localCommandIndex
 		engine.executeNextCommand()
 	}
 	
 	
 	public func abort()
 	{
-		engine.cancel()
+		self.rootEngine.cancel()
 		self.close()
 		Self.shared = nil
 	}
@@ -215,8 +223,7 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	
 	public var currentStepName:String
 	{
-		guard stepIndex>=0 && stepIndex<stepCount else { return "" }
-		return self.labels[stepIndex]
+		currentStep?.label ?? ""
 	}
 
 

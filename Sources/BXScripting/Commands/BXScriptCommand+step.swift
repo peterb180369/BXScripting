@@ -41,9 +41,20 @@ public struct BXScriptCommand_step : BXScriptCommand, BXScriptCommandLabeled
 	{
 		self.queue.async
 		{
-			completionHandler?() // Nothing to be done here, immediately call completionHandler
+			BXScriptWindowController.shared?.currentStep = self // Store reference to the current step
+			completionHandler?()
 		}
 	}
+
+	// The Helper class is used to store a various indexes. The BXScriptCommand_step struct is immutable and cannot store anything by itself.
+	
+	class Helper
+	{
+		var globalStepIndex:Int = 0
+		var localCommandIndex:Int = 0
+	}
+	
+	let helper = Helper()
 }
 	
 

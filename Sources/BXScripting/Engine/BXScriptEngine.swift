@@ -44,7 +44,7 @@ public class BXScriptEngine
 //----------------------------------------------------------------------------------------------------------------------
 
 
-	/// The index of the current command
+	/// The local index of the current command
 	
 	@Published public var commandIndex = 0
 	

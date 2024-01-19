@@ -43,12 +43,16 @@ public struct BXScriptCommand_run : BXScriptCommand, BXScriptCommandCancellable
 	{
 		guard let parentEngine = scriptEngine else { return }
 		let parentEnvironment = parentEngine.environment
+
+		let subEngine = BXScriptEngine(scriptCommands, environment:parentEnvironment, completionHandler:
+		{
+			BXScriptWindowController.shared?.currentEngine = scriptEngine
+			completionHandler?()
+		})
 		
-		let subEngine = BXScriptEngine(scriptCommands, environment:parentEnvironment, completionHandler:completionHandler)
-		subEngine.firstCommandIndex = parentEngine.firstCommandIndex + parentEngine.scriptCommands.count
-		subEngine.run(on:queue)
-		
+		BXScriptWindowController.shared?.currentEngine = subEngine
 		helper.subEngine = subEngine
+		subEngine.run(on:queue)
 	}
 	
 	// Cancel
@@ -58,7 +62,7 @@ public struct BXScriptCommand_run : BXScriptCommand, BXScriptCommandCancellable
 		helper.subEngine?.cancel()
 	}
 
-	// The Helper class is used to store a reference to the subEngine. The BXScriptCommand_run struct is immutable and cannot store it by itself.
+	// The Helper class is used to store a reference to the subEngine. The BXScriptCommand_run struct is immutable and cannot store anything by itself.
 	
 	class Helper
 	{
