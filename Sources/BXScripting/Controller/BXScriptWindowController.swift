@@ -41,9 +41,6 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	/// The number of the current step (useful for progress info)
 
 	@Published public var stepIndex = 0
-	{
-		didSet { print("stepIndex = \(stepIndex)") }
-	}
 	
 	/// The total number of steps (useful for progress info)
 
