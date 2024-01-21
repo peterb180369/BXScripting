@@ -76,6 +76,31 @@ struct BXScriptControllerView : View
 			}
 			.opacity(0.6)
 			
+			// Pause Button
+			
+			Button(action:{controller.isPaused = !controller.isPaused})
+			{
+				HStack
+				{
+					Spacer()
+					
+					if #available(macOS 11,*)
+					{
+						SwiftUI.Image(systemName:"pause.fill")
+					}
+					else
+					{
+						#if canImport(BXSwiftUI)
+						BXImage(systemName:"pause.fill")
+						#endif
+					}
+
+					Text("Pause")
+					Spacer()
+				}
+				.foregroundColor(controller.isPaused ? .accentColor : .primary.opacity(0.6))
+			}
+			
 			// Stop Button
 			
 			Button(action:controller.abort)

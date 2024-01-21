@@ -205,7 +205,12 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 		Self.shared = nil
 	}
 	
-	
+	@Published public var isPaused = false
+	{
+		didSet { self.currentEngine?.isPaused = isPaused }
+	}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 	
 	

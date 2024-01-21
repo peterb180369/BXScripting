@@ -52,6 +52,13 @@ public class BXScriptEngine
 	
 	@Published private var isCancelled = false
 	
+	/// Set to true to pause script execution
+	
+	@Published public var isPaused = false
+	{
+		didSet { NotificationCenter.default.post(name:Self.didPauseNotification, object:nil) }
+	}
+	
 	
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -75,6 +82,10 @@ public class BXScriptEngine
 	/// This notification is sent after the script finishes.
 
 	public static let didEndNotification = Notification.Name("BXScriptEngine.didEnd")
+	
+	/// This notification is sent when the script is paused or unpaused.
+
+	public static let didPauseNotification = Notification.Name("BXScriptEngine.didPause")
 	
 	
 //----------------------------------------------------------------------------------------------------------------------
@@ -133,6 +144,18 @@ public class BXScriptEngine
 	
 	internal func executeNextCommand()
 	{
+		// If script is currently paused then try again in the next runloop cycle
+		
+		if isPaused
+		{
+			self.queue.async
+			{
+				[weak self] in self?.executeNextCommand()
+			}
+			
+			return
+		}
+		
 		// If this script has been cancelled, then stop execution
 		
 		guard !isCancelled else

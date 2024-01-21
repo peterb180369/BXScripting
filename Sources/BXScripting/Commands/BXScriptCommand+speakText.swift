@@ -43,6 +43,11 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 	{
 		self.text = text
 		self.wait = wait
+		
+		self.delegate.observers += NotificationCenter.default.publisher(for:BXScriptEngine.didPauseNotification, object:nil).sink
+		{
+			[self] _ in self.pause()
+		}
 	}
 	
 	public func execute()
@@ -85,6 +90,18 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 	{
 		self.synthesizer.stopSpeaking(at:.immediate)
 	}
+	
+	nonmutating func pause()
+	{
+		if synthesizer.isPaused
+		{
+			synthesizer.continueSpeaking()
+		}
+		else
+		{
+			synthesizer.pauseSpeaking(at:.word)
+		}
+	}
  }
 
 
@@ -93,8 +110,10 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 
 fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDelegate
 {
+	var observers:[Any] = []
 	var didCallCompletionHandler = false
 	var completionHandler:(()->Void)? = nil
+
 	public static var currentSpeaker:AVSpeechSynthesizer? = nil
 	
 	func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance)
