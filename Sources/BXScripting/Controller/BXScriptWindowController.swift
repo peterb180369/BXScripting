@@ -143,6 +143,7 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 		window.isFloatingPanel = true
 		window.becomesKeyOnlyIfNeeded = true
 		window.hasShadow = true
+		window.backgroundColor = .clear
 		
 		window.contentView = hostview
 		window.delegate = self
