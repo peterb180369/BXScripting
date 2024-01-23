@@ -208,13 +208,7 @@ struct VisualEffectView: NSViewRepresentable
 {
     func makeNSView(context: Context) -> NSVisualEffectView
     {
-        let effectView = NSVisualEffectView()
-        effectView.appearance = NSAppearance(named:.vibrantLight)
-        effectView.state = .active
-        effectView.material = .mediumLight // This material is deprecated, but I haven't found a visual equivalent yet, so until I do, do not change
-        effectView.blendingMode = .behindWindow
-        effectView.isEmphasized = true
-        return effectView
+		NSVisualEffectView.frostedGlassView()
     }
 
     func updateNSView(_ nsView:NSVisualEffectView, context: Context) { }
