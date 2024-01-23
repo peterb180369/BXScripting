@@ -127,6 +127,10 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 		let hostview = NSHostingView(rootView:view)
 		let size = hostview.intrinsicContentSize
 
+        hostview.wantsLayer = true
+        hostview.layer?.cornerRadius = 8  // Adjust the corner radius as needed
+        hostview.layer?.masksToBounds = true
+
 		// Create window
 
 		let frame = CGRect(origin:.zero, size:size)
