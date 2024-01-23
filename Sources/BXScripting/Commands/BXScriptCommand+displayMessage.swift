@@ -648,15 +648,30 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 	
 	func createStandaloneWindow() -> NSWindow
 	{
-		let window = NSWindow(contentRect:CGRect(origin:.zero, size:CGSize(1,1)), styleMask:[.borderless,.fullSizeContentView], backing:.buffered, defer:false)
-
-		window.backgroundColor = .clear
-		window.isMovableByWindowBackground = true
+		let frame = CGRect(origin:.zero, size:CGSize(1,1))
+		let style:NSWindow.StyleMask = [.borderless,.fullSizeContentView]
+		let window = BXScriptControllerPanel(contentRect:frame, styleMask:style, backing:.buffered, defer:true)
+		window.titlebarAppearsTransparent = true
+		window.isMovableByWindowBackground = false
 		window.isExcludedFromWindowsMenu = true
-		window.collectionBehavior = .fullScreenAuxiliary
+		window.collectionBehavior.insert(.fullScreenAuxiliary)
 		window.isReleasedWhenClosed = false
-		window.contentView?.wantsLayer = true
+		window.backgroundColor = .clear
 		window.hasShadow = true
+
+        let effectView = NSVisualEffectView.frostedGlassView()
+		effectView.wantsLayer = true
+        effectView.layer?.cornerRadius = cornerRadius
+        effectView.layer?.masksToBounds = true
+		effectView.autoresizingMask = [.width,.height]
+
+		let rootView = NSView()
+		rootView.wantsLayer = true
+        rootView.layer?.cornerRadius = cornerRadius
+        rootView.layer?.masksToBounds = true
+		rootView.addSubview(effectView)
+		
+		window.contentView = rootView
 
 		window.orderFront(nil)
 		Self.standaloneWindow = window
