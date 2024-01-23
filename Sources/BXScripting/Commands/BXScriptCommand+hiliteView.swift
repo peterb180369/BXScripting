@@ -127,7 +127,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 		}
 		
 		let critical = view.screenRect(for:frameLayer.frame)
-		BXScriptWindowController.shared?.setCriticalRegion(critical)
+		BXScriptWindowController.shared?.addCriticalRegion(critical)
 	}
 
 
@@ -136,23 +136,25 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 		guard let window = self.window() else { return }
 		guard let view = window.subviewWithIdentifier(id) else { return }
 		self._removeHilite(for:view)
-//		view.removeSublayer(named:frameLayerName)
-//		view.removeSublayer(named:labelLayerName)
-//		window.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
-//
-//		BXScriptWindowController.shared?.setCriticalRegion(.zero)
 	}
+
 
 	private func _removeHilite(for view:NSView?)
 	{
 		guard let view = view else { return }
 		guard let window = view.window else { return }
+
+		if let backgroundLayer = view.sublayer(named:frameLayerName)
+		{
+			let critical = view.screenRect(for:backgroundLayer.frame)
+			BXScriptWindowController.shared?.removeCriticalRegion(critical)
+		}
+
 		view.removeSublayer(named:frameLayerName)
 		view.removeSublayer(named:labelLayerName)
 		window.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
-
-		BXScriptWindowController.shared?.setCriticalRegion(.zero)
 	}
+
 
 	private let frameLayerName = "\(Self.self).frame"
 	private let labelLayerName = "\(Self.self).label"

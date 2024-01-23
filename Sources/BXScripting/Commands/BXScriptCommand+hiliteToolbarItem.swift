@@ -72,7 +72,7 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 				frameLayer.zPosition = 1000
 		
 				let critical = view.screenRect(for:frameLayer.frame)
-				BXScriptWindowController.shared?.setCriticalRegion(critical)
+				BXScriptWindowController.shared?.addCriticalRegion(critical)
 			}
 			else
 			{
@@ -90,10 +90,15 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 	{
 		guard let window = self.window() else { return }
 		guard let view = window.toolbarItemView(withIdentifier:id) else { return }
+
+		if let backgroundLayer = view.sublayer(named:frameLayerName)
+		{
+			let critical = view.screenRect(for:backgroundLayer.frame)
+			BXScriptWindowController.shared?.removeCriticalRegion(critical)
+		}
+
 		view.removeSublayer(named:frameLayerName)
 		window.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
-
-		BXScriptWindowController.shared?.setCriticalRegion(.zero)
 	}
 
 

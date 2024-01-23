@@ -293,9 +293,18 @@ extension BXScriptCommand_displayMessage
 //			let borderColor:NSColor = BXScriptEnvironment.shared[.hiliteStrokeColorKey] ?? .white
 //			backgroundLayer.borderColor = borderColor.cgColor
 //			backgroundLayer.borderWidth = lineWidth
+
+			let critical = view.screenRect(for:backgroundLayer.frame)
+			BXScriptWindowController.shared?.addCriticalRegion(critical)
 		}
 		else
 		{
+			if let backgroundLayer = view.sublayer(named:Self.backgroundLayerName)
+			{
+				let critical = view.screenRect(for:backgroundLayer.frame)
+				BXScriptWindowController.shared?.removeCriticalRegion(critical)
+			}
+			
 			view.removeSublayer(named:Self.backgroundLayerName)
 		}
 	}
@@ -848,9 +857,18 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 //			let borderColor:NSColor = BXScriptEnvironment.shared[.hiliteStrokeColorKey] ?? .white
 //			backgroundLayer.borderColor = borderColor.cgColor
 //			backgroundLayer.borderWidth = lineWidth
+
+			let critical = view.screenRect(for:backgroundLayer.frame)
+			BXScriptWindowController.shared?.addCriticalRegion(critical)
 		}
 		else
 		{
+			if let backgroundLayer = view.sublayer(named:BXScriptCommand_displayMessage.backgroundLayerName)
+			{
+				let critical = view.screenRect(for:backgroundLayer.frame)
+				BXScriptWindowController.shared?.removeCriticalRegion(critical)
+			}
+			
 			view.removeSublayer(named:BXScriptCommand_displayMessage.backgroundLayerName)
 		}
 	}

@@ -50,6 +50,10 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	
 	var currentStep:BXScriptCommand_step? = nil
 
+	/// Set to true if the controller window should be automatically moved to make sure it doesn't overlap a critical region
+	
+	public static var autoMoveWindow = false
+	
 	/// Subscribers
 	
 	private var subscribers:[Any] = []
@@ -245,21 +249,46 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	
 	// MARK: - Auto-Move
 	
+	public func addCriticalRegion(_ rect:CGRect)
+	{
+		self.criticalRegions += rect
+		
+		for region in criticalRegions
+		{
+			moveControllerWindowIfNecessary(with:region)
+		}
+	}
+	
+	public func removeCriticalRegion(_ rect:CGRect)
+	{
+		self.criticalRegions.removeAll
+		{
+			$0 == rect
+		}
+	}
+	
+	public func clearCriticalRegions()
+	{
+		self.criticalRegions = []
+	}
+
+
+	private var criticalRegions:[CGRect] = []
+	
 	/// This function automatically moves the controller window if it covers a critical region (specified in screen coordinates).
 	///
 	/// Script authors can set this critical region to make sure that parts of the UI that must be visible are not covered by the controller window.
 	/// The window is automatically moved in a way that the critical region no longer overlaps the window frame.
 	
-	public func setCriticalRegion(_ rect:CGRect)
+	private func moveControllerWindowIfNecessary(with criticalRect:CGRect)
 	{
-		self.criticalRegion = rect
-		
+		guard Self.autoMoveWindow else { return }
 		guard let window = self.window else { return }
 		guard let screen = window.screen else { return }
 		
 		let screenFrame = screen.frame
 		let windowFrame = window.frame
-		let criticalFrame = criticalRegion.insetBy(dx:-32, dy:-32)
+		let criticalFrame = criticalRect.insetBy(dx:-32, dy:-32)
 		let windowPos = windowFrame.center
 		
 		// We only need to do something if the window actually overlaps the critical region
@@ -374,8 +403,6 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 		
 		// Oops, couldn't find any place to move window, so leave it were it is
 	}
-	
-	private var criticalRegion = CGRect.zero
 }
 
 
