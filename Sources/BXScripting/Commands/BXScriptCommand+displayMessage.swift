@@ -166,9 +166,9 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 
 		// Create and update various other sublayers to display a frosted glass background and an optional pointer line
 		
-		Self.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius)
-		self.updatePointerLayer(in:view, bounds:bounds, position:position, margin:margin, lineWidth:lineWidth)
-		Self.updateShadowLayer(in:view)
+		Self.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius, autoresizingMask:autoresizingMask)
+		self.updatePointerLayer(in:view, bounds:bounds, position:position, margin:margin, lineWidth:lineWidth, autoresizingMask:autoresizingMask)
+		Self.updateShadowLayer(in:view, autoresizingMask:autoresizingMask)
 	}
 	
 	
@@ -242,7 +242,7 @@ extension BXScriptCommand_displayMessage
 	
 	/// Creates/Updates a background layer with a frosted glass look behind the CATextLayer
 		
-	static func updateBackgroundLayer(in view:NSView, visible:Bool, padding:NSEdgeInsets, cornerRadius:CGFloat)
+	static func updateBackgroundLayer(in view:NSView, visible:Bool, padding:NSEdgeInsets, cornerRadius:CGFloat, autoresizingMask:CAAutoresizingMask)
 	{
 		guard let textLayer = view.sublayer(named:Self.textLayerName) as? CATextLayer else { return }
 		
@@ -262,7 +262,7 @@ extension BXScriptCommand_displayMessage
 				newLayer.shadowOffset = CGSize(0,-5)
 				newLayer.shadowRadius = 5
 				
-				if let blur = CIFilter(name:"CIGaussianBlur", parameters:[kCIInputRadiusKey:32])
+				if let blur = CIFilter(name:"CIGaussianBlur", parameters:[kCIInputRadiusKey:20])
 				{
 					newLayer.backgroundFilters = [blur]
 					newLayer.masksToBounds = true
@@ -288,6 +288,7 @@ extension BXScriptCommand_displayMessage
 			backgroundLayer.bounds = bounds
 			backgroundLayer.position = textLayer.frame.center + CGPoint(dx,dy)
 			backgroundLayer.cornerRadius = cornerRadius
+			backgroundLayer.autoresizingMask = autoresizingMask
 
 //			let borderColor:NSColor = BXScriptEnvironment.shared[.hiliteStrokeColorKey] ?? .white
 //			backgroundLayer.borderColor = borderColor.cgColor
@@ -302,7 +303,7 @@ extension BXScriptCommand_displayMessage
 	
 	/// Creates/Updates a CALayer that draws a shadow for the frosted glass background
 		
-	static func updateShadowLayer(in view:NSView)
+	static func updateShadowLayer(in view:NSView, autoresizingMask:CAAutoresizingMask)
 	{
 		guard let backgroundLayer = view.sublayer(named:Self.backgroundLayerName) else { return }
 
@@ -332,6 +333,7 @@ extension BXScriptCommand_displayMessage
 		shadowLayer.bounds = bounds
 //		shadowLayer.cornerRadius = 12
 		shadowLayer.position = backgroundLayer.position
+		shadowLayer.autoresizingMask = autoresizingMask
 
 		shadowLayer.shadowPath = path
 		shadowLayer.shadowColor = NSColor.black.cgColor
@@ -343,7 +345,7 @@ extension BXScriptCommand_displayMessage
 	
 	/// Creates/Updates a CALayer that draws a line from the glass background to the specified position
 		
-	func updatePointerLayer(in view:NSView, bounds:CGRect, position:CGPoint, margin:CGFloat, lineWidth:CGFloat)
+	func updatePointerLayer(in view:NSView, bounds:CGRect, position:CGPoint, margin:CGFloat, lineWidth:CGFloat, autoresizingMask:CAAutoresizingMask)
 	{
 		guard pointerLength != nil else { return }
 		guard let backgroundLayer = view.sublayer(named:Self.backgroundLayerName) else { return }
@@ -364,13 +366,14 @@ extension BXScriptCommand_displayMessage
 		let dy =  p2.y - p1.y
 		let angle = atan2(dy,dx)
 		let hiliteColor:NSColor = BXScriptEnvironment.shared[.hiliteStrokeColorKey] ?? .white
-		let white = CGColor(gray:0.6, alpha:1)
+//		let white = CGColor(gray:0.6, alpha:1)
 		let color = hiliteColor.cgColor
 		
 		pointerLayer.bounds = CGRect(x:0, y:0, width:lineLength, height:lineWidth)
 		pointerLayer.anchorPoint = CGPoint(0,0.5)
 		pointerLayer.transform = CATransform3DMakeRotation(angle,0,0,1)
 		pointerLayer.position = p1
+//		pointerLayer.autoresizingMask = autoresizingMask
 		
 //		pointerLayer.backgroundColor = color
 		pointerLayer.colors = [color,color]

@@ -63,9 +63,15 @@ public struct BXScriptCommand_setMessageBackground : BXScriptCommand
 
 		let showsBackground = backgroundPadding != nil
 		let padding = backgroundPadding ?? NSEdgeInsets()
-	
-		BXScriptCommand_displayMessage.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius)
-		BXScriptCommand_displayMessage.updateShadowLayer(in:view)
+		let pos = textLayer.position
+		let bounds = view.bounds
+		let autoresizingMask = BXScriptCommand_displayMessage.autoresizingMask(for:bounds, position:pos)
+
+
+
+
+		BXScriptCommand_displayMessage.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius, autoresizingMask:autoresizingMask)
+		BXScriptCommand_displayMessage.updateShadowLayer(in:view, autoresizingMask:autoresizingMask)
 	}
 }
 
