@@ -78,7 +78,7 @@ extension String
 
 extension CGPoint
 {
-	/// Returns the absolute location of a relative point in a view. The relative coordinates are specified in the range [0 ... 1]. The result is in window coordinates.
+	/// Returns the absolute location of a relative point in a view. The relative coordinates are specified in the range [0 ... 1]. 
 	
 	public static func relativePoint(_ relative:CGPoint, in view:NSView) -> CGPoint
 	{
@@ -88,53 +88,52 @@ extension CGPoint
 			bounds.minX + relative.x * bounds.width,
 			bounds.minY + relative.y * bounds.height)
 			
-		return view.convert(p, to:nil)
+		return p
 	}
 
-	/// Returns the topLeft point in a view in window coordinates (with specified inset)
+	/// Returns the topLeft point in a view  (with specified inset)
 	
-//	public static func topLeft(of view:NSView?, inset:CGSize = .zero) -> CGPoint
 	public static func topLeft(of view:@escaping @autoclosure ()->NSView?, inset:CGSize = .zero) -> CGPoint
 	{
 		guard let view = view() else { return .zero }
 		let p = view.bounds.insetBy(dx:inset.width, dy:inset.height).topLeft
-		return view.convert(p, to:nil)
+		return p
 	}
 
-	/// Returns the top point in a view in window coordinates (with specified inset)
+	/// Returns the top point in a view  (with specified inset)
 	
 	public static func top(of view:@escaping @autoclosure ()->NSView?, inset:CGSize = .zero) -> CGPoint
 	{
 		guard let view = view() else { return .zero }
 		let p = view.bounds.insetBy(dx:inset.width, dy:inset.height).top
-		return view.convert(p, to:nil)
+		return p
 	}
 
-	/// Returns the topRight point in a view in window coordinates (with specified inset)
+	/// Returns the topRight point in a view  (with specified inset)
 	
 	public static func topRight(of view:@escaping @autoclosure ()->NSView?, inset:CGSize = .zero) -> CGPoint
 	{
 		guard let view = view() else { return .zero }
 		let p = view.bounds.insetBy(dx:inset.width, dy:inset.height).topRight
-		return view.convert(p, to:nil)
+		return p
 	}
 
-	/// Returns the left point in a view in window coordinates (with specified inset)
+	/// Returns the left point in a view  (with specified inset)
 	
 	public static func left(of view:@escaping @autoclosure ()->NSView?, inset:CGSize = .zero) -> CGPoint
 	{
 		guard let view = view() else { return .zero }
 		let p = view.bounds.insetBy(dx:inset.width, dy:inset.height).left
-		return view.convert(p, to:nil)
+		return p
 	}
 
-	/// Returns the center point in a view in window coordinates (with specified inset)
+	/// Returns the center point in a view  (with specified inset)
 	
 	public static func center(of view:@escaping @autoclosure ()->NSView?) -> CGPoint
 	{
 		guard let view = view() else { return .zero }
 		let p = view.bounds.center
-		return view.convert(p, to:nil)
+		return p
 	}
 
 	/// Returns the center point of the specified screen
@@ -144,40 +143,40 @@ extension CGPoint
 		screen?.frame.center ?? .zero
 	}
 
-	/// Returns the right point in a view in window coordinates (with specified inset)
+	/// Returns the right point in a view  (with specified inset)
 	
 	public static func right(of view:@escaping @autoclosure ()->NSView?, inset:CGSize = .zero) -> CGPoint
 	{
 		guard let view = view() else { return .zero }
 		let p = view.bounds.insetBy(dx:inset.width, dy:inset.height).right
-		return view.convert(p, to:nil)
+		return p
 	}
 
-	/// Returns the bottomLeft point in a view in window coordinates (with specified inset)
+	/// Returns the bottomLeft point in a view  (with specified inset)
 	
 	public static func bottomLeft(of view:@escaping @autoclosure ()->NSView?, inset:CGSize = .zero) -> CGPoint
 	{
 		guard let view = view() else { return .zero }
 		let p = view.bounds.insetBy(dx:inset.width, dy:inset.height).bottomLeft
-		return view.convert(p, to:nil)
+		return p
 	}
 
-	/// Returns the bottom point in a view in window coordinates (with specified inset)
+	/// Returns the bottom point in a view  (with specified inset)
 	
 	public static func bottom(of view:@escaping @autoclosure ()->NSView?, inset:CGSize = .zero) -> CGPoint
 	{
 		guard let view = view() else { return .zero }
 		let p = view.bounds.insetBy(dx:inset.width, dy:inset.height).bottom
-		return view.convert(p, to:nil)
+		return p
 	}
 
-	/// Returns the bottomRight point in a view in window coordinates (with specified inset)
+	/// Returns the bottomRight point in a view  (with specified inset)
 	
 	public static func bottomRight(of view:@escaping @autoclosure ()->NSView?, inset:CGSize = .zero) -> CGPoint
 	{
 		guard let view = view() else { return .zero }
 		let p = view.bounds.insetBy(dx:inset.width, dy:inset.height).bottomRight
-		return view.convert(p, to:nil)
+		return p
 	}
 }
 
