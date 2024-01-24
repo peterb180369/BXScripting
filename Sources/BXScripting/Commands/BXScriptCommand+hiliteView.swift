@@ -101,6 +101,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 		
 		frameLayer.bounds = bounds.insetBy(dx:inset, dy:inset)
 		frameLayer.position = bounds.center
+		frameLayer.autoresizingMask = [.layerWidthSizable,.layerHeightSizable]
 		frameLayer.backgroundColor = fillColor.cgColor
 		frameLayer.borderColor = strokeColor.cgColor
 		frameLayer.borderWidth = 3
