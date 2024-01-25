@@ -57,19 +57,27 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessageWindow
 
 public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCommandCancellable
 {
+	// Text
+	
 	var message:()->Any?
 	var textAlignment:CATextLayerAlignmentMode = .center
+	
+	// Layout
+	
 	var position:()->CGPoint
 	var anchor:MessageLayerAnchor = .center
 	var backgroundPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:72, bottom:12, right:72)
 	var cornerRadius:CGFloat = 12.0
 	var pointerLength:CGFloat? = nil
 	
+	// Execution support
 	
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
 	public weak var scriptEngine:BXScriptEngine? = nil
 	private static var standaloneWindow:NSWindow? = nil
+	
+	// Execute
 	
 	public func execute()
 	{
@@ -93,9 +101,36 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 	}
 	
 	
+	public func cancel()
+	{
+		self.cleanup()
+	}
+	
+	
+	private func cleanup()
+	{
+		guard let window = self.window() else { return }
+		guard let view = window.contentView else { return }
+		
+		view.removeSublayer(named:BXScriptCommand_displayMessage.textLayerName)
+		view.removeSublayer(named:BXScriptCommand_displayMessage.backgroundLayerName)
+		view.removeSublayer(named:BXScriptCommand_displayMessage.shadowLayerName)
+		
+		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
+		view.removeSublayer(named:BXScriptCommand_hiliteMessage.hiliteLayerName)
+		
+		self.closeStandaloneWindow()
+	}
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// MARK: - Window
+
+extension BXScriptCommand_displayMessageWindow
+{
 	func window() -> NSWindow?
 	{
 		let center = position()
@@ -109,11 +144,24 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 	}
 	
 	
+	func windowSize() -> CGSize
+	{
+		guard let text = self.attributedString() else { return .zero }
+		let padding = backgroundPadding ?? NSEdgeInsets()
+
+		var size = text.size()
+		size.width += padding.left + padding.right
+		size.height += padding.top + padding.bottom
+		return size
+	}
+	
+	
 	func createStandaloneWindow() -> NSWindow
 	{
 		let frame = CGRect(origin:.zero, size:CGSize(1,1))
 		let style:NSWindow.StyleMask = [.borderless,.fullSizeContentView]
 		let window = BXScriptControllerPanel(contentRect:frame, styleMask:style, backing:.buffered, defer:true)
+		window.level = .modalPanel
 		window.titlebarAppearsTransparent = true
 		window.isMovableByWindowBackground = false
 		window.isExcludedFromWindowsMenu = true
@@ -147,20 +195,16 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 		Self.standaloneWindow?.close()
 		Self.standaloneWindow = nil
 	}
-	
-	
-	func windowSize() -> CGSize
-	{
-		guard let text = self.attributedString() else { return .zero }
-		let padding = backgroundPadding ?? NSEdgeInsets()
+}
 
-		var size = text.size()
-		size.width += padding.left + padding.right
-		size.height += padding.top + padding.bottom
-		return size
-	}
-	
-	
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: - Rendering
+
+extension BXScriptCommand_displayMessageWindow
+{
 	private func attributedString() -> NSAttributedString?
 	{
 		let message = message()
@@ -170,6 +214,14 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 			return message
 		}
 		
+		if #available(macOS 12,*)
+		{
+			if let attributedString = message as? AttributedString
+			{
+				return NSAttributedString(attributedString)
+			}
+		}
+				
 		if let string = message as? String
 		{
 			guard let environment = scriptEngine?.environment else { return nil }
@@ -179,14 +231,6 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 			return NSAttributedString(string:string, attributes:attributes)
 		}
 
-		if #available(macOS 12,*)
-		{
-			if let attributedString = message as? AttributedString
-			{
-				return NSAttributedString(attributedString)
-			}
-		}
-				
 		return nil
 	}
 	
@@ -226,28 +270,6 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 		Self.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius)
 //		Self.updateShadowLayer(in:view)
 	}
-	
-	
-	public func cancel()
-	{
-		self.cleanup()
-	}
-	
-	
-	private func cleanup()
-	{
-		guard let window = self.window() else { return }
-		guard let view = window.contentView else { return }
-		
-		view.removeSublayer(named:BXScriptCommand_displayMessage.textLayerName)
-		view.removeSublayer(named:BXScriptCommand_displayMessage.backgroundLayerName)
-		view.removeSublayer(named:BXScriptCommand_displayMessage.shadowLayerName)
-		
-		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)
-		view.removeSublayer(named:BXScriptCommand_hiliteMessage.hiliteLayerName)
-		
-		self.closeStandaloneWindow()
-	}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -255,7 +277,7 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 
 	/// Creates/Updates a CATextLayer with the specified text and layout parameters
 		
-	func updateTextLayer(with text:NSAttributedString, in view:NSView, position:CGPoint/*, anchorPoint:CGPoint, autoresizingMask:CAAutoresizingMask*/)
+	func updateTextLayer(with text:NSAttributedString, in view:NSView, position:CGPoint)
 	{
 		// Create a CATextLayer to display the message
 		
