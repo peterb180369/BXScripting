@@ -274,3 +274,30 @@ extension CGPoint
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+extension NSMenuItem
+{
+	/// Returns the frame of the specified NSMenuItem
+	
+	public static func frameOfItem(withIdentifier identifier:String) -> CGRect
+	{
+		BXScriptCommand_hiliteMenuItem.menuItemFrame(withIdentifier:identifier)
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+extension NSScreen
+{
+	public static func frame(inset:CGSize = .zero) -> CGRect
+	{
+		guard let screen = NSScreen.main else { return .zero }
+		return screen.frame.insetBy(dx:inset.width, dy:inset.height)
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
