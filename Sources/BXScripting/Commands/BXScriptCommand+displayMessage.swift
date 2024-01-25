@@ -162,25 +162,17 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
 	public weak var scriptEngine:BXScriptEngine? = nil
-	
-	public class Helper
-	{
-		var observers:[Any] = []
-	}
-	
-	public var helper = Helper()
-	
+	static var observers:[Any] = []
 	
 	// Execute
 
 	public func execute()
 	{
-		self.helper.observers.removeAll()
+		Self.observers.removeAll()
 		
-		self.helper.observers += self.targetView?.onFrameDidChange
+		Self.observers += self.targetView?.onFrameDidChange
 		{
-			_ in
-			self.updateLayerPositons()
+			_ in self.updateLayerPositons()
 		}
 		
 		self.queue.async
@@ -203,6 +195,8 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	
 	private func cleanup()
 	{
+		Self.observers.removeAll()
+		
 		guard let view = self.rootView else { return }
 		
 		view.removeSublayer(named:Self.textLayerName)
