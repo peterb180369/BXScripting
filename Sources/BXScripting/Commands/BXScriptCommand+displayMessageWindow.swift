@@ -318,7 +318,7 @@ extension BXScriptCommand_displayMessageWindow
 				let newLayer = CALayer()
 				newLayer.zPosition = 990
 
-				newLayer.backgroundColor = CGColor(gray:0.4, alpha:0.9)
+				newLayer.backgroundColor = CGColor(gray:0.4, alpha:0.2)
 				newLayer.borderColor = CGColor(gray:1, alpha:0.35)
 				newLayer.borderWidth = 1
 				
@@ -327,16 +327,16 @@ extension BXScriptCommand_displayMessageWindow
 				newLayer.shadowOffset = CGSize(0,-5)
 				newLayer.shadowRadius = 5
 				
-				if let blur = CIFilter(name:"CIGaussianBlur", parameters:[kCIInputRadiusKey:32])
-				{
-					newLayer.backgroundFilters = [blur]
-					newLayer.masksToBounds = true
-				}
-				
-				if let compositing = CIFilter(name:"CIScreenBlendMode")
-				{
-					newLayer.compositingFilter = compositing
-				}
+//				if let blur = CIFilter(name:"CIGaussianBlur", parameters:[kCIInputRadiusKey:32])
+//				{
+//					newLayer.backgroundFilters = [blur]
+//					newLayer.masksToBounds = true
+//				}
+//				
+//				if let compositing = CIFilter(name:"CIScreenBlendMode")
+//				{
+//					newLayer.compositingFilter = compositing
+//				}
 				
 				return newLayer
 			}
