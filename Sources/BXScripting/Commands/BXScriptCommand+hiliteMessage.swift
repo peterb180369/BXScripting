@@ -61,7 +61,7 @@ public struct BXScriptCommand_hiliteMessage : BXScriptCommand, BXScriptCommandCa
 	
 	private func updateLayers()
 	{
-		guard let window = self.window() else { return }
+		guard let window = self.window() ?? BXScriptCommand_displayMessageWindow.standaloneWindow else { return }
 		guard let view = window.contentView else { return }
 		guard let textLayer = view.sublayer(named:BXScriptCommand_displayMessage.textLayerName) as? CATextLayer else { return }
 		guard let backgroundLayer = view.sublayer(named:BXScriptCommand_displayMessage.backgroundLayerName) else { return }
