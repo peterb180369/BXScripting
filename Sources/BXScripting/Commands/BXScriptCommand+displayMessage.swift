@@ -307,7 +307,7 @@ extension BXScriptCommand_displayMessage
 		guard let rootView = self.rootView else { return }
 
 		let position = self.positionInWindow(with:text)
-		let autoresizingMask:CAAutoresizingMask = [] // Self.autoresizingMask(for:bounds, position:pos)
+		let autoresizingMask:CAAutoresizingMask = []
 		
 		// Create and update a sublayers to display the message with optional glass background and a pointer line
 		
@@ -360,12 +360,12 @@ extension BXScriptCommand_displayMessage
 		let showsBackground = backgroundPadding != nil
 		let padding = backgroundPadding ?? NSEdgeInsets()
 		let lineWidth:CGFloat = 3.0
-		let margin = pointerLength ?? 0.0
-		let autoresizingMask:CAAutoresizingMask = [] // Self.autoresizingMask(for:bounds, position:pos)
+//		let margin = pointerLength ?? 0.0
+		let autoresizingMask:CAAutoresizingMask = []
 
 		Self.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius, autoresizingMask:autoresizingMask)
 		Self.updateShadowLayer(in:view, autoresizingMask:autoresizingMask)
-		self.updatePointerLayer(in:view, position:position, margin:margin, lineWidth:lineWidth, autoresizingMask:autoresizingMask)
+		Self.updatePointerLayer(in:view, position:position, anchor:anchor, pointerLength:pointerLength, lineWidth:lineWidth, autoresizingMask:autoresizingMask)
 	}
 	
 	
@@ -386,7 +386,7 @@ extension BXScriptCommand_displayMessage
 	
 	/// Creates/Updates a background layer with a frosted glass look behind the CATextLayer
 		
-	static func updateBackgroundLayer(in view:NSView, visible:Bool, padding:NSEdgeInsets, cornerRadius:CGFloat, autoresizingMask:CAAutoresizingMask)
+	static func updateBackgroundLayer(in view:NSView, visible:Bool, padding:NSEdgeInsets, cornerRadius:CGFloat, autoresizingMask:CAAutoresizingMask = [])
 	{
 		guard let textLayer = view.sublayer(named:Self.textLayerName) as? CATextLayer else { return }
 		
@@ -464,7 +464,7 @@ extension BXScriptCommand_displayMessage
 	
 	/// Creates/Updates a CALayer that draws a shadow for the frosted glass background
 		
-	static func updateShadowLayer(in view:NSView, autoresizingMask:CAAutoresizingMask)
+	static func updateShadowLayer(in view:NSView, autoresizingMask:CAAutoresizingMask = [])
 	{
 		guard let backgroundLayer = view.sublayer(named:Self.backgroundLayerName) else { return }
 
@@ -516,7 +516,7 @@ extension BXScriptCommand_displayMessage
 	
 	/// Creates/Updates a CALayer that draws a line from the glass background to the specified position
 		
-	func updatePointerLayer(in view:NSView, /*bounds:CGRect,*/ position:CGPoint, margin:CGFloat, lineWidth:CGFloat, autoresizingMask:CAAutoresizingMask)
+	static func updatePointerLayer(in view:NSView, position:CGPoint, anchor:MessageLayerAnchor, pointerLength:CGFloat?, lineWidth:CGFloat, autoresizingMask:CAAutoresizingMask = [])
 	{
 		// Only do this if we have a backgroundLayer and want a pointer
 		
@@ -532,6 +532,7 @@ extension BXScriptCommand_displayMessage
 			return newLayer
 		}
 	
+		let margin = pointerLength ?? 0.0
 		let frame = backgroundLayer.frame
 		let inner = frame.safeInsetBy(dx:margin, dy:margin)
 		let outer = frame.insetBy(dx:-margin, dy:-margin)

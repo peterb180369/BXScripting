@@ -75,7 +75,7 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
 	public weak var scriptEngine:BXScriptEngine? = nil
-	private static var standaloneWindow:NSWindow? = nil
+	public private(set) static var standaloneWindow:NSWindow? = nil
 	
 	// Execute
 	
@@ -109,7 +109,7 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 	
 	private func cleanup()
 	{
-		guard let window = self.window() else { return }
+		guard let window = Self.standaloneWindow else { return }
 		guard let view = window.contentView else { return }
 		
 		view.removeSublayer(named:BXScriptCommand_displayMessage.textLayerName)
@@ -131,11 +131,14 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 
 extension BXScriptCommand_displayMessageWindow
 {
+	/// Returns the standalone window (creating it if necessary) and moves it to the correct location
+	
 	func window() -> NSWindow?
 	{
-		let center = position()
-		let size = self.windowSize()
-		let rect = CGRect(center:center, size:size)
+		guard let text = self.attributedString() else { return nil }
+		let position = self.positionOnScreen(with:text)
+		let size = self.windowSize(with:text)
+		let rect = CGRect(center:position, size:size)
 
 		let window = Self.standaloneWindow ?? createStandaloneWindow()
 		window.setFrame(rect, display:true, animate:false)
@@ -144,9 +147,32 @@ extension BXScriptCommand_displayMessageWindow
 	}
 	
 	
-	func windowSize() -> CGSize
+	/// Calculates the position of the window
+	
+	private func positionOnScreen(with text:NSAttributedString) -> CGPoint
 	{
-		guard let text = self.attributedString() else { return .zero }
+		let margin = pointerLength ?? 0.0
+		let padding = backgroundPadding ?? NSEdgeInsets()
+		
+		// Calculate correct layer position
+		
+		let position = BXScriptCommand_displayMessage.adjustPosition(
+			position(),
+			anchor: anchor,
+			textSize: text.size(),
+			t:margin+padding.top,
+			l:margin+padding.left,
+			b:margin+padding.bottom,
+			r:margin+padding.right)
+		
+		return position
+	}
+
+
+	/// Calculates the size of the window
+	
+	func windowSize(with text:NSAttributedString) -> CGSize
+	{
 		let padding = backgroundPadding ?? NSEdgeInsets()
 
 		var size = text.size()
@@ -155,6 +181,8 @@ extension BXScriptCommand_displayMessageWindow
 		return size
 	}
 	
+	
+	/// Creates the standalone window and configures it for a frosted glass look
 	
 	func createStandaloneWindow() -> NSWindow
 	{
@@ -203,6 +231,7 @@ extension BXScriptCommand_displayMessageWindow
 
 // MARK: - Rendering
 
+
 extension BXScriptCommand_displayMessageWindow
 {
 	private func attributedString() -> NSAttributedString?
@@ -241,8 +270,8 @@ extension BXScriptCommand_displayMessageWindow
 	private func prepareForUpdates()
 	{
 		guard let view = self.window()?.contentView else { return }
-		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName) // Remove previous message icon
-		view.removeSublayer(named:BXScriptCommand_hiliteMessage.hiliteLayerName) 	// Remove previous hilite
+		view.removeSublayer(named:BXScriptCommand_hiliteMessage.hiliteLayerName) 		// Remove previous hilite
+		view.removeSublayer(named:BXScriptCommand_displayMessageIcon.sublayerName)		// Remove previous message icon
 	}
 	
 	
@@ -253,58 +282,25 @@ extension BXScriptCommand_displayMessageWindow
 
 		// Determine correct layout properties depending on position within the view
 		
-		var pos = position()
-		let bounds = view.bounds
-		if view.isFlipped { pos.y = bounds.maxY - pos.y }
-		
 		let padding = backgroundPadding ?? NSEdgeInsets()
-		let position = bounds.center
+		let position = view.bounds.center
 		let showsBackground = backgroundPadding != nil
 		
 		// Create and update a CATextLayer to display the message
 		
-		self.updateTextLayer(with:text, in:view, position:position)
+		BXScriptCommand_displayMessage.updateTextLayer(with:text, textAlignment:textAlignment, in:view, position:position, autoresizingMask:[])
 
 		// Create and update various other sublayers to display a frosted glass background and an optional pointer line
 		
 		Self.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius)
-//		Self.updateShadowLayer(in:view)
+//		BXScriptCommand_displayMessage.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius, autoresizingMask:[])
+		BXScriptCommand_displayMessage.updatePointerLayer(in:view, position:position, anchor:anchor, pointerLength:pointerLength, lineWidth:3)
 	}
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-	/// Creates/Updates a CATextLayer with the specified text and layout parameters
-		
-	func updateTextLayer(with text:NSAttributedString, in view:NSView, position:CGPoint)
-	{
-		// Create a CATextLayer to display the message
-		
-		let textLayer:CATextLayer = view.createSublayer(named:BXScriptCommand_displayMessage.textLayerName)
-		{
-			let newLayer = CATextLayer()
-			newLayer.zPosition = 1000
-			newLayer.isWrapped = true
-			newLayer.shadowColor = NSColor.black.cgColor
-			newLayer.shadowOpacity = 0.5
-			newLayer.shadowOffset = CGSize(0,0)
-			newLayer.shadowRadius = 2
-			return newLayer
-		}
-		
-		CATransaction.begin()
-		CATransaction.setDisableActions(true)
-		
-			textLayer.string = text
-			textLayer.alignmentMode = textAlignment
-			textLayer.position = position
-			textLayer.bounds = CGRect(origin:.zero, size:text.size())
-			
-		CATransaction.commit()
-	}
-	
-	
 	/// Creates/Updates a background layer with a frosted glass look behind the CATextLayer
 		
 	static func updateBackgroundLayer(in view:NSView, visible:Bool, padding:NSEdgeInsets, cornerRadius:CGFloat)
@@ -371,47 +367,6 @@ extension BXScriptCommand_displayMessageWindow
 			
 			view.removeSublayer(named:BXScriptCommand_displayMessage.backgroundLayerName)
 		}
-	}
-	
-	
-	/// Creates/Updates a CALayer that draws a shadow for the frosted glass background
-		
-	static func updateShadowLayer(in view:NSView)
-	{
-		guard let backgroundLayer = view.sublayer(named:BXScriptCommand_displayMessage.backgroundLayerName) else { return }
-
-		let bounds = backgroundLayer.bounds
-		let r:CGFloat = 6.0
-		let d:CGFloat = 0.75 * r
-		let inner = view.isFlipped ?
-			bounds.insetBy(dx:d, dy:0).offsetBy(dx:0, dy:-d) :
-			bounds.insetBy(dx:d, dy:0).offsetBy(dx:0, dy:d)
-		
-		let shadowLayer:CALayer = view.createSublayer(named:BXScriptCommand_displayMessage.shadowLayerName)
-		{
-			let newLayer = CALayer()
-			newLayer.zPosition = 980
-			return newLayer
-		}
-
-		let path1 = CGPath(roundedRect:bounds, cornerWidth:12, cornerHeight:12, transform:nil)
-		let path2 = CGPath(rect:inner, transform:nil)
-		var path = path1
-		
-		if #available(macOS 13.0,*)
-		{
-			path = path1.subtracting(path2)
-		}
-
-		shadowLayer.bounds = bounds
-//		shadowLayer.cornerRadius = 12
-		shadowLayer.position = backgroundLayer.position
-
-		shadowLayer.shadowPath = path
-		shadowLayer.shadowColor = NSColor.black.cgColor
-		shadowLayer.shadowOpacity = 1.5
-		shadowLayer.shadowRadius = r
-		shadowLayer.shadowOffset = CGSize(0,view.isFlipped ? r : -r)
 	}
 }
 
