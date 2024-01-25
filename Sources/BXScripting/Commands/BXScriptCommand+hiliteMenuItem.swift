@@ -19,7 +19,7 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteMenuItem
 {
 	/// Creates a command that shows or hides a highlight on the view with the specified identifier. You can also supply an optional view label.
 
-	public static func hiliteMenuItem(withID itemID:String, menuID:String, cornerRadius:CGFloat = 8.0) -> BXScriptCommand
+	public static func hiliteMenuItem(withID itemID:String, menuID:String, cornerRadius:CGFloat = 4.0) -> BXScriptCommand
 	{
 		BXScriptCommand_hiliteMenuItem(itemID:itemID, menuID:menuID, cornerRadius:cornerRadius)
 	}
@@ -47,7 +47,7 @@ public struct BXScriptCommand_hiliteMenuItem : BXScriptCommand, BXScriptCommandC
 	
 	/// The corner radius of the highlight frame
 	
-	var cornerRadius:CGFloat = 0.0
+	var cornerRadius:CGFloat = 4.0
 	
 	/// This helper is needed to open a window and draw the hilite frame
 
@@ -71,13 +71,10 @@ public struct BXScriptCommand_hiliteMenuItem : BXScriptCommand, BXScriptCommandC
 			guard let mainMenu = NSMenu.main else { return }
 			guard let item = mainMenu.menuItems(forIdentifier:itemID).first else { return }
 			guard let menu = item.menu  else { return }
-//			guard let menuTitleElement = BXAccessibilityHelper.findElement(withIdentifier:menuID) else { return }
-//			guard let menuItemElement = BXAccessibilityHelper.findElement(withIdentifier:itemID) else { return }
 
 			// Configure the helper
 			
 			Self.helper.itemID = self.itemID
-//			Self.helper.itemElement = menuItemElement
 			Self.helper.strokeColor = environment.value(forKey:.hiliteStrokeColorKey) ?? .yellow
 			Self.helper.strokeWidth = 4.0
 			Self.helper.cornerRadius = self.cornerRadius
@@ -119,7 +116,13 @@ public struct BXScriptCommand_hiliteMenuItem : BXScriptCommand, BXScriptCommandC
 
 	var menuTitleFrame:CGRect
 	{
-		guard let element = BXAccessibilityHelper.findElement(withIdentifier:menuID) else { return .zero }
+		Self.menuItemFrame(withIdentifier:menuID)
+	}
+
+
+	public static func menuItemFrame(withIdentifier itemID:String) -> CGRect
+	{
+		guard let element = BXAccessibilityHelper.findElement(withIdentifier:itemID) else { return .zero }
 		guard let frame = BXAccessibilityHelper.getFrame(of:element) else { return .zero }
 		return frame.insetBy(dx:-3, dy:-5)
 	}
@@ -190,11 +193,10 @@ fileprivate class WindowHelper : NSObject
 	
 	var menuItemFrame:CGRect
 	{
-		guard let element = BXAccessibilityHelper.findElement(withIdentifier:itemID) else { return .zero }
-		guard let frame = BXAccessibilityHelper.getFrame(of:element) else { return .zero }
-		return frame.insetBy(dx:-3, dy:-5)
+		BXScriptCommand_hiliteMenuItem.menuItemFrame(withIdentifier:itemID)
 	}
-	
+
+
 	func postMouseEvent(position:CGPoint, type:NSEvent.EventType = .leftMouseDown)
 	{
 		let window = NSApplication.shared.windows.last
