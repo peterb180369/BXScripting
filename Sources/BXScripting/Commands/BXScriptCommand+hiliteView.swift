@@ -17,9 +17,9 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteView
 {
 	/// Creates a command that shows or hides a highlight on the view with the specified identifier. You can also supply an optional view label.
 
-	public static func hiliteView(withID id:String, in window:@escaping @autoclosure ()->NSWindow?, label:String? = nil, visible:Bool = true, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0) -> BXScriptCommand
+	public static func hiliteView(withID id:String, in window:@escaping @autoclosure ()->NSWindow?, label:String? = nil, visible:Bool = true, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0, animated:Bool = false) -> BXScriptCommand
 	{
-		BXScriptCommand_hiliteView(id:id, window:window, label:label, visible:visible, inset:inset, cornerRadius:cornerRadius)
+		BXScriptCommand_hiliteView(id:id, window:window, label:label, visible:visible, inset:inset, cornerRadius:cornerRadius, animated:animated)
 	}
 	
 	/// Creates a command that hides the previous highlight on the view.
@@ -44,6 +44,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	var visible:Bool
 	var inset:CGFloat = 0.0
 	var cornerRadius:CGFloat = 0.0
+	var animated:Bool = false
 	
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
@@ -127,6 +128,8 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 			textLayer.zPosition = 1000
 		}
 		
+		if animated { self.animate(frameLayer) }
+		
 		let critical = view.screenRect(for:frameLayer.frame)
 		BXScriptWindowController.shared?.addCriticalRegion(critical)
 	}
@@ -155,6 +158,37 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 		view.removeSublayer(named:labelLayerName)
 		window.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
 	}
+
+
+	private func animate(_ frameLayer:CALayer, duration:Double = 0.15, scaleFactor:CGFloat = 1.7)
+	{
+		let easeOut = CAMediaTimingFunction(name:CAMediaTimingFunctionName.easeOut)
+		
+		let fadeIn = CABasicAnimation(keyPath:"opacity")
+        fadeIn.fromValue = 0.0
+        fadeIn.toValue = 1.0
+        fadeIn.duration = duration
+		fadeIn.timingFunction = easeOut
+
+		let scale = CABasicAnimation(keyPath:"transform.scale")
+        scale.fromValue = scaleFactor
+        scale.toValue = 1.0
+        scale.duration = duration
+		scale.timingFunction = easeOut
+
+        let group = CAAnimationGroup()
+        group.animations = [fadeIn, scale]
+        group.duration = duration
+		group.timingFunction = easeOut
+
+        // Add the animation group to the layer
+        frameLayer.add(group, forKey:"fadeAndScaleAnimation")
+
+        // Set the final values for opacity and scale
+        
+        frameLayer.opacity = 1.0
+        frameLayer.transform = CATransform3DIdentity
+ 	}
 
 
 	private let frameLayerName = "\(Self.self).frame"
