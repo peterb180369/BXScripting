@@ -136,13 +136,6 @@ extension CGPoint
 		return p
 	}
 
-	/// Returns the center point of the specified screen
-	
-	public static func center(of screen:NSScreen?) -> CGPoint
-	{
-		screen?.frame.center ?? .zero
-	}
-
 	/// Returns the right point in a view  (with specified inset)
 	
 	public static func right(of view:@escaping @autoclosure ()->NSView?, inset:CGSize = .zero) -> CGPoint
@@ -269,6 +262,62 @@ extension CGPoint
 	{
 		guard let view = window()?.contentView else { return .zero }
 		return self.bottomRight(of:view, inset:inset)
+	}
+}
+
+
+extension CGPoint
+{
+	public static func topLeft(of screen:NSScreen?) -> CGPoint
+	{
+		screen?.frame.topLeft ?? .zero
+	}
+
+	public static func top(of screen:NSScreen?) -> CGPoint
+	{
+		screen?.frame.top ?? .zero
+	}
+
+	public static func topRight(of screen:NSScreen?) -> CGPoint
+	{
+		screen?.frame.topRight ?? .zero
+	}
+
+	public static func left(of screen:NSScreen?) -> CGPoint
+	{
+		screen?.frame.left ?? .zero
+	}
+
+	public static func center(of screen:NSScreen?) -> CGPoint
+	{
+		screen?.frame.center ?? .zero
+	}
+
+	public static func right(of screen:NSScreen?) -> CGPoint
+	{
+		screen?.frame.right ?? .zero
+	}
+
+	public static func bottomLeft(of screen:NSScreen?) -> CGPoint
+	{
+		screen?.frame.bottomLeft ?? .zero
+	}
+
+	public static func bottom(of screen:NSScreen?) -> CGPoint
+	{
+		screen?.frame.bottom ?? .zero
+	}
+
+	public static func bottomRight(of screen:NSScreen?) -> CGPoint
+	{
+		screen?.frame.bottomRight ?? .zero
+	}
+
+	/// Returns a point that it definately offscreen
+	
+	public static func offscreen() -> CGPoint
+	{
+		CGPoint(1e6,1e6)
 	}
 }
 
