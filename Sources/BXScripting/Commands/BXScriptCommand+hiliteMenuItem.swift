@@ -19,9 +19,9 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteMenuItem
 {
 	/// Creates a command that shows or hides a highlight on the view with the specified identifier. You can also supply an optional view label.
 
-	public static func hiliteMenuItem(withID itemID:String, menuID:String, cornerRadius:CGFloat = 4.0) -> BXScriptCommand
+	public static func hiliteMenuItem(withID itemID:String, menuID:String, cornerRadius:CGFloat = 4.0, attachMessageWithGap:CGFloat? = nil) -> BXScriptCommand
 	{
-		BXScriptCommand_hiliteMenuItem(itemID:itemID, menuID:menuID, cornerRadius:cornerRadius)
+		BXScriptCommand_hiliteMenuItem(itemID:itemID, menuID:menuID, cornerRadius:cornerRadius, attachMessageWithGap:attachMessageWithGap)
 	}
 }
 
@@ -48,6 +48,10 @@ public struct BXScriptCommand_hiliteMenuItem : BXScriptCommand, BXScriptCommandC
 	/// The corner radius of the highlight frame
 	
 	var cornerRadius:CGFloat = 4.0
+	
+	/// Specifies the gap between the menu item and an optional message window
+	
+	var attachMessageWithGap:CGFloat? = nil
 	
 	/// This helper is needed to open a window and draw the hilite frame
 
@@ -78,7 +82,8 @@ public struct BXScriptCommand_hiliteMenuItem : BXScriptCommand, BXScriptCommandC
 			Self.helper.strokeColor = environment.value(forKey:.hiliteStrokeColorKey) ?? .yellow
 			Self.helper.strokeWidth = 4.0
 			Self.helper.cornerRadius = self.cornerRadius
-			
+			Self.helper.attachMessageWithGap = self.attachMessageWithGap
+		
 //			Self.helper.postMouseEvent(position:menuTitleFrame.center, type:.leftMouseDown)
 //			Self.helper.postMouseEvent(position:menuTitleFrame.center, type:.leftMouseUp)
 			
@@ -92,6 +97,15 @@ public struct BXScriptCommand_hiliteMenuItem : BXScriptCommand, BXScriptCommandC
 				with:nil,
 				afterDelay:0.2,
 				inModes: [.eventTracking,.modalPanel,.common,.default])
+			
+//			// OPTIONAL: also move an existing message window next to the menu item. Once again this has
+//			// to be scheduled in .eventTracking mode ahead of opening the menu.
+//			
+//			Self.helper.perform(
+//				#selector(WindowHelper.moveMessage),
+//				with:nil,
+//				afterDelay:0.2,
+//				inModes: [.eventTracking,.modalPanel,.common,.default])
 			
 			// Popup the menu. This will BLOCK the entire main thread until the user makes a mouse click!
 			
@@ -144,6 +158,7 @@ fileprivate class WindowHelper : NSObject
 	var strokeColor:Color = .yellow
 	var strokeWidth:CGFloat = 4.0
 	var cornerRadius:CGFloat = 0.0
+	var attachMessageWithGap:CGFloat? = nil
 	
 	/// Creates and configures a transparent window that contains a view that draws the hilite frame
 	
@@ -178,6 +193,8 @@ fileprivate class WindowHelper : NSObject
 		self.window?.orderFront(nil)
 		self.window?.setFrame(frame, display:true)
 
+		self.moveMessage(menuItemFrame:frame)
+		
 		return window
 	}
 	
@@ -189,6 +206,22 @@ fileprivate class WindowHelper : NSObject
 		self.window = nil
 	}
 
+	/// If we have a message window, move it close to the hilited menu item
+	
+	@objc func moveMessage(menuItemFrame:CGRect)
+	{
+		guard let messageWindow = BXScriptCommand_displayMessageWindow.standaloneWindow else { return }
+		guard let gap = self.attachMessageWithGap else { return }
+		
+		let frame = menuItemFrame.insetBy(dx:-gap, dy:-gap)
+		
+		BXScriptCommand_moveMessageWindow.moveWindow(
+			messageWindow,
+			to:frame.right,
+			anchor:.left,
+			animated:false)
+	}
+	
 	/// Calculates the frame of the menu item in screen coordinates
 	
 	var menuItemFrame:CGRect
