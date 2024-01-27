@@ -32,7 +32,7 @@ struct BXScriptControllerView : View
 			ZStack
 			{
 				Text(controller.currentStepName).centerAligned()
-				Text(controller.currentStepNumber).rightAligned().opacity(0.33)
+				Text(controller.currentStepNumber).leftAligned().opacity(0.33)
 			}
 			.padding(.top,-6)
 			
