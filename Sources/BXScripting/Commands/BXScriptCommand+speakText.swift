@@ -48,6 +48,11 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 		{
 			[self] _ in self.pause()
 		}
+
+		self.delegate.observers += NotificationCenter.default.publisher(for:BXScriptWindowController.muteAudioNotification, object:nil).sink
+		{
+			[self] _ in self.delegate.updateVolume()
+		}
 	}
 	
 	public func execute()
@@ -62,7 +67,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 				return
 			}
 			
-			// Start spealing new text
+			// Start speaking new text
 			
 			DispatchQueue.main.asyncIfNeeded
 			{
@@ -70,10 +75,15 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 
 				let utterance = AVSpeechUtterance(string:text)
 				utterance.voice = AVSpeechSynthesisVoice.bestAvailableVoice
+				self.delegate.utterance = utterance
+				self.delegate.updateVolume()
+				
 				self.synthesizer.delegate = self.delegate
 				self.synthesizer.speak(utterance)
 				
 				BXScriptCommandSpeakDelegate.currentSpeaker = synthesizer
+				
+				BXSubtitleWindowController.shared.text = text
 			}
 			
 			// If waiting for end is not desired, then we can continue to the next command immediately
@@ -111,6 +121,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDelegate
 {
 	var observers:[Any] = []
+	var utterance:AVSpeechUtterance? = nil
 	var didCallCompletionHandler = false
 	var completionHandler:(()->Void)? = nil
 
@@ -118,13 +129,28 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 	
 	func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance)
     {
-		Self.currentSpeaker = nil
+		self.cleanup()
 		if !didCallCompletionHandler { self.completionHandler?() }
     }
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance)
     {
+		self.cleanup()
+    }
+    
+    func cleanup()
+    {
+		BXSubtitleWindowController.shared.text = nil
+		self.utterance = nil
 		Self.currentSpeaker = nil
+    }
+    
+    func updateVolume()
+    {
+		if let controller = BXScriptWindowController.shared, let utterance = utterance
+		{
+			utterance.volume = controller.muteAudio ? 0.0 : 1.0
+		}
     }
 }
  

@@ -22,6 +22,7 @@ import BXSwiftUI
 struct BXScriptControllerView : View
 {
 	@ObservedObject var controller:BXScriptWindowController
+//	@EnvironmentObject var subtitleController:BXSubtitleWindowController
 	
 	public var body: some View
 	{
@@ -33,6 +34,7 @@ struct BXScriptControllerView : View
 			{
 				Text(controller.currentStepName).centerAligned()
 				Text(controller.currentStepNumber).leftAligned().opacity(0.33)
+				self.audioButtons().rightAligned()
 			}
 			.padding(.top,-6)
 			
@@ -72,6 +74,20 @@ struct BXScriptControllerView : View
 		.controlSize(.small)
 		.background(VisualEffectView())
 		.overlay(RoundedRectangle(cornerRadius:8).stroke(Color.primary.opacity(0.33)))
+	}
+	
+	func audioButtons() -> some View
+	{
+		HStack(spacing:3)
+		{
+			Button(action:{controller.muteAudio.toggle()})
+			{
+				BXScriptControllerIcon(systemName:controller.muteAudio ? "speaker.slash.fill" : "speaker.fill")
+			}
+
+			BXScriptControllerSubtitleButton()
+		}
+		.buttonStyle(.borderless)
 	}
 }
 
@@ -195,6 +211,46 @@ fileprivate struct BXScriptControllerIcon : View
 			BXImage(systemName:systemName)
 			#endif
 		}
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+fileprivate struct BXScriptControllerSubtitleButton : View
+{
+	@EnvironmentObject var subtitleController:BXSubtitleWindowController
+
+	var body: some View
+	{
+		Button(action:{subtitleController.displaySubtitles.toggle()})
+		{
+			Text("CC")
+				.controlSize(.mini)
+				.foregroundColor(textColor)
+				.padding(.horizontal,2)
+				.background(shape)
+		}
+	}
+	
+	@ViewBuilder var shape: some View
+	{
+		if subtitleController.displaySubtitles
+		{
+			RoundedRectangle(cornerRadius:3)
+				.fill(Color.primary.opacity(0.8))
+		}
+		else
+		{
+			RoundedRectangle(cornerRadius:3)
+				.stroke(Color.primary.opacity(0.5))
+		}
+	}
+	
+	var textColor:Color
+	{
+		subtitleController.displaySubtitles ? .black : .primary
 	}
 }
 

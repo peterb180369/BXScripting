@@ -58,7 +58,39 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	
 	private var subscribers:[Any] = []
 	
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+	/// Set to true if spoken audio should be muted
+
+	public var muteAudio:Bool
+	{
+		set
+		{
+			self.objectWillChange.send()
+			UserDefaults.standard.set(newValue, forKey:"BXScriptWindowController.muteAudio")
+			NotificationCenter.default.post(name:Self.muteAudioNotification, object:newValue)
+		}
+
+		get
+		{
+			UserDefaults.standard.bool(forKey:"BXScriptWindowController.muteAudio")
+		}
+	}
 	
+	public static let muteAudioNotification = Notification.Name("BXScriptWindowController.muteAudio")
+
+
+	/// Passes on the subtitle to BXSubtitleWindowController
+	
+	public var subtitle:String?
+	{
+		set { BXSubtitleWindowController.shared.text = newValue }
+		get { BXSubtitleWindowController.shared.text }
+	}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -128,6 +160,8 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 		// Create the view
 
 		let view = BXScriptControllerView(controller:self)
+			.environmentObject(BXSubtitleWindowController.shared)
+			
 		let hostview = NSHostingView(rootView:view)
 		let size = hostview.intrinsicContentSize
 
