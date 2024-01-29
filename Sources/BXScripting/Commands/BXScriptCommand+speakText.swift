@@ -160,21 +160,21 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 
 extension AVSpeechSynthesisVoice
 {
-	/// Tries to find the best available voice for the current language. Returns nil if not available. In this case the default system voice will be used.
+	/// Tries to find the best available voice for the current UI language. Returns nil if not available. In this case the default system voice will be used.
 	
 	static var bestAvailableVoice:AVSpeechSynthesisVoice?
 	{
-		let code = Self.currentLanguageCode()
-		
+		let preferredLanguages = Bundle.main.preferredLocalizations
+		let code = preferredLanguages.first ?? Self.currentLanguageCode()
+	
 		let voices = Self.speechVoices()
-			.filter { $0.language == code }
-			.filter { $0.quality != .default }
+			.filter { $0.language.contains(code) }
 			.sorted { $0.quality.rawValue < $1.quality.rawValue }
 		
 		return voices.last
 	}
 }
- 
+
  
 //----------------------------------------------------------------------------------------------------------------------
 
