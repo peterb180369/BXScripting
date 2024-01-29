@@ -178,19 +178,14 @@ extension AVSpeechSynthesisVoice
 		
 		let voices = Self.speechVoices()
 			.filter { $0.language.contains(code) }							// remove all voices that do not match current UI language
-			.filter { !$0.identifier.contains("eloquence") } 				// remove all "Eloquence" voices (they are really bad)
-			.filter { !$0.identifier.contains("speech.synthesis.voice") } 	// remove all "Novelty" voices (they are really bad)
+			.filter { Self.isAcceptable($0) } 								// remove all blacklisted voices (they are really bad)
 			.sorted { $0.quality.rawValue < $1.quality.rawValue }			// sort by quality
-		
-		
-		voices.forEach
-		{
-			print("\($0.identifier), \($0.gender), \($0.quality)")
-		}
-		
+
 		// Use the highest quality voice that is available
 		
-		return voices.last
+		let voice = voices.last
+		print("\(voice)")
+		return voice
 	}
 	
 	
@@ -220,6 +215,37 @@ extension AVSpeechSynthesisVoice
 		
 		let code = name2code[oldName]
 		return code ?? "en"
+	}
+	
+	
+	/// Removes blacklisted voices. These are being removed because they have insufficient quality and would thus create a bad impression.
+	
+	static func isAcceptable(_ voice:AVSpeechSynthesisVoice) -> Bool
+	{
+		// "Novelty" voices are really bad, so eliminate them
+		
+		if voice.identifier.contains("speech.synthesis.voice") { return false }
+		
+		// "Eloquence" voices are really bad, so eliminate them
+		
+		if voice.identifier.contains("eloquence") { return false }
+		
+		// Remove other blacklisted voices
+		
+		let blacklist:[String] =
+		[
+			"com.apple.voice.compact.en-ZA.Tessa",
+			"com.apple.voice.compact.en-US.Samantha",
+		]
+		
+		if blacklist.contains(voice.identifier)
+		{
+			return false
+		}
+		
+		// This voice is acceptable
+		
+		return true
 	}
 }
 
