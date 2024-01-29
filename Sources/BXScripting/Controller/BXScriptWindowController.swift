@@ -71,6 +71,13 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 			self.objectWillChange.send()
 			UserDefaults.standard.set(newValue, forKey:"BXScriptWindowController.muteAudio")
 			NotificationCenter.default.post(name:Self.muteAudioNotification, object:newValue)
+			
+			// Automatically turn on subtitle when audio is being muted
+			
+			if newValue && BXSubtitleWindowController.shared.displaySubtitles == false
+			{
+				BXSubtitleWindowController.shared.displaySubtitles = true
+			}
 		}
 
 		get
