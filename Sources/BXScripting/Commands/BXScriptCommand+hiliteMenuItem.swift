@@ -72,7 +72,7 @@ public struct BXScriptCommand_hiliteMenuItem : BXScriptCommand, BXScriptCommandC
 			defer { self.completionHandler?() }
 
 			guard let environment = scriptEngine?.environment else { return }
-			guard let mainMenu = NSMenu.main else { return }
+			guard let mainMenu = NSApp.mainMenu else { return }
 			guard let item = mainMenu.menuItems(forIdentifier:itemID).first else { return }
 			guard let menu = item.menu  else { return }
 
@@ -251,6 +251,52 @@ fileprivate class WindowHelper : NSObject
 		{
 			NSApplication.shared.postEvent(event, atStart:true)
 		}
+	}
+}
+	
+	
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: -
+
+fileprivate extension NSMenu
+{
+	/// Return the main menu of the application
+
+	class var main:NSMenu?
+	{
+		NSApp.mainMenu
+	}
+
+	/// Performs a recursive search for a NSMenuItem with the specified identifier
+
+	func menuItems(forIdentifier identifier:String) -> [NSMenuItem]
+	{
+		var menuItems:[NSMenuItem] = []
+		let prefix = identifier.replacingOccurrences(of:"*", with:"")
+		
+		for item in self.items
+		{
+			if let id = item.identifier?.rawValue
+			{
+				if identifier.hasSuffix("*") && id.hasPrefix(prefix)
+				{
+					menuItems += item
+				}
+				else if id == identifier
+				{
+					menuItems += item
+				}
+			}
+			
+			if let submenu = item.submenu
+			{
+				menuItems += submenu.menuItems(forIdentifier:identifier)
+			}
+		}
+
+		return menuItems
 	}
 }
 	

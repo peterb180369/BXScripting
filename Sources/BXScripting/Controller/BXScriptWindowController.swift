@@ -2,7 +2,7 @@
 //
 //  BXScriptWindowController.swift
 //	Displays a small floating window with a controller for the BXScriptEngine
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2024 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 

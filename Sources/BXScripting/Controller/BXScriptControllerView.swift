@@ -2,16 +2,12 @@
 //
 //  BXScriptWindowController.swift
 //	Displays a small floating window with a controller for the BXScriptEngine
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2024 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
 
 import SwiftUI
-
-#if canImport(BXSwiftUI)
-import BXSwiftUI
-#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -22,7 +18,6 @@ import BXSwiftUI
 struct BXScriptControllerView : View
 {
 	@ObservedObject var controller:BXScriptWindowController
-//	@EnvironmentObject var subtitleController:BXSubtitleWindowController
 	
 	public var body: some View
 	{
@@ -32,9 +27,24 @@ struct BXScriptControllerView : View
 			
 			ZStack
 			{
-				Text(controller.currentStepName).centerAligned()
-				Text(controller.currentStepNumber).leftAligned().opacity(0.33)
-				self.audioButtons().rightAligned()
+				HStack
+				{
+					Spacer()
+					Text(controller.currentStepName)
+					Spacer()
+				}
+				
+				HStack
+				{
+					Text(controller.currentStepNumber).opacity(0.33)
+					Spacer()
+				}
+				
+				HStack
+				{
+					Spacer()
+					self.audioButtons()
+				}
 			}
 			.padding(.top,-6)
 			
