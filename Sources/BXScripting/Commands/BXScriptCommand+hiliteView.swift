@@ -17,9 +17,9 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteView
 {
 	/// Creates a command that shows or hides a highlight on the view with the specified identifier. You can also supply an optional view label.
 
-	public static func hiliteView(withID id:String, in window:@escaping @autoclosure ()->NSWindow?, label:String? = nil, visible:Bool = true, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0, animated:Bool = false) -> BXScriptCommand
+	public static func hiliteView(withID id:String, method:BXIdentifierMethod = .exactMatch, in window:@escaping @autoclosure ()->NSWindow?, label:String? = nil, visible:Bool = true, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0, animated:Bool = false) -> BXScriptCommand
 	{
-		BXScriptCommand_hiliteView(id:id, window:window, label:label, visible:visible, inset:inset, cornerRadius:cornerRadius, animated:animated)
+		BXScriptCommand_hiliteView(id:id, method:method, window:window, label:label, visible:visible, inset:inset, cornerRadius:cornerRadius, animated:animated)
 	}
 	
 	/// Creates a command that hides the previous highlight on the view.
@@ -39,6 +39,7 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteView
 public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCancellable
 {
 	var id:String
+	var method:BXIdentifierMethod = .exactMatch
 	var window:()->NSWindow?
 	var label:String?
 	var visible:Bool
@@ -85,7 +86,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	private func addHilite()
 	{
 		guard let window = self.window() else { return }
-		guard let view = window.subviewWithIdentifier(id) else { return }
+		guard let view = window.subviewWithIdentifier(id, method:method) else { return }
 		guard let layer = view.layer else { return }
 		Self.hilitedView = view
 		
@@ -138,7 +139,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	private func removeHilite()
 	{
 		guard let window = self.window() else { return }
-		guard let view = window.subviewWithIdentifier(id) else { return }
+		guard let view = window.subviewWithIdentifier(id, method:method) else { return }
 		self._removeHilite(for:view)
 	}
 
