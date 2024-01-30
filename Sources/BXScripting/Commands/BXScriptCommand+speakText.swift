@@ -29,31 +29,31 @@ extension BXScriptCommand where Self == BXScriptCommand_speakText
 
 public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancellable
 {
+	// Params
+	
 	public var text:String
 	public var wait:Bool
+	
+	// Text to Speech
+	
+	fileprivate static var synthesizer:AVSpeechSynthesizer? = nil
+	fileprivate static var delegate = BXScriptCommandSpeakDelegate()
+	
+	// Execution support
 	
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
 	public weak var scriptEngine:BXScriptEngine? = nil
 	
-	private let synthesizer = AVSpeechSynthesizer()
-	private let delegate = BXScriptCommandSpeakDelegate()
+	// Init
 	
 	public init(text: String, wait:Bool)
 	{
 		self.text = text
 		self.wait = wait
-		
-		self.delegate.observers += NotificationCenter.default.publisher(for:BXScriptEngine.didPauseNotification, object:nil).sink
-		{
-			[self] _ in self.pause()
-		}
-
-		self.delegate.observers += NotificationCenter.default.publisher(for:BXScriptWindowController.muteAudioNotification, object:nil).sink
-		{
-			[self] _ in self.delegate.updateVolume()
-		}
 	}
+	
+	// Execute
 	
 	public func execute()
 	{
@@ -61,7 +61,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 		{
 			// If we still have somebody speaking, we cannot start a new speaker. Try again in the next runloop cycle.
 			
-			if BXScriptCommandSpeakDelegate.currentSpeaker != nil
+			if Self.synthesizer != nil
 			{
 				self.execute()
 				return
@@ -71,18 +71,26 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 			
 			DispatchQueue.main.asyncIfNeeded
 			{
-				self.delegate.completionHandler = completionHandler
+				// Create speech synthesizer
+				
+				Self.synthesizer = AVSpeechSynthesizer()
+				Self.synthesizer?.delegate = Self.delegate
+				
+				// Setup delegate
+				
+				Self.delegate.completionHandler = completionHandler
+				Self.delegate.didCallCompletionHandler = false 
 
+				// Setup text to be spoken
+				
 				let utterance = AVSpeechUtterance(string:text)
 				utterance.voice = AVSpeechSynthesisVoice.bestAvailableVoice
-				self.delegate.utterance = utterance
-				self.delegate.updateVolume()
+				Self.delegate.utterance = utterance
+				Self.delegate.updateVolume()
+
+				// Start speaking
 				
-				self.synthesizer.delegate = self.delegate
-				self.synthesizer.speak(utterance)
-				
-				BXScriptCommandSpeakDelegate.currentSpeaker = synthesizer
-				
+				Self.synthesizer?.speak(utterance)
 				BXSubtitleWindowController.shared.text = text
 			}
 			
@@ -90,7 +98,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 			
 			if !wait
 			{
-				self.delegate.didCallCompletionHandler = true
+				Self.delegate.didCallCompletionHandler = true
 				self.completionHandler?()
 			}
 		}
@@ -98,19 +106,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 	
 	public func cancel()
 	{
-		self.synthesizer.stopSpeaking(at:.immediate)
-	}
-	
-	nonmutating func pause()
-	{
-		if synthesizer.isPaused
-		{
-			synthesizer.continueSpeaking()
-		}
-		else
-		{
-			synthesizer.pauseSpeaking(at:.word)
-		}
+		Self.synthesizer?.stopSpeaking(at:.immediate)
 	}
  }
 
@@ -122,10 +118,25 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 {
 	var observers:[Any] = []
 	var utterance:AVSpeechUtterance? = nil
-	var didCallCompletionHandler = false
 	var completionHandler:(()->Void)? = nil
+	var didCallCompletionHandler = false
+	
+	override init()
+	{
+		super.init()
+		
+		self.observers += NotificationCenter.default.publisher(for:BXScriptEngine.didPauseNotification, object:nil).sink
+		{
+			[self] _ in self.pause()
+		}
 
-	public static var currentSpeaker:AVSpeechSynthesizer? = nil
+//		self.observers += NotificationCenter.default.publisher(for:BXScriptWindowController.muteAudioNotification, object:nil).sink
+//		{
+//			[self] _ in self.delegate.updateVolume()
+//		}
+	}
+	
+	// AVSpeechSynthesizerDelegate
 	
 	func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance)
     {
@@ -138,19 +149,39 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 		self.cleanup()
     }
     
-    func cleanup()
-    {
-		BXSubtitleWindowController.shared.text = nil
-		self.utterance = nil
-		Self.currentSpeaker = nil
-    }
+    /// Pauses or continues speaking
     
+	func pause()
+	{
+		guard let synthesizer = BXScriptCommand_speakText.synthesizer else { return }
+		
+		if synthesizer.isPaused
+		{
+			synthesizer.continueSpeaking()
+		}
+		else
+		{
+			synthesizer.pauseSpeaking(at:.word)
+		}
+	}
+
+	/// Sets the volume
+	
     func updateVolume()
     {
 		if let controller = BXScriptWindowController.shared, let utterance = utterance
 		{
 			utterance.volume = controller.muteAudio ? 0.0 : 1.0
 		}
+    }
+    
+    /// Performs cleanup after speaking
+    
+    func cleanup()
+    {
+		self.utterance = nil
+		BXScriptCommand_speakText.synthesizer = nil
+		BXSubtitleWindowController.shared.text = nil
     }
 }
  
@@ -177,7 +208,7 @@ extension AVSpeechSynthesisVoice
 		// Filter installed system voices to currently running UI language, sorted by quality
 		
 		let voices = Self.speechVoices()
-			.filter { $0.language.contains(code) }							// remove all voices that do not match current UI language
+			.filter { Self.isCorrectLanguage($0,code) }						// remove all voices that do not match current UI language
 			.filter { Self.isAcceptable($0) } 								// remove all blacklisted voices (they are really bad)
 			.sorted { $0.quality.rawValue < $1.quality.rawValue }			// sort by quality
 
@@ -218,6 +249,14 @@ extension AVSpeechSynthesisVoice
 	}
 	
 	
+	/// Removes voice that do not have the correct language code.
+	
+	static func isCorrectLanguage(_ voice:AVSpeechSynthesisVoice,_ code:String) -> Bool
+	{
+		voice.language.contains(code)
+	}
+
+
 	/// Removes blacklisted voices. These are being removed because they have insufficient quality and would thus create a bad impression.
 	
 	static func isAcceptable(_ voice:AVSpeechSynthesisVoice) -> Bool
