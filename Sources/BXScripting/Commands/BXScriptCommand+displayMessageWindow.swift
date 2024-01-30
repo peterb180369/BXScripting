@@ -191,6 +191,7 @@ extension BXScriptCommand_displayMessageWindow
 		window.isMovableByWindowBackground = false
 		window.isExcludedFromWindowsMenu = true
 		window.collectionBehavior.insert(.fullScreenAuxiliary)
+		window.hidesOnDeactivate = false
 		window.isReleasedWhenClosed = false
 		window.backgroundColor = .clear
 		window.hasShadow = true
