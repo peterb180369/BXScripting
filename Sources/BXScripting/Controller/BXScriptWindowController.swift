@@ -106,6 +106,15 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	
 	@discardableResult public class func run(_ engine:BXScriptEngine, title:String = "", on queue:DispatchQueue = .main) -> String
 	{
+		// Abort any script that may currently be running
+
+		if let shared = shared
+		{
+			shared.abort()
+		}
+		
+		// Create a new controller
+		
 		if shared == nil
 		{
 			self.shared = BXScriptWindowController(engine:engine, title:title)
