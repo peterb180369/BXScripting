@@ -42,8 +42,15 @@ public struct BXScriptCommand_playAudio : BXScriptCommand, BXScriptCommandCancel
 		{
 			DispatchQueue.main.asyncIfNeeded
 			{
+				var volume = Float(self.volume)
+				
+				if let controller = BXScriptWindowController.shared, controller.muteAudio
+				{
+					volume = 0.0
+				}
+
 				guard let sound = NSSound(named:name) else { return }
-				sound.volume = Float(volume)
+				sound.volume = volume
 				sound.play()
 			}
 			
