@@ -17,16 +17,16 @@ extension BXScriptCommand where Self == BXScriptCommand_hiliteView
 {
 	/// Creates a command that shows or hides a highlight on the view with the specified identifier. You can also supply an optional view label.
 
-	public static func hiliteView(withID id:String, method:BXIdentifierMethod = .exactMatch, in window:@escaping @autoclosure ()->NSWindow?, label:String? = nil, visible:Bool = true, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0, animated:Bool = false) -> BXScriptCommand
+	public static func hiliteView(withID id:String, method:BXIdentifierMethod = .exactMatch, in window:@escaping @autoclosure ()->NSWindow?, label:String? = nil, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0, animated:Bool = false) -> BXScriptCommand
 	{
-		BXScriptCommand_hiliteView(id:id, method:method, window:window, label:label, visible:visible, inset:inset, cornerRadius:cornerRadius, animated:animated)
+		BXScriptCommand_hiliteView(id:id, method:method, window:window, label:label, inset:inset, cornerRadius:cornerRadius, animated:animated)
 	}
 	
 	/// Creates a command that hides the previous highlight on the view.
 
 	public static func unhiliteView() -> BXScriptCommand
 	{
-		BXScriptCommand_hiliteView(id:"", window:{nil}, label:"", visible:false, inset:0, cornerRadius:4)
+		BXScriptCommand_hiliteView(id:"", window:{nil}, label:"", inset:0, cornerRadius:0)
 	}
 }
 
@@ -42,7 +42,6 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	var method:BXIdentifierMethod = .exactMatch
 	var window:()->NSWindow?
 	var label:String?
-	var visible:Bool
 	var inset:CGFloat = 0.0
 	var cornerRadius:CGFloat = 0.0
 	var animated:Bool = false
@@ -58,20 +57,13 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 		{
 			defer { self.completionHandler?() }
 			
-			if visible
+			if !id.isEmpty
 			{
 				self.addHilite()
 			}
 			else
 			{
-				if id != ""
-				{
-					self.removeHilite()
-				}
-				else
-				{
-					self._removeHilite(for:Self.hilitedView)
-				}
+				self.removeHilite(for:Self.hilitedView)
 			}
 		}
 	}
@@ -79,14 +71,15 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 
 	public func cancel()
 	{
-		self.removeHilite()
+		self.removeHilite(for:Self.hilitedView)
 	}
 	
 	
 	private func addHilite()
 	{
 		guard let window = self.window() else { return }
-		guard let view = window.subviewWithIdentifier(id, method:method) else { return }
+		guard let subview = window.subviewWithIdentifier(id, method:method) else { return }
+		guard let view = window.addSubviewMatchingFrame(of:subview) else { return }
 		guard let layer = view.layer else { return }
 		Self.hilitedView = view
 		
@@ -136,27 +129,12 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	}
 
 
-	private func removeHilite()
-	{
-		guard let window = self.window() else { return }
-		guard let view = window.subviewWithIdentifier(id, method:method) else { return }
-		self._removeHilite(for:view)
-	}
-
-
-	private func _removeHilite(for view:NSView?)
+	private func removeHilite(for view:NSView?)
 	{
 		guard let view = view else { return }
 		guard let window = view.window else { return }
-
-		if let backgroundLayer = view.sublayer(named:frameLayerName)
-		{
-			let critical = view.screenRect(for:backgroundLayer.frame)
-			BXScriptWindowController.shared?.removeCriticalRegion(critical)
-		}
-
-		view.removeSublayer(named:frameLayerName)
-		view.removeSublayer(named:labelLayerName)
+		
+		view.removeFromSuperview()
 		window.contentView?.removeSublayer(named:BXScriptCommand_displayMessage.pointerLayerName)
 	}
 

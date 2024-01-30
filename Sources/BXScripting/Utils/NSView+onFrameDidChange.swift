@@ -20,7 +20,7 @@ extension NSView
 	///
 	/// You must retain the return value of this function, or the frame observing and reporting will not work correctly.
 	
-    func onFrameDidChange(_ frameDidChangeHandler:@escaping (CGRect)->Void) -> [Any]
+    public func onFrameDidChange(_ frameDidChangeHandler:@escaping (CGRect)->Void) -> [Any]
     {
 		var observers:[Any] = []
 		var lastKnownFrame:CGRect = .zero
@@ -60,18 +60,67 @@ extension NSView
     
     /// Returns the frame of a view in window coordinates
 	
-    var frameInWindowCoordinates:CGRect
+    public var frameInWindowCoordinates:CGRect
     {
 		self.convert(self.bounds, to:nil)
     }
 
 	/// Return sthe root view in this view hierarchy
 	
-    var rootView:NSView?
+    public var rootView:NSView?
     {
 		self.window?.contentView
     }
+}
+
+
     
+//----------------------------------------------------------------------------------------------------------------------
+
+
+extension NSWindow
+{
+    /// Creates a NSView that is added to the contentView of the this NSWindow.
+	///
+	/// The new subview always matches the frame of the specified view, regardless of where in the view hierarchy it sits.
+	
+    public func addSubviewMatchingFrame(of view:NSView) -> NSView?
+    {
+		let frame = view.frameInWindowCoordinates
+		let newView = NSView(frame:frame)
+		newView.wantsLayer = true
+		
+		self.contentView?.addSubview(newView)
+		
+		newView.frameObservers = view.onFrameDidChange
+		{
+			[weak newView] in newView?.frame = $0
+		}
+		
+		return newView
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+extension NSView
+{
+    private static var frameObserversKey = "frameObservers"
+
+    public var frameObservers:[Any]?
+    {
+        set
+        {
+            objc_setAssociatedObject(self, &NSView.frameObserversKey, newValue, .OBJC_ASSOCIATION_RETAIN)
+        }
+
+        get
+        {
+            return objc_getAssociatedObject(self, &NSView.frameObserversKey) as? [Any]
+        }
+     }
 }
 
 
