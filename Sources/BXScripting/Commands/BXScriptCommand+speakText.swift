@@ -196,14 +196,8 @@ extension AVSpeechSynthesisVoice
 	static var bestAvailableVoice:AVSpeechSynthesisVoice?
 	{
 		// Get current UI language
-		
-		let preferredLanguages = Bundle.main.preferredLocalizations
-		let language = preferredLanguages.first ?? Self.currentLanguageCode()
-		
-		// Older apps may stil be using "English.lproj" instead of "en.lproj". Convert "English" to "en"
-		// to make sure that the following filtering works correctly.
-		
-		let code = Self.fixLanguageCode(for:language)
+
+		let code = Self.currentLanguageCode
 
 		// Filter installed system voices to currently running UI language, sorted by quality
 		
@@ -219,6 +213,21 @@ extension AVSpeechSynthesisVoice
 		return voice
 	}
 	
+	
+	/// Returns the code of the current UI languange
+	
+	static var currentLanguageCode:String
+	{
+		// Get current UI language
+		
+		let preferredLanguages = Bundle.main.preferredLocalizations
+		let language = preferredLanguages.first ?? Self.currentLanguageCode()
+		
+		// Older apps may stil be using "English.lproj" instead of "en.lproj". Convert "English" to "en"
+		// to make sure that the following filtering works correctly.
+		
+		return Self.fixLanguageCode(for:language)
+	}
 	
 	/// Some old apps use English.lproj or German.lproj folders instead of en.lproj and de.lproj. This function converts old style language names
 	/// to modern ISO  language codes.
