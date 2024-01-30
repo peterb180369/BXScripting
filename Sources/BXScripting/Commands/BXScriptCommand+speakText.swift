@@ -83,7 +83,8 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 
 				// Setup text to be spoken
 				
-				let utterance = AVSpeechUtterance(string:text)
+				let fixedText = Self.fixPronunciation(for:text)
+				let utterance = AVSpeechUtterance(string:fixedText)
 				utterance.voice = AVSpeechSynthesisVoice.bestAvailableVoice
 				Self.delegate.utterance = utterance
 				Self.delegate.updateVolume()
@@ -107,6 +108,23 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 	public func cancel()
 	{
 		Self.synthesizer?.stopSpeaking(at:.immediate)
+	}
+	
+	/// Checks if we have any registered pronunciation fixes for the current language. If yes, then all occurances in the text will be replaced with the fixes that
+	/// force a better pronunciation.
+	
+	public static func fixPronunciation(for text:String) -> String
+	{
+		var text = text
+		let code = AVSpeechSynthesisVoice.currentLanguageCode
+		let pronunciationFixes = BXScriptEnvironment.shared.speechPronunciationFixes[code] ?? [:]
+
+		for (key,value) in pronunciationFixes
+		{
+			text = text.replacingOccurrences(of:key, with:value)
+		}
+		
+		return text
 	}
  }
 

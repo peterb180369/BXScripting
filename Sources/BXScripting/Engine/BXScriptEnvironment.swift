@@ -116,3 +116,27 @@ extension String
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+extension BXScriptEnvironment
+{
+	/// A lookup table for fixing words that not pronounced correcty by AVSpeechSynthesizer and its voices.
+	///
+	/// The first key is the language code (en,de,fr). The second key is the word that is being pronounced incorrectly or funny.
+	/// The value is a modified string that forces a correct pronunciation for the language.
+	
+	public var speechPronunciationFixes:[String:[String:String]]
+	{
+		set { self[.speechPronunciationFixesKey] = newValue }
+		get { self[.speechPronunciationFixesKey] ?? [:] }
+	}
+}
+
+
+extension String
+{
+	public static let speechPronunciationFixesKey = "speechPronunciationFixes"
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
