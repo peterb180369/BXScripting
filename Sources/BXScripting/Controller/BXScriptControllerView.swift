@@ -217,9 +217,7 @@ fileprivate struct BXScriptControllerIcon : View
 		}
 		else
 		{
-			#if canImport(BXSwiftUI)
-			BXImage(systemName:systemName)
-			#endif
+			EmptyView()
 		}
 	}
 }
