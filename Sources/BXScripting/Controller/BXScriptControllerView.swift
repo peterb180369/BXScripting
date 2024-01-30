@@ -236,7 +236,7 @@ fileprivate struct BXScriptControllerSubtitleButton : View
 		{
 			Text("CC")
 				.controlSize(.mini)
-				.foregroundColor(textColor)
+				.foregroundColor(.primary)
 				.padding(.horizontal,2)
 				.background(shape)
 		}
@@ -244,21 +244,17 @@ fileprivate struct BXScriptControllerSubtitleButton : View
 	
 	@ViewBuilder var shape: some View
 	{
-		if subtitleController.displaySubtitles
+		ZStack
 		{
-			RoundedRectangle(cornerRadius:3)
-				.fill(Color.primary.opacity(0.8))
-		}
-		else
-		{
+			if subtitleController.displaySubtitles
+			{
+				RoundedRectangle(cornerRadius:3)
+					.fill(Color.accentColor)
+			}
+
 			RoundedRectangle(cornerRadius:3)
 				.stroke(Color.primary.opacity(0.5))
 		}
-	}
-	
-	var textColor:Color
-	{
-		subtitleController.displaySubtitles ? .black : .primary
 	}
 }
 
