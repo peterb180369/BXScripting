@@ -62,7 +62,16 @@ extension NSView
 	
     public var frameInWindowCoordinates:CGRect
     {
-		self.convert(self.bounds, to:nil)
+		var frame = self.convert(self.bounds, to:nil)
+
+		guard let rootView = rootView else { return frame }
+		
+		if rootView.isFlipped
+		{
+			frame.origin.y = rootView.bounds.maxY - frame.maxY
+		}
+		
+		return frame
     }
 
 	/// Return sthe root view in this view hierarchy
