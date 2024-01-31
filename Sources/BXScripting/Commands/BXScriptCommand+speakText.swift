@@ -224,10 +224,12 @@ extension AVSpeechSynthesisVoice
 			.filter { Self.isAcceptable($0) } 								// remove all blacklisted voices (they are really bad)
 			.sorted { $0.quality.rawValue < $1.quality.rawValue }			// sort by quality
 
+print("\(voices)")
+
 		// Use the highest quality voice that is available
 		
 		let voice = voices.last
-		print("\(voice)")
+print("USING: \(voice)")
 		return voice
 	}
 	
