@@ -96,11 +96,12 @@ extension NSWindow
     public func addSubviewMatchingFrame(of view:NSView) -> NSView?
     {
 		let frame = view.frameInWindowCoordinates
-		let newView = NSView(frame:frame)
+		let newView = BXEventIgnoringView(frame:frame)
 		newView.wantsLayer = true
+		newView.clipsToBounds = false
 		
-		self.contentView?.addSubview(newView)
-		
+		self.contentView?.addSubview(newView) //, positioned:.above, relativeTo:nil)
+	
 		newView.frameObservers = view.onFrameDidChange
 		{
 			[weak newView] in newView?.frame = $0
@@ -130,6 +131,26 @@ extension NSView
             return objc_getAssociatedObject(self, &NSView.frameObserversKey) as? [Any]
         }
      }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+/// This custom NSView sublcass is completely transparent to mouse event, making sure that any views below (ancenstors or sibling) will
+/// receive the mouse event and can handle any installed NSGestureRecognizers.
+
+class BXEventIgnoringView : NSView
+{
+	override func hitTest(_ point:NSPoint) -> NSView?
+	{
+		nil
+	}
+
+	override func acceptsFirstMouse(for event:NSEvent?) -> Bool
+	{
+		return false
+	}
 }
 
 
