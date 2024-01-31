@@ -302,6 +302,9 @@ extension AVSpeechSynthesisVoice
 		[
 			"com.apple.voice.compact.en-ZA.Tessa",
 			"com.apple.voice.compact.en-US.Samantha",
+			"com.apple.ttsbundle.siri_Marie_fr-FR_compact",
+			"com.apple.ttsbundle.siri_Dan_fr-FR_compact",
+			"com.apple.voice.compact.fr-FR.Thomas",
 		]
 		
 		if blacklist.contains(voice.identifier)
