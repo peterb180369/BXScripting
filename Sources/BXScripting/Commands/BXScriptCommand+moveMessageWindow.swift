@@ -17,7 +17,7 @@ extension BXScriptCommand where Self == BXScriptCommand_moveMessageWindow
 {
 	/// Creates a command that moves an existing standalone message window to the specified position on screen.
 
-	public static func moveMessageWindow(to position:@escaping @autoclosure ()->CGPoint, anchor:MessageLayerAnchor = .center, animated:Bool = false) -> BXScriptCommand
+	public static func moveMessageWindow(to position:@escaping @autoclosure ()->CGPoint, anchor:BXAnchorPoint = .center, animated:Bool = false) -> BXScriptCommand
 	{
 		BXScriptCommand_moveMessageWindow(position:position, anchor:anchor, animated:animated)
 	}
@@ -36,7 +36,7 @@ public struct BXScriptCommand_moveMessageWindow : BXScriptCommand, BXScriptComma
 	// Layout
 	
 	var position:()->CGPoint
-	var anchor:MessageLayerAnchor = .center
+	var anchor:BXAnchorPoint = .center
 	var animated:Bool = false
 	
 	// Execution support
@@ -78,7 +78,7 @@ public struct BXScriptCommand_moveMessageWindow : BXScriptCommand, BXScriptComma
 
 extension BXScriptCommand_moveMessageWindow
 {
-	static func moveWindow(_ window:NSWindow, to position:CGPoint, anchor:MessageLayerAnchor, animated:Bool)
+	static func moveWindow(_ window:NSWindow, to position:CGPoint, anchor:BXAnchorPoint, animated:Bool)
 	{
 		// Get the current size of the message window. Please note that this includes the background,
 		// i.e.the padding around the text.

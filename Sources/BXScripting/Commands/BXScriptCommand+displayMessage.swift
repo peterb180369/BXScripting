@@ -17,54 +17,54 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 {
 	/// Creates a command that displays a text message in the specified window.
 
-	public static func displayMessage(_ message:@escaping @autoclosure ()->String, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, anchor:MessageLayerAnchor = .center, inset:CGFloat = 0.0, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
+	public static func displayMessage(_ message:@escaping @autoclosure ()->String, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, anchor:BXAnchorPoint = .center, inset:CGFloat = 0.0, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
 	{
 		let position = { view()?.position(for:anchor,inset) ?? .zero }
 		return BXScriptCommand_displayMessage(message:message, textAlignment:textAlignment, view:view, window:{nil}, position:position, anchor:anchor.opposite, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength)
 	}
 
-	public static func displayMessage(_ message:@escaping @autoclosure ()->String, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, at position:@escaping @autoclosure ()->CGPoint, anchor:MessageLayerAnchor = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
+	public static func displayMessage(_ message:@escaping @autoclosure ()->String, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, at position:@escaping @autoclosure ()->CGPoint, anchor:BXAnchorPoint = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
 	{
 		BXScriptCommand_displayMessage(message:message, textAlignment:textAlignment, view:view, window:{nil}, position:position, anchor:anchor, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength)
 	}
 
-	public static func displayMessage(_ message:@escaping @autoclosure ()->String, textAlignment:CATextLayerAlignmentMode = .center, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, anchor:MessageLayerAnchor = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
+	public static func displayMessage(_ message:@escaping @autoclosure ()->String, textAlignment:CATextLayerAlignmentMode = .center, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, anchor:BXAnchorPoint = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
 	{
 		BXScriptCommand_displayMessage(message:message, textAlignment:textAlignment, view:{nil}, window:window, position:position, anchor:anchor, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength)
 	}
 
 	/// Creates a command that displays a styled text message in the specified window.
 	
-	public static func displayMessage(_ message:@escaping @autoclosure ()->NSAttributedString, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, anchor:MessageLayerAnchor = .center, inset:CGFloat = 0.0, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
+	public static func displayMessage(_ message:@escaping @autoclosure ()->NSAttributedString, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, anchor:BXAnchorPoint = .center, inset:CGFloat = 0.0, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
 	{
 		let position = { view()?.position(for:anchor,inset) ?? .zero }
 		return BXScriptCommand_displayMessage(message:message, textAlignment:textAlignment, view:view, window:{nil}, position:position, anchor:anchor.opposite, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength)
 	}
 
-	public static func displayMessage(_ message:@escaping @autoclosure ()->NSAttributedString, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, at position:@escaping @autoclosure ()->CGPoint, anchor:MessageLayerAnchor = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
+	public static func displayMessage(_ message:@escaping @autoclosure ()->NSAttributedString, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, at position:@escaping @autoclosure ()->CGPoint, anchor:BXAnchorPoint = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
 	{
 		BXScriptCommand_displayMessage(message:message, textAlignment:textAlignment, view:view, window:{nil}, position:position, anchor:anchor, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength)
 	}
 
-	public static func displayMessage(_ message:@escaping @autoclosure ()->NSAttributedString, textAlignment:CATextLayerAlignmentMode = .center, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, anchor:MessageLayerAnchor = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
+	public static func displayMessage(_ message:@escaping @autoclosure ()->NSAttributedString, textAlignment:CATextLayerAlignmentMode = .center, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, anchor:BXAnchorPoint = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
 	{
 		BXScriptCommand_displayMessage(message:message, textAlignment:textAlignment, view:{nil}, window:window, position:position, anchor:anchor, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength)
 	}
 
 	/// Creates a command that displays a styled text message in the specified window.
 	
-	@available(macOS 12,*) public static func displayMessage(_ message:@escaping @autoclosure ()->AttributedString, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, anchor:MessageLayerAnchor = .center, inset:CGFloat = 0.0, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
+	@available(macOS 12,*) public static func displayMessage(_ message:@escaping @autoclosure ()->AttributedString, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, anchor:BXAnchorPoint = .center, inset:CGFloat = 0.0, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
 	{
 		let position = { view()?.position(for:anchor,inset) ?? .zero }
 		return BXScriptCommand_displayMessage(message:message, textAlignment:textAlignment, view:view, window:{nil}, position:position, anchor:anchor.opposite, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength)
 	}
 
-	@available(macOS 12,*) public static func displayMessage(_ message:@escaping @autoclosure ()->AttributedString, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, at position:@escaping @autoclosure ()->CGPoint, anchor:MessageLayerAnchor = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
+	@available(macOS 12,*) public static func displayMessage(_ message:@escaping @autoclosure ()->AttributedString, textAlignment:CATextLayerAlignmentMode = .center, in view:@escaping @autoclosure ()->NSView?, at position:@escaping @autoclosure ()->CGPoint, anchor:BXAnchorPoint = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
 	{
 		BXScriptCommand_displayMessage(message:message, textAlignment:textAlignment, view:view, window:{nil}, position:position, anchor:anchor, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength)
 	}
 
-	@available(macOS 12,*) public static func displayMessage(_ message:@escaping @autoclosure ()->AttributedString, textAlignment:CATextLayerAlignmentMode = .center, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, anchor:MessageLayerAnchor = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
+	@available(macOS 12,*) public static func displayMessage(_ message:@escaping @autoclosure ()->AttributedString, textAlignment:CATextLayerAlignmentMode = .center, in window:@escaping @autoclosure ()->NSWindow?, at position:@escaping @autoclosure ()->CGPoint, anchor:BXAnchorPoint = .center, backgroundWithPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0, pointerWithLength:CGFloat? = nil) -> BXScriptCommand
 	{
 		BXScriptCommand_displayMessage(message:message, textAlignment:textAlignment, view:{nil}, window:window, position:position, anchor:anchor, backgroundPadding:backgroundWithPadding, cornerRadius:cornerRadius, pointerLength:pointerWithLength)
 	}
@@ -86,7 +86,7 @@ extension BXScriptCommand where Self == BXScriptCommand_displayMessage
 //----------------------------------------------------------------------------------------------------------------------
 
 
-public enum MessageLayerAnchor
+public enum BXAnchorPoint
 {
 	case topLeft
 	case top
@@ -100,9 +100,9 @@ public enum MessageLayerAnchor
 }
 
 
-extension MessageLayerAnchor
+extension BXAnchorPoint
 {
-	public var opposite:MessageLayerAnchor
+	public var opposite:BXAnchorPoint
 	{
 		switch self
 		{
@@ -121,7 +121,7 @@ extension MessageLayerAnchor
 
 extension NSView
 {
-	public func position(for anchor:MessageLayerAnchor,_ inset:CGFloat = 0.0) -> CGPoint
+	public func position(for anchor:BXAnchorPoint,_ inset:CGFloat = 0.0) -> CGPoint
 	{
 		let bounds = self.bounds.insetBy(dx:inset, dy:inset)
 		
@@ -164,7 +164,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	
 	// Layout
 	
-	var anchor:MessageLayerAnchor = .center
+	var anchor:BXAnchorPoint = .center
 	var backgroundPadding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32)
 	var cornerRadius:CGFloat = 12.0
 	var pointerLength:CGFloat? = nil
@@ -527,7 +527,7 @@ extension BXScriptCommand_displayMessage
 	
 	/// Creates/Updates a CALayer that draws a line from the glass background to the specified position
 		
-	static func updatePointerLayer(in view:NSView, position:CGPoint, anchor:MessageLayerAnchor, pointerLength:CGFloat?, lineWidth:CGFloat, autoresizingMask:CAAutoresizingMask = [])
+	static func updatePointerLayer(in view:NSView, position:CGPoint, anchor:BXAnchorPoint, pointerLength:CGFloat?, lineWidth:CGFloat, autoresizingMask:CAAutoresizingMask = [])
 	{
 		// Only do this if we have a backgroundLayer and want a pointer
 		
@@ -618,7 +618,7 @@ extension BXScriptCommand_displayMessage
 	
 	/// Adjusts the position according to the specified layerAlignment, with the specified padding values.
 	
-	static func adjustPosition(_ position:CGPoint, anchor:MessageLayerAnchor, textSize:CGSize, t:CGFloat, l:CGFloat, b:CGFloat, r:CGFloat) -> CGPoint
+	static func adjustPosition(_ position:CGPoint, anchor:BXAnchorPoint, textSize:CGSize, t:CGFloat, l:CGFloat, b:CGFloat, r:CGFloat) -> CGPoint
 	{
 		var position = position
 
@@ -674,7 +674,7 @@ extension BXScriptCommand_displayMessage
 
 	/// Returns the start and end point for the pointer, given a position and layerAlignment. The inner and outer rects define the length of the pointer..
 	
-	static func pointer(for position:CGPoint, anchor:MessageLayerAnchor, inner:CGRect, outer:CGRect) -> (CGPoint,CGPoint)
+	static func pointer(for position:CGPoint, anchor:BXAnchorPoint, inner:CGRect, outer:CGRect) -> (CGPoint,CGPoint)
 	{
 		var p1 = inner.center
 		var p2 = outer.center
