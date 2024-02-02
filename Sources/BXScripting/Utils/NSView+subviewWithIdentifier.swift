@@ -66,10 +66,24 @@ extension NSWindow
 	
     public func subviewWithIdentifier(_ identifier:String, method:BXIdentifierMethod = .exactMatch) -> NSView?
     {
+		// Search this window
+		
 		if let subview = self.contentView?.subviewWithIdentifier(identifier, method:method)
 		{
 			return subview
 		}
+		
+		// Not found so search an attached sheet
+		
+		if let sheet = self.attachedSheet
+		{
+			if let subview = sheet.contentView?.subviewWithIdentifier(identifier, method:method)
+			{
+				return subview
+			}
+		}
+		
+		// Still not found, so search child window (e.g. popovers)
 		
 		for childWindow in self.childWindows ?? []
 		{
@@ -79,14 +93,6 @@ extension NSWindow
 			}
 		}
 
-		if let sheet = self.attachedSheet
-		{
-			if let subview = sheet.contentView?.subviewWithIdentifier(identifier, method:method)
-			{
-				return subview
-			}
-		}
-		
 		return nil
     }
 }
