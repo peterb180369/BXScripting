@@ -58,23 +58,16 @@ extension NSView
 		return observers
     }
     
-    /// Returns the frame of a view in window coordinates
+    /// Returns the frame of a view in the coordinates of the window content view.
+	///
+	/// In almost all cases this is equivalent to window coordinates. However there are some cases where this is not true, e.g. for popovers, where the window is larger than its content view (because of the irregular window shape).
 	
     public var frameInWindowCoordinates:CGRect
     {
-		var frame = self.convert(self.bounds, to:nil)
-
-		guard let rootView = rootView else { return frame }
-		
-		if rootView.isFlipped
-		{
-			frame.origin.y = rootView.bounds.maxY - frame.maxY
-		}
-		
-		return frame
+		self.convert(self.bounds, to:rootView)
     }
 
-	/// Return sthe root view in this view hierarchy
+	/// Returns the root view in this view hierarchy
 	
     public var rootView:NSView?
     {
