@@ -79,13 +79,13 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 	{
 		guard let window = self.window() else { return }
 		guard let subview = window.subviewWithIdentifier(id, method:method) else { return }
-		guard let view = window.addSubviewMatchingFrame(of:subview) else { return }
-		guard let layer = view.layer else { return }
-		Self.hilitedView = view
+		guard let hilitedView = subview.window?.addSubviewMatchingFrame(of:subview) else { return }
+		guard let layer = hilitedView.layer else { return }
+
+		Self.hilitedView = hilitedView
+		let bounds = hilitedView.bounds
 		
-		let bounds = view.bounds
-		
-		let frameLayer:CALayer = view.createSublayer(named:frameLayerName)
+		let frameLayer:CALayer = hilitedView.createSublayer(named:frameLayerName)
 		{
 			return CALayer()
 		}
@@ -105,7 +105,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 		
 		if let string = label
 		{
-			let textLayer = view.sublayer(named:labelLayerName) as? CATextLayer ?? CATextLayer()
+			let textLayer = hilitedView.sublayer(named:labelLayerName) as? CATextLayer ?? CATextLayer()
 			textLayer.name = labelLayerName
 			layer.addSublayer(textLayer)
 
@@ -124,7 +124,7 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 		
 		if animated { self.animate(frameLayer) }
 		
-		let critical = view.screenRect(for:frameLayer.frame)
+		let critical = hilitedView.screenRect(for:frameLayer.frame)
 		BXScriptWindowController.shared?.addCriticalRegion(critical)
 	}
 
