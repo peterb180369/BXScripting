@@ -89,6 +89,18 @@ public class BXScriptEngine
 	
 	
 //----------------------------------------------------------------------------------------------------------------------
+	
+	
+	/// An external closure that will be called whenever speaking starts
+	
+	public static var didStartSpeakingHandler:(()->Void)? = nil
+
+	/// An external closure that will be called whenever speaking stops
+	
+	public static var didStopSpeakingHandler:(()->Void)? = nil
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 	// MARK: -

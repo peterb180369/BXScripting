@@ -156,13 +156,18 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 	
 	// AVSpeechSynthesizerDelegate
 	
-	func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance)
+    public func speechSynthesizer(_ synthesizer:AVSpeechSynthesizer, didStart utterance:AVSpeechUtterance)
+    {
+		BXScriptEngine.didStartSpeakingHandler?()
+    }
+    
+	public func speechSynthesizer(_ synthesizer:AVSpeechSynthesizer, didFinish utterance:AVSpeechUtterance)
     {
 		self.cleanup()
 		if !didCallCompletionHandler { self.completionHandler?() }
     }
 
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance)
+	public func speechSynthesizer(_ synthesizer:AVSpeechSynthesizer, didCancel utterance:AVSpeechUtterance)
     {
 		self.cleanup()
     }
@@ -200,6 +205,7 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 		self.utterance = nil
 		BXScriptCommand_speakText.synthesizer = nil
 		BXSubtitleWindowController.shared.text = nil
+		BXScriptEngine.didStopSpeakingHandler?()
     }
 }
  
