@@ -459,6 +459,8 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// MARK: -
+
 extension NSView
 {
 	func screenRect(for viewRect:CGRect) -> CGRect

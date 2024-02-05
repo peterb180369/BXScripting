@@ -147,11 +147,6 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 		{
 			[self] _ in self.pause()
 		}
-
-//		self.observers += NotificationCenter.default.publisher(for:BXScriptWindowController.muteAudioNotification, object:nil).sink
-//		{
-//			[self] _ in self.delegate.updateVolume()
-//		}
 	}
 	
 	// AVSpeechSynthesizerDelegate
