@@ -299,12 +299,25 @@ print("USING: \(voice)")
 		
 		if voice.identifier.contains("eloquence") { return false }
 		
+		// Remove Siri voices
+		
+//		if voice.identifier.contains("ttsbundle.siri") { return false }
+		
+		// Remove indian voices
+		
+		if voice.identifier.contains("en-IN") { return false }
+
 		// Remove other blacklisted voices
 		
 		let blacklist:[String] =
 		[
 			"com.apple.voice.compact.en-ZA.Tessa",
 			"com.apple.voice.compact.en-US.Samantha",
+			"com.apple.voice.compact.en-IE.Moira",
+			"com.apple.voice.compact.en-GB.Daniel",
+			"com.apple.voice.compact.en-AU.Karen",
+			"com.apple.ttsbundle.siri_Aaron_en-US_compact",
+			
 			"com.apple.ttsbundle.siri_Marie_fr-FR_compact",
 			"com.apple.ttsbundle.siri_Dan_fr-FR_compact",
 			"com.apple.voice.compact.fr-FR.Thomas",
