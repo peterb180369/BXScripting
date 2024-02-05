@@ -15,7 +15,7 @@ import AVFAudio
 
 extension BXScriptCommand where Self == BXScriptCommand_speakText
 {
-	public static func speakText(_ text:String, wait:Bool = true) -> BXScriptCommand
+	public static func speakText(_ text:@escaping @autoclosure ()->String, wait:Bool = true) -> BXScriptCommand
 	{
 		BXScriptCommand_speakText(text:text, wait:wait)
 	}
@@ -31,7 +31,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 {
 	// Params
 	
-	public var text:String
+	public var text:()->String
 	public var wait:Bool
 	
 	// Text to Speech
@@ -44,14 +44,6 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 	public var queue:DispatchQueue = .main
 	public var completionHandler:(()->Void)? = nil
 	public weak var scriptEngine:BXScriptEngine? = nil
-	
-	// Init
-	
-	public init(text: String, wait:Bool)
-	{
-		self.text = text
-		self.wait = wait
-	}
 	
 	// Execute
 	
@@ -83,6 +75,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 
 				// Setup text to be spoken
 				
+				let text = text()
 				let fixedText = Self.fixPronunciation(for:text)
 				let utterance = AVSpeechUtterance(string:fixedText)
 				utterance.voice = AVSpeechSynthesisVoice.bestAvailableVoice
@@ -318,7 +311,7 @@ print("USING: \(voice)")
 			"com.apple.voice.compact.en-AU.Karen",
 			"com.apple.ttsbundle.siri_Aaron_en-US_compact",
 			
-			"com.apple.ttsbundle.siri_Marie_fr-FR_compact",
+//			"com.apple.ttsbundle.siri_Marie_fr-FR_compact",
 			"com.apple.ttsbundle.siri_Dan_fr-FR_compact",
 			"com.apple.voice.compact.fr-FR.Thomas",
 		]
