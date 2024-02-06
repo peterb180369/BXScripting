@@ -89,21 +89,9 @@ public class BXScriptEngine
 	
 	
 //----------------------------------------------------------------------------------------------------------------------
-	
-	
-	/// An external closure that will be called whenever speaking starts
-	
-	public static var didStartSpeakingHandler:(()->Void)? = nil
-
-	/// An external closure that will be called whenever speaking stops
-	
-	public static var didStopSpeakingHandler:(()->Void)? = nil
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-	// MARK: -
+	// MARK: - Init
 	
 	
 	/// Creates a new BXScriptEngine with the specified command and completionHandler.
@@ -120,6 +108,9 @@ public class BXScriptEngine
 //----------------------------------------------------------------------------------------------------------------------
 
 
+	// MARK: - Run
+	
+	
 	/// Runs a script on the specified queue. Default is the main queue.
 	///
 	/// - Returns: The ID of the script.
@@ -220,7 +211,7 @@ public class BXScriptEngine
 //----------------------------------------------------------------------------------------------------------------------
 
 
-	// MARK: -
+	// MARK: - Cancel
 	
 	
 	/// This function cancels execution of all scripts that are currently running.
@@ -269,6 +260,7 @@ public class BXScriptEngine
 			(command as? BXScriptCommandCancellable)?.cancel()
 		}
 	}
+
 }
 
 
