@@ -149,3 +149,25 @@ print("USING: \(String(describing: voice))")
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+	// MARK: - Ducking
+	
+	
+	/// An external closure that will be called whenever speaking starts
+	///
+	/// An application can use this hook to start ducking audio that is currently playing
+	
+	public static var didStartSpeakingHandler:(()->Void)? = nil
+
+
+	/// An external closure that will be called whenever speaking stops
+	///
+	/// An application can use this hook to stop ducking audio that is currently playing
+	
+	public static var didStopSpeakingHandler:(()->Void)? = nil
+
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
