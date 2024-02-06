@@ -78,7 +78,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 				let text = text()
 				let fixedText = Self.fixPronunciation(for:text)
 				let utterance = AVSpeechUtterance(string:fixedText)
-				utterance.voice = AVSpeechSynthesisVoice.bestAvailableVoice
+				utterance.voice = BXScriptVoice.bestAvailableVoice
 				Self.delegate.utterance = utterance
 				Self.delegate.updateVolume()
 
@@ -109,7 +109,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 	public static func fixPronunciation(for text:String) -> String
 	{
 		var text = text
-		let code = AVSpeechSynthesisVoice.currentLanguageCode
+		let code = BXScriptVoice.currentLanguageCode
 		let pronunciationFixes = BXScriptEnvironment.shared.speechPronunciationFixes[code] ?? [:]
 
 		for (key,value) in pronunciationFixes
@@ -146,7 +146,7 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 	
     public func speechSynthesizer(_ synthesizer:AVSpeechSynthesizer, didStart utterance:AVSpeechUtterance)
     {
-		BXScriptEngine.didStartSpeakingHandler?()
+		BXScriptVoice.didStartSpeakingHandler?()
     }
     
 	public func speechSynthesizer(_ synthesizer:AVSpeechSynthesizer, didFinish utterance:AVSpeechUtterance)
@@ -193,7 +193,7 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 		self.utterance = nil
 		BXScriptCommand_speakText.synthesizer = nil
 		BXSubtitleWindowController.shared.text = nil
-		BXScriptEngine.didStopSpeakingHandler?()
+		BXScriptVoice.didStopSpeakingHandler?()
     }
 }
  
