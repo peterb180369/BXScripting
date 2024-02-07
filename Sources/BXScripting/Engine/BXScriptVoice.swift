@@ -8,6 +8,7 @@
 
 
 import AVFAudio
+import AppKit
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -167,6 +168,16 @@ print("USING: \(String(describing: voice))")
 	
 	public static var didStopSpeakingHandler:(()->Void)? = nil
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+	// MARK: - UI Blocking
+	
+	
+	/// If this property is set, then any UI interaction will be blocked while speaking is in progress.
+	
+	public static var blockedWindowWhileSpeaking:NSWindow? = nil
 }
 
 

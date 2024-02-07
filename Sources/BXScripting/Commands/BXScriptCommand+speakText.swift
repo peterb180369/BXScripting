@@ -86,7 +86,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 
 				// Start speaking
 				
-				if blockUI && wait { Self.delegate.installBlockingWindow() }
+				if blockUI && wait { Self.delegate.startBlockingWindow() }
 				
 				Self.synthesizer?.speak(utterance)
 				BXSubtitleWindowController.shared.text = text
@@ -96,7 +96,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 			
 			if !wait
 			{
-				Self.delegate.removeBlockingWindow()
+				Self.delegate.endBlockingWindow()
 				Self.delegate.didCallCompletionHandler = true
 				self.completionHandler?()
 			}
@@ -195,42 +195,36 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
     
     /// Installs a transparent window that covers the whole screen and catches all mouse events
 	
-    func installBlockingWindow()
+    func startBlockingWindow()
     {
-		guard let screen = NSScreen.main else { return }
-		let frame = screen.frame
+		guard let window = BXScriptVoice.blockedWindowWhileSpeaking else { return }
 		
-		if Self.blockingWindow == nil
-		{
-			let window = NSPanel(contentRect:frame, styleMask:[.borderless], backing:.buffered, defer:true)
-			window.level = .screenSaver
-			window.backgroundColor = .clear
-			window.isReleasedWhenClosed = false
-			window.contentView = BXBlockingView(frame:CGRect(origin:.zero, size:frame.size))
-			window.makeKeyAndOrderFront(nil)
-			
-			Self.blockingWindow = window
-		}
-		else
-		{
-			Self.blockingWindow?.setFrame(frame, display:true)
-		}
+		let frame = window.contentView?.frame ?? .zero
+		let view = BXBlockingView(frame:frame)
+		view.autoresizingMask = [.width,.height]
+//		view.wantsLayer = true
+//		view.layer?.borderColor = NSColor.green.cgColor
+//		view.layer?.borderWidth = 1.0
+		
+		window.contentView?.addSubview(view)
     }
     
     /// Removes the blocking window again
 	
-    func removeBlockingWindow()
+    func endBlockingWindow()
     {
-		guard let window = Self.blockingWindow else { return }
-		window.orderOut(nil)
-		Self.blockingWindow = nil
+		BXScriptVoice.blockedWindowWhileSpeaking?
+			.contentView?
+			.subviews
+			.compactMap { $0 as? BXBlockingView }
+			.forEach { $0.removeFromSuperview() }
     }
     
     /// Performs cleanup after speaking
     
     func cleanup()
     {
-		self.removeBlockingWindow()
+		self.endBlockingWindow()
 		
 		self.utterance = nil
 		BXScriptCommand_speakText.synthesizer = nil
@@ -243,23 +237,10 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 //----------------------------------------------------------------------------------------------------------------------
 
 
+/// This view class swallows all mouse events. If it is installed above all other window views, it effectively disabled the UI
+
 fileprivate class BXBlockingView : NSView
 {
-	override init(frame:CGRect)
-	{
-		super.init(frame:frame)
-		
-		self.wantsLayer = true
-		self.layer?.borderColor = NSColor.green.cgColor
-		self.layer?.borderWidth = 1.0
-		self.layer?.backgroundColor = CGColor(gray:0.0, alpha:0.01)
-	}
-	
-	required init?(coder:NSCoder)
-	{
-		fatalError("init(coder:) has not been implemented")
-	}
-	
 	override func acceptsFirstMouse(for event:NSEvent?) -> Bool
 	{
 		true
