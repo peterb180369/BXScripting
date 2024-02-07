@@ -2,12 +2,13 @@
 //
 //  BXScriptCommand+speakText.swift
 //	Adds a speakText command that speaks a text
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2024 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
 
 import AVFAudio
+import AppKit
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -15,9 +16,9 @@ import AVFAudio
 
 extension BXScriptCommand where Self == BXScriptCommand_speakText
 {
-	public static func speakText(_ text:@escaping @autoclosure ()->String, wait:Bool = true) -> BXScriptCommand
+	public static func speakText(_ text:@escaping @autoclosure ()->String, blockUI:Bool = true, wait:Bool = true) -> BXScriptCommand
 	{
-		BXScriptCommand_speakText(text:text, wait:wait)
+		BXScriptCommand_speakText(text:text, blockUI:blockUI, wait:wait)
 	}
 }
 
@@ -32,6 +33,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 	// Params
 	
 	public var text:()->String
+	public var blockUI:Bool
 	public var wait:Bool
 	
 	// Text to Speech
@@ -84,6 +86,8 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 
 				// Start speaking
 				
+				if blockUI && wait { Self.delegate.installBlockingWindow() }
+				
 				Self.synthesizer?.speak(utterance)
 				BXSubtitleWindowController.shared.text = text
 			}
@@ -92,6 +96,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 			
 			if !wait
 			{
+				Self.delegate.removeBlockingWindow()
 				Self.delegate.didCallCompletionHandler = true
 				self.completionHandler?()
 			}
@@ -101,6 +106,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 	public func cancel()
 	{
 		Self.synthesizer?.stopSpeaking(at:.immediate)
+		Self.delegate.cleanup()
 	}
 	
 	/// Checks if we have any registered pronunciation fixes for the current language. If yes, then all occurances in the text will be replaced with the fixes that
@@ -131,6 +137,7 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 	var utterance:AVSpeechUtterance? = nil
 	var completionHandler:(()->Void)? = nil
 	var didCallCompletionHandler = false
+	static var blockingWindow:NSWindow? = nil
 	
 	override init()
 	{
@@ -186,10 +193,45 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 		}
     }
     
+    /// Installs a transparent window that covers the whole screen and catches all mouse events
+	
+    func installBlockingWindow()
+    {
+		guard let screen = NSScreen.main else { return }
+		let frame = screen.frame
+		
+		if Self.blockingWindow == nil
+		{
+			let window = NSPanel(contentRect:frame, styleMask:[.borderless], backing:.buffered, defer:true)
+			window.level = .screenSaver
+			window.backgroundColor = .clear
+			window.isReleasedWhenClosed = false
+			window.contentView = BXBlockingView(frame:CGRect(origin:.zero, size:frame.size))
+			window.makeKeyAndOrderFront(nil)
+			
+			Self.blockingWindow = window
+		}
+		else
+		{
+			Self.blockingWindow?.setFrame(frame, display:true)
+		}
+    }
+    
+    /// Removes the blocking window again
+	
+    func removeBlockingWindow()
+    {
+		guard let window = Self.blockingWindow else { return }
+		window.orderOut(nil)
+		Self.blockingWindow = nil
+    }
+    
     /// Performs cleanup after speaking
     
     func cleanup()
     {
+		self.removeBlockingWindow()
+		
 		self.utterance = nil
 		BXScriptCommand_speakText.synthesizer = nil
 		BXSubtitleWindowController.shared.text = nil
@@ -198,4 +240,76 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 }
  
  
+//----------------------------------------------------------------------------------------------------------------------
+
+
+fileprivate class BXBlockingView : NSView
+{
+	override init(frame:CGRect)
+	{
+		super.init(frame:frame)
+		
+		self.wantsLayer = true
+		self.layer?.borderColor = NSColor.green.cgColor
+		self.layer?.borderWidth = 1.0
+		self.layer?.backgroundColor = CGColor(gray:0.0, alpha:0.01)
+	}
+	
+	required init?(coder:NSCoder)
+	{
+		fatalError("init(coder:) has not been implemented")
+	}
+	
+	override func acceptsFirstMouse(for event:NSEvent?) -> Bool
+	{
+		true
+	}
+	
+	override func mouseDown(with event:NSEvent)
+	{
+		NSSound.beep()
+	}
+
+	override func mouseDragged(with event:NSEvent)
+	{
+
+	}
+
+	override func mouseUp(with event:NSEvent)
+	{
+
+	}
+
+	override func rightMouseDown(with event:NSEvent)
+	{
+		NSSound.beep()
+	}
+
+	override func rightMouseDragged(with event:NSEvent)
+	{
+
+	}
+
+	override func rightMouseUp(with event:NSEvent)
+	{
+
+	}
+
+	override func otherMouseDown(with event:NSEvent)
+	{
+		NSSound.beep()
+	}
+
+	override func otherMouseDragged(with event:NSEvent)
+	{
+
+	}
+
+	override func otherMouseUp(with event:NSEvent)
+	{
+
+	}
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
