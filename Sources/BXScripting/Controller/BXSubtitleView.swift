@@ -22,10 +22,15 @@ struct BXSubtitleView : View
 	public var body: some View
 	{
 		Text(controller.displayedText)
-			.lineLimit(nil)
+		
+			.font(.system(size:20))
 			.foregroundColor(.white)
-			.font(.title)
-			.padding()
+			
+			.lineLimit(nil)
+			.fixedSize(horizontal:false, vertical:true)
+			
+			.padding(12)
+			.frame(width:controller.size.width, height:controller.size.height)
 	}
 }
 

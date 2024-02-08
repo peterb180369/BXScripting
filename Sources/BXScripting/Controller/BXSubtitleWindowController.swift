@@ -56,6 +56,9 @@ public class BXSubtitleWindowController : NSWindowController, ObservableObject
 	
 	@Published public var displayedText:String = ""
 	
+	/// The size of the subtitle window
+	
+	@Published public var size = CGSize(1000,48)
 	
 	/// Subscribers
 	
@@ -87,7 +90,7 @@ public class BXSubtitleWindowController : NSWindowController, ObservableObject
 
 		let view = BXSubtitleView(controller:self)
 		let hostview = NSHostingView(rootView:view)
-		let size = hostview.intrinsicContentSize
+		let size = CGSize.zero // hostview.intrinsicContentSize
 
 		// Create window
 
@@ -96,7 +99,7 @@ public class BXSubtitleWindowController : NSWindowController, ObservableObject
 		let window = BXScriptControllerPanel(contentRect:frame, styleMask:style, backing:.buffered, defer:true)
 		window.titlebarAppearsTransparent = true
 		window.isMovableByWindowBackground = true
-		window.isExcludedFromWindowsMenu = true 
+		window.isExcludedFromWindowsMenu = true
 		window.collectionBehavior.insert(NSWindow.CollectionBehavior.fullScreenAuxiliary)
 		window.isFloatingPanel = true
 		window.becomesKeyOnlyIfNeeded = true
@@ -116,7 +119,7 @@ public class BXSubtitleWindowController : NSWindowController, ObservableObject
 			if let text = text, text.count > 0
 			{
 				self.cancelAllDelayedPerforms()
-				self.showSubtitle(text)
+				self.showSubtitle(displayedText)
 			}
 			else
 			{
@@ -137,22 +140,30 @@ public class BXSubtitleWindowController : NSWindowController, ObservableObject
 		
 		guard let screen = NSScreen.main else { return }
 		guard let window = window else { return }
-		guard let hostview = window.contentView as? NSHostingView<BXSubtitleView> else { return }
 		
 		// Get the main screen safe area (with inset)
 		
 		let safeArea = screen.visibleFrame.insetBy(dx:50, dy:50)
+
+		// Measure the size of the text
 		
-		// Set window to safe area and measure text size
+		let margin:CGFloat = 12
+		let maxWidth = safeArea.width - margin - margin
+
+		let attributedText = NSAttributedString(string:text, attributes: [.font:NSFont.systemFont(ofSize:20)])
+		let rect = attributedText.boundingRect(with: CGSize(maxWidth,1e8), options:[.usesLineFragmentOrigin,.usesFontLeading])
+		let outer = rect.insetBy(dx:-margin, dy:-margin)
+		let w = outer.width
+		let h = outer.height
 		
-		window.setFrame(safeArea, display:false)
-		let size = hostview.intrinsicContentSize
-		
+		self.size = CGSize(w,h)
+
 		// Resize the window to text size
 		
 		var frame = safeArea
-		frame.origin.x = safeArea.midX - round (0.5 * size.width)
-		frame.size.height = size.height
+		frame.origin.x = safeArea.midX - round (0.5 * w)
+		frame.origin.y = safeArea.minY
+		frame.size = size
 		window.setFrame(frame, display:true)
 		
 		// Show the window
