@@ -214,7 +214,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	{
 		Self.observers.removeAll()
 		
-		guard let view = self.rootView else { return }
+		guard let view = self.rootView ?? Self.rootView else { return }
 		
 		view.removeSublayer(named:Self.textLayerName)
 		view.removeSublayer(named:Self.backgroundLayerName)
@@ -286,6 +286,7 @@ extension BXScriptCommand_displayMessage
 		self.targetView?.rootView
 	}
 	
+	static var rootView:NSView?
 
 	/// Updates all layers for current conditions
 	
@@ -316,7 +317,8 @@ extension BXScriptCommand_displayMessage
 	func updateLayers(with text:NSAttributedString)
 	{
 		guard let rootView = self.rootView else { return }
-
+		Self.rootView = rootView
+		
 		let position = self.positionInWindow(with:text)
 		let autoresizingMask:CAAutoresizingMask = []
 		

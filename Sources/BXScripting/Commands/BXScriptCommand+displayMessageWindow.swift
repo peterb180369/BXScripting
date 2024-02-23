@@ -106,9 +106,15 @@ public struct BXScriptCommand_displayMessageWindow : BXScriptCommand, BXScriptCo
 	
 	private func cleanup()
 	{
-		guard let window = Self.standaloneWindow else { return }
-		guard let view = window.contentView else { return }
-		
+		if let view = Self.standaloneWindow?.contentView ?? BXScriptCommand_displayMessage.rootView
+		{
+			self.cleanup(in:view)
+		}
+	}
+	
+	
+	private func cleanup(in view:NSView)
+	{
 		view.removeSublayer(named:BXScriptCommand_displayMessage.textLayerName)
 		view.removeSublayer(named:BXScriptCommand_displayMessage.backgroundLayerName)
 		view.removeSublayer(named:BXScriptCommand_displayMessage.shadowLayerName)
