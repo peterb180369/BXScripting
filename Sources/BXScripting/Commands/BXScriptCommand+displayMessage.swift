@@ -549,7 +549,7 @@ extension BXScriptCommand_displayMessage
 		let frame = backgroundLayer.frame
 		let inner = frame.safeInsetBy(dx:margin, dy:margin)
 		let outer = frame.insetBy(dx:-margin, dy:-margin)
-		let (p1,p2) = Self.pointer(for:position, anchor:anchor, inner:inner, outer:outer)
+		let (p1,p2) = Self.pointer(for:position, anchor:anchor, inner:inner, outer:outer, isFlipped:view.isFlipped)
 		let lineLength = (p2-p1).length + lineWidth
 		let dx =  p2.x - p1.x
 		let dy =  p2.y - p1.y
@@ -676,7 +676,7 @@ extension BXScriptCommand_displayMessage
 
 	/// Returns the start and end point for the pointer, given a position and layerAlignment. The inner and outer rects define the length of the pointer..
 	
-	static func pointer(for position:CGPoint, anchor:BXAnchorPoint, inner:CGRect, outer:CGRect) -> (CGPoint,CGPoint)
+	static func pointer(for position:CGPoint, anchor:BXAnchorPoint, inner:CGRect, outer:CGRect, isFlipped:Bool) -> (CGPoint,CGPoint)
 	{
 		var p1 = inner.center
 		var p2 = outer.center
@@ -685,18 +685,18 @@ extension BXScriptCommand_displayMessage
 		{
 			case .topLeft:
 			
-				p1 = inner.topLeft
-				p2 = outer.topLeft
+				p1 = isFlipped ? inner.bottomLeft : inner.topLeft
+				p2 = isFlipped ? outer.bottomLeft : outer.topLeft
 
 			case .top:
 			
-				p1 = inner.top
-				p2 = outer.top
+				p1 = isFlipped ? inner.bottom : inner.top
+				p2 = isFlipped ? outer.bottom : outer.top
 
 			case .topRight:
 			
-				p1 = inner.topRight
-				p2 = outer.topRight
+				p1 = isFlipped ? inner.bottomRight : inner.topRight
+				p2 = isFlipped ? outer.bottomRight : outer.topRight
 
 			case .left:
 			
@@ -715,18 +715,18 @@ extension BXScriptCommand_displayMessage
 				
 			case .bottomLeft:
 			
-				p1 = inner.bottomLeft
-				p2 = outer.bottomLeft
+				p1 = isFlipped ? inner.topLeft : inner.bottomLeft
+				p2 = isFlipped ? outer.topLeft : outer.bottomLeft
 
 			case .bottom:
 			
-				p1 = inner.bottom
-				p2 = outer.bottom
+				p1 = isFlipped ? inner.top : inner.bottom
+				p2 = isFlipped ? outer.top : outer.bottom
 
 			case .bottomRight:
 			
-				p1 = inner.bottomRight
-				p2 = outer.bottomRight
+				p1 = isFlipped ? inner.topRight : inner.bottomRight
+				p2 = isFlipped ? outer.topRight : outer.bottomRight
 		}
 
 		return (p1,p2)
