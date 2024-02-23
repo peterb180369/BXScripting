@@ -193,7 +193,7 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 		}
     }
     
-    /// Installs a transparent window that covers the whole screen and catches all mouse events
+    /// Installs a transparent window that covers the whole window and catches all mouse events
 	
     func startBlockingWindow()
     {
@@ -206,7 +206,7 @@ fileprivate class BXScriptCommandSpeakDelegate : NSObject, AVSpeechSynthesizerDe
 //		view.layer?.borderColor = NSColor.green.cgColor
 //		view.layer?.borderWidth = 1.0
 		
-		window.contentView?.addSubview(view)
+		window.contentView?.addSubview(view, positioned:.above, relativeTo:nil)
     }
     
     /// Removes the blocking window again
