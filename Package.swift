@@ -24,7 +24,7 @@ let package = Package(
     dependencies:
     [
 //        .package(url: "git@github.com:boinx/BXSwiftUtils.git", .branch("master")),
-		.package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.3.4"),
+		.package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.5.0"),
     ],
     
 	// Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -32,7 +32,7 @@ let package = Package(
 
     targets:
     [
-        .target(name:"BXScripting", dependencies:[]),
+        .target(name:"BXScripting", dependencies:[.product(name:"Lottie", package:"lottie-spm")]),
 //		.testTarget( name:"BXScriptingTests", dependencies:["BXScripting"]),
     ]
 )
