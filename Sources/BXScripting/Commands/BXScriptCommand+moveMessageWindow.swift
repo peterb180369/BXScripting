@@ -88,7 +88,7 @@ extension BXScriptCommand_moveMessageWindow
 		// Since the size already includes that background padding, we will supply 0 values for the padding
 		// to calculate the new center position.
 		
-		var center = BXScriptCommand_displayMessage.adjustPosition(
+		let center = BXScriptCommand_displayMessage.adjustPosition(
 			position,
 			anchor: anchor,
 			textSize:size,
