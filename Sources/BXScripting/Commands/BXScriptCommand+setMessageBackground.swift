@@ -64,7 +64,7 @@ public struct BXScriptCommand_setMessageBackground : BXScriptCommand
 	private func updateLayers()
 	{
 		guard let view = hostView else { return }
-		guard let textLayer = view.sublayer(named:BXScriptCommand_displayMessage.textLayerName) as? CATextLayer else { return }
+//		guard let textLayer = view.sublayer(named:BXScriptCommand_displayMessage.textLayerName) as? CATextLayer else { return }
 
 		let showsBackground = backgroundPadding != nil
 		let padding = backgroundPadding ?? NSEdgeInsets()
