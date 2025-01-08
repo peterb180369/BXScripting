@@ -110,7 +110,8 @@ extension NSWindow
 
 extension NSView
 {
-    private static var frameObserversKey = "frameObservers"
+//	private static var frameObserversKey = "frameObservers"
+	private static var frameObserversKey:Void?
 
     public var frameObservers:[Any]?
     {
