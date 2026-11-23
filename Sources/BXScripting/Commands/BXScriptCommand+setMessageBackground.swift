@@ -2,7 +2,7 @@
 //
 //  BXScriptCommand+setMessageBackground.swift
 //	Sets or modifies the background layer for the currently visible message
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -85,6 +85,30 @@ public struct BXScriptCommand_setMessageBackground : BXScriptCommand
 	}
 	
 	
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: - Builder
+
+
+// The following functions provide the high-level syntax for the commands above. They simply forward to the low-level
+// factory functions. Capitalized function names are necessary, because a command cannot be written with leading dot
+// syntax as a statement inside a @BXScriptBuilder body - the compiler would parse consecutive lines that start with
+// a dot as a single method chain.
+
+
+public func SetMessageBackground(in view:@escaping @autoclosure ()->NSView?, padding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0) -> BXScriptCommand
+{
+	.setMessageBackground(in:view(), padding:padding, cornerRadius:cornerRadius)
+}
+
+
+public func SetMessageBackground(in window:@escaping @autoclosure ()->NSWindow?, padding:NSEdgeInsets? = NSEdgeInsets(top:12, left:32, bottom:12, right:32), cornerRadius:CGFloat = 12.0) -> BXScriptCommand
+{
+	.setMessageBackground(in:window(), padding:padding, cornerRadius:cornerRadius)
 }
 
 

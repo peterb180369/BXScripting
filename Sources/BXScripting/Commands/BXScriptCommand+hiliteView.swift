@@ -2,7 +2,7 @@
 //
 //  BXScriptCommand+hiliteView.swift
 //	Adds a hiliteView command to BXScriptCommand
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -172,6 +172,30 @@ public struct BXScriptCommand_hiliteView : BXScriptCommand, BXScriptCommandCance
 
 	private let frameLayerName = "\(Self.self).frame"
 	private let labelLayerName = "\(Self.self).label"
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: - Builder
+
+
+// The following functions provide the high-level syntax for the commands above. They simply forward to the low-level
+// factory functions. Capitalized function names are necessary, because a command cannot be written with leading dot
+// syntax as a statement inside a @BXScriptBuilder body - the compiler would parse consecutive lines that start with
+// a dot as a single method chain.
+
+
+public func HiliteView(withID id:String, method:BXIdentifierMethod = .exactMatch, in window:@escaping @autoclosure ()->NSWindow?, label:String? = nil, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0, animated:Bool = false) -> BXScriptCommand
+{
+	.hiliteView(withID:id, method:method, in:window(), label:label, inset:inset, cornerRadius:cornerRadius, animated:animated)
+}
+
+
+public func UnhiliteView() -> BXScriptCommand
+{
+	.unhiliteView()
 }
 
 

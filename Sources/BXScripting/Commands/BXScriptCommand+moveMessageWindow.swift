@@ -2,7 +2,7 @@
 //
 //  BXScriptCommand+displayMessageWindow.swift
 //	Adds a displayMessage command to BXScriptCommand
-//  Copyright ©2023-2024 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -102,6 +102,24 @@ extension BXScriptCommand_moveMessageWindow
 		let frame = CGRect(center:center, size:size)
 		window.setFrame(frame, display:true, animate:animated)
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: - Builder
+
+
+// The following functions provide the high-level syntax for the commands above. They simply forward to the low-level
+// factory functions. Capitalized function names are necessary, because a command cannot be written with leading dot
+// syntax as a statement inside a @BXScriptBuilder body - the compiler would parse consecutive lines that start with
+// a dot as a single method chain.
+
+
+public func MoveMessageWindow(to position:@escaping @autoclosure ()->CGPoint, anchor:BXAnchorPoint = .center, animated:Bool = false) -> BXScriptCommand
+{
+	.moveMessageWindow(to:position(), anchor:anchor, animated:animated)
 }
 
 

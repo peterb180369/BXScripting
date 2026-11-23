@@ -2,7 +2,7 @@
 //
 //  BXScriptCommand+while-closure.swift
 //	Adds a while-loop command to BXScriptCommand
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -61,6 +61,30 @@ public struct BXScriptCommand_while_closure : BXScriptCommand
 			completionHandler?()
 		}
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: - Builder
+
+
+// The following functions provide the high-level syntax for the commands above. They simply forward to the low-level
+// factory functions. Capitalized function names are necessary, because a command cannot be written with leading dot
+// syntax as a statement inside a @BXScriptBuilder body - the compiler would parse consecutive lines that start with
+// a dot as a single method chain.
+
+
+public func While(_ condition:@escaping ()->Bool, loopBody:@escaping ()->Void) -> BXScriptCommand
+{
+	.while(condition, loopBody:loopBody)
+}
+
+
+public func While(_ conditionName:String, loopBodyName:String) -> BXScriptCommand
+{
+	.while(conditionName, loopBodyName:loopBodyName)
 }
 
 

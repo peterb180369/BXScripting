@@ -2,7 +2,7 @@
 //
 //  BXScriptCommand+waitForPublisher.swift
 //	Adds a waitForPublisher command to BXScriptCommand
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -124,6 +124,36 @@ fileprivate class Helper
 {
 	var count = 0
 	var subscribers:[Any] = []
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: - Builder
+
+
+// The following functions provide the high-level syntax for the commands above. They simply forward to the low-level
+// factory functions. Capitalized function names are necessary, because a command cannot be written with leading dot
+// syntax as a statement inside a @BXScriptBuilder body - the compiler would parse consecutive lines that start with
+// a dot as a single method chain.
+
+
+public func WaitForNotification(_ notification:Notification.Name, minimumCount:Int = 1, timeoutDuration:Double? = nil, timeoutHandler:(()->Void)? = nil) -> BXScriptCommand
+{
+	.waitForNotification(notification, minimumCount:minimumCount, timeoutDuration:timeoutDuration, timeoutHandler:timeoutHandler)
+}
+
+
+public func WaitForPublisher(_ publisher:AnyPublisher<Any,Never>, minimumCount:Int = 1, timeoutDuration:Double? = nil, timeoutHandler:(()->Void)? = nil) -> BXScriptCommand
+{
+	.waitForPublisher(publisher, minimumCount:minimumCount, timeoutDuration:timeoutDuration, timeoutHandler:timeoutHandler)
+}
+
+
+public func WaitForPublisher(_ publisher:ObservableObjectPublisher, minimumCount:Int = 1, timeoutDuration:Double? = nil, timeoutHandler:(()->Void)? = nil) -> BXScriptCommand
+{
+	.waitForPublisher(publisher, minimumCount:minimumCount, timeoutDuration:timeoutDuration, timeoutHandler:timeoutHandler)
 }
 
 

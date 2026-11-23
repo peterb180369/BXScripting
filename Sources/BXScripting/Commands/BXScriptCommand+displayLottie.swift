@@ -2,7 +2,7 @@
 //
 //  BXScriptCommand+displayLottie.swift
 //	Adds a displayLottie command to BXScriptCommand
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -231,6 +231,30 @@ extension BXScriptCommand_displayLottie
 		
 		return position
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: - Builder
+
+
+// The following functions provide the high-level syntax for the commands above. They simply forward to the low-level
+// factory functions. Capitalized function names are necessary, because a command cannot be written with leading dot
+// syntax as a statement inside a @BXScriptBuilder body - the compiler would parse consecutive lines that start with
+// a dot as a single method chain.
+
+
+public func DisplayLottie(_ animation:LottieAnimation?, size:@escaping @autoclosure ()->CGSize, anchor:BXAnchorPoint = .center, in view:@escaping @autoclosure ()->NSView?, at position:@escaping @autoclosure ()->CGPoint, wait:Bool = true) -> BXScriptCommand
+{
+	.displayLottie(animation, size:size(), anchor:anchor, in:view(), at:position(), wait:wait)
+}
+
+
+public func HideLottie() -> BXScriptCommand
+{
+	.hideLottie()
 }
 
 

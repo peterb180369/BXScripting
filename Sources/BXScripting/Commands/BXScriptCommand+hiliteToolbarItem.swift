@@ -2,7 +2,7 @@
 //
 //  BXScriptCommand+hiliteToolbarItem.swift
 //	Adds a hiliteView command to BXScriptCommand
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -103,6 +103,24 @@ public struct BXScriptCommand_hiliteToolbarItem : BXScriptCommand, BXScriptComma
 
 
 	private let frameLayerName = "\(Self.self).frame"
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: - Builder
+
+
+// The following functions provide the high-level syntax for the commands above. They simply forward to the low-level
+// factory functions. Capitalized function names are necessary, because a command cannot be written with leading dot
+// syntax as a statement inside a @BXScriptBuilder body - the compiler would parse consecutive lines that start with
+// a dot as a single method chain.
+
+
+public func HiliteToolbarItem(withID id:String, in window:@escaping @autoclosure ()->NSWindow?, visible:Bool = true, inset:CGFloat = 0.0, cornerRadius:CGFloat = 4.0) -> BXScriptCommand
+{
+	.hiliteToolbarItem(withID:id, in:window(), visible:visible, inset:inset, cornerRadius:cornerRadius)
 }
 
 
