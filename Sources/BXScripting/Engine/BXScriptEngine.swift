@@ -2,7 +2,7 @@
 //
 //  BXScriptEngine.swift
 //	Lightweight and extensible scripting engine for Swift based applications
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -102,6 +102,13 @@ public class BXScriptEngine
 		self.environment = environment
 		self.completionHandler = completionHandler
 		self.cleanupHandler = cleanupHandler
+
+		// Duplicate jump targets make a script jump to the wrong location, which is extremely hard to debug,
+		// so complain loudly while developing
+
+		#if DEBUG
+		scriptCommands.validateJumpTargets()
+		#endif
 	}
 	
 	
