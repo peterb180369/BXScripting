@@ -2,7 +2,7 @@
 //
 //  BXScriptCommand+while-endwhile.swift
 //	Adds a while-loop command to BXScriptCommand
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -93,6 +93,53 @@ public struct BXScriptCommand_endwhile : BXScriptCommand, BXScriptCommandLabeled
 			
 			completionHandler?()
 		}
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: - Builder
+
+
+/// Creates a loop for the high-level script syntax.
+///
+///		While( !document.isSaved )
+///		{
+///			SpeakText("Please save the document.")
+///			Wait(seconds:5)
+///		}
+///
+/// The condition is stored in a closure and re-evaluated by the engine at the start of each iteration.
+
+public func While(_ condition:@autoclosure @escaping ()->Bool, @BXScriptBuilder _ body:()->BXScriptCommands) -> BXScriptWhile
+{
+	BXScriptWhile(condition:condition, bodyCommands:body())
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+/// A While loop that is expanded to a while-endwhile command pair by the BXScriptBuilder
+
+public struct BXScriptWhile : BXScriptFragment
+{
+	let condition:()->Bool
+	let bodyCommands:BXScriptCommands
+
+
+	public var scriptCommands:BXScriptCommands
+	{
+		let label = UUID().uuidString
+		var scriptCommands:BXScriptCommands = []
+
+		scriptCommands.append(.while(condition, label:label))
+		scriptCommands += bodyCommands
+		scriptCommands.append(.endwhile(label))
+
+		return scriptCommands
 	}
 }
 
