@@ -599,7 +599,11 @@ extension BXScriptCommand_displayMessage
 		let margin = pointerLength ?? 0.0
 		let padding = backgroundPadding ?? NSEdgeInsets()
 		
-		// Calculate correct layer position
+		// Calculate correct layer position. This happens in the coordinate system of the targetView, so
+		// adjustPosition() needs to know whether that view is flipped - otherwise the vertical offsets are
+		// applied in the wrong direction and the message ends up mirrored around its anchor point. Please
+		// note that every NSControl (NSTextField, NSPopUpButton, NSSlider, NSButton) is flipped, so this
+		// case occurs whenever a message is attached to a control instead of a plain NSView.
 		
 		var position = Self.adjustPosition(
 			getPosition(),
@@ -608,7 +612,8 @@ extension BXScriptCommand_displayMessage
 			t:margin+padding.top,
 			l:margin+padding.left,
 			b:margin+padding.bottom,
-			r:margin+padding.right)
+			r:margin+padding.right,
+			isFlipped:targetView.isFlipped)
 		
 		// Convert to window coordinates
 		
@@ -620,25 +625,30 @@ extension BXScriptCommand_displayMessage
 	
 	/// Adjusts the position according to the specified layerAlignment, with the specified padding values.
 	
-	static func adjustPosition(_ position:CGPoint, anchor:BXAnchorPoint, textSize:CGSize, t:CGFloat, l:CGFloat, b:CGFloat, r:CGFloat) -> CGPoint
+	static func adjustPosition(_ position:CGPoint, anchor:BXAnchorPoint, textSize:CGSize, t:CGFloat, l:CGFloat, b:CGFloat, r:CGFloat, isFlipped:Bool = false) -> CGPoint
 	{
 		var position = position
+		
+		// In a flipped coordinate system y increases downwards, so all vertical offsets have to be negated.
+		// The default of false preserves the behavior for callers that work in screen coordinates.
+		
+		let dy:CGFloat = isFlipped ? -1.0 : 1.0
 
 		switch anchor
 		{
 			case .topLeft:
 			
 				position.x += l + 0.5 * textSize.width
-				position.y -= t + 0.5 * textSize.height
+				position.y -= dy * (t + 0.5 * textSize.height)
 
 			case .top:
 			
-				position.y -= t + 0.5 * textSize.height
+				position.y -= dy * (t + 0.5 * textSize.height)
 
 			case .topRight:
 			
 				position.x -= r + 0.5 * textSize.width
-				position.y -= t + 0.5 * textSize.height
+				position.y -= dy * (t + 0.5 * textSize.height)
 
 			case .left:
 			
@@ -655,16 +665,16 @@ extension BXScriptCommand_displayMessage
 			case .bottomLeft:
 			
 				position.x += l + 0.5 * textSize.width
-				position.y += b + 0.5 * textSize.height
+				position.y += dy * (b + 0.5 * textSize.height)
 
 			case .bottom:
 			
-				position.y += b + 0.5 * textSize.height
+				position.y += dy * (b + 0.5 * textSize.height)
 
 			case .bottomRight:
 			
 				position.x -= r + 0.5 * textSize.width
-				position.y += b + 0.5 * textSize.height
+				position.y += dy * (b + 0.5 * textSize.height)
 		}
 
 		position.x = round(position.x)
