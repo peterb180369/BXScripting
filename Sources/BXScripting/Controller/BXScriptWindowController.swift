@@ -2,7 +2,7 @@
 //
 //  BXScriptWindowController.swift
 //	Displays a small floating window with a controller for the BXScriptEngine
-//  Copyright ©2023-2024 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -53,6 +53,10 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 	/// Set to true if the controller window should be automatically moved to make sure it doesn't overlap a critical region
 	
 	public static var autoMoveWindow = false
+	
+	/// Set to true while the mouse is over the controller window. The window recedes while this is false.
+
+	@Published public private(set) var isHovering = false
 	
 	/// Subscribers
 	
@@ -199,10 +203,45 @@ public class BXScriptWindowController : NSWindowController, ObservableObject, NS
 		window.hasShadow = true
 		window.backgroundColor = .clear
 		
+		// The content of this window is always drawn with colorScheme(.dark), so pin the window appearance
+		// as well - otherwise parts of the window frame would resolve against the (possibly light) appearance
+		// of the host application.
+		
+		window.appearance = NSAppearance(named:.darkAqua)
+		
 		window.contentView = hostview
 		window.delegate = self
 		
+		// Track the mouse, so that the window can firm up when the user reaches for it. This cannot be done
+		// with the SwiftUI onHover modifier, because BXScriptControllerPanel can never become the key window,
+		// so only a tracking area with the .activeAlways option will ever fire here.
+		
+		let options:NSTrackingArea.Options = [.mouseEnteredAndExited,.activeAlways,.inVisibleRect]
+		let trackingArea = NSTrackingArea(rect:.zero, options:options, owner:self, userInfo:nil)
+		hostview.addTrackingArea(trackingArea)
+		
 		self.window = window
+	}
+	
+	
+	override public func mouseEntered(with event:NSEvent)
+	{
+		self.setHovering(true)
+	}
+
+
+	override public func mouseExited(with event:NSEvent)
+	{
+		self.setHovering(false)
+	}
+	
+	
+	private func setHovering(_ isHovering:Bool)
+	{
+		withAnimation(.easeInOut(duration:0.2))
+		{
+			self.isHovering = isHovering
+		}
 	}
 	
 	
