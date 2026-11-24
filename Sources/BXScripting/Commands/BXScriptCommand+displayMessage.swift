@@ -171,6 +171,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 	
 	static let textLayerName = "\(Self.self).textLayer"
 	static let backgroundLayerName = "\(Self.self).backgroundLayer"
+	static let tintLayerName = "\(Self.self).tintLayer"
 	static let shadowLayerName = "\(Self.self).shadowLayer"
 	static let pointerLayerName = "\(Self.self).pointerLayer"
 	
@@ -218,6 +219,7 @@ public struct BXScriptCommand_displayMessage : BXScriptCommand, BXScriptCommandC
 		
 		view.removeSublayer(named:Self.textLayerName)
 		view.removeSublayer(named:Self.backgroundLayerName)
+		view.removeSublayer(named:Self.tintLayerName)
 		view.removeSublayer(named:Self.shadowLayerName)
 		view.removeSublayer(named:Self.pointerLayerName)
 		
@@ -377,6 +379,7 @@ extension BXScriptCommand_displayMessage
 		let autoresizingMask:CAAutoresizingMask = []
 
 		Self.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius, autoresizingMask:autoresizingMask)
+		Self.updateTintLayer(in:view, cornerRadius:cornerRadius, isConnected:pointerLength != nil)
 		Self.updateShadowLayer(in:view, autoresizingMask:autoresizingMask)
 		Self.updatePointerLayer(in:view, position:position, anchor:anchor, pointerLength:pointerLength, lineWidth:lineWidth, autoresizingMask:autoresizingMask)
 		Self.updateAttachedLayers(in:view)
@@ -411,6 +414,48 @@ extension BXScriptCommand_displayMessage
 		Self.updateTextLayer(in:rootView, position:position)
 		self.updateAdornmentLayers(in:rootView, position:position)
 	}
+	
+	
+	/// Creates/Updates a layer that tints the message bubble with the accent color of the tutorial.
+	///
+	/// A message that points at a hilited control is attached to it by a line, and both the hilite and the
+	/// line are drawn in the accent color, so a neutral gray bubble at the end of a colored line looks
+	/// disconnected from the very thing it is pointing at.
+	///
+	/// This is why only connected messages are tinted. A bubble that stands on its own - a chapter title, or
+	/// the welcome message in the middle of the screen - belongs to no particular control, so coloring it
+	/// would suggest a relationship that does not exist.
+	///
+	/// This uses the same mechanism as the green tint that marks a completed step - a colored layer behind the
+	/// translucent background - and deliberately sits below it, so that the green still covers it completely
+	/// when a step is finished and the success feedback keeps looking exactly as it did.
+	///
+	/// The tint color carries its own alpha, which is how strong the tint is. Without a color in the
+	/// environment no layer is created at all, so clients that do not set one are unaffected.
+	
+	static func updateTintLayer(in view:NSView, cornerRadius:CGFloat, isConnected:Bool)
+	{
+		let color:NSColor? = isConnected ? BXScriptEnvironment.shared[.messageTintColorKey] : nil
+		
+		guard let color = color, let backgroundLayer = view.sublayer(named:Self.backgroundLayerName) else
+		{
+			view.removeSublayer(named:Self.tintLayerName)
+			return
+		}
+		
+		let tintLayer:CALayer = view.createSublayer(named:Self.tintLayerName)
+		{
+			let newLayer = CALayer()
+			newLayer.zPosition = 980
+			return newLayer
+		}
+		
+		tintLayer.backgroundColor = color.cgColor
+		tintLayer.bounds = backgroundLayer.bounds
+		tintLayer.position = backgroundLayer.position
+		tintLayer.cornerRadius = cornerRadius
+	}
+	
 	
 	/// Creates/Updates a background layer with a frosted glass look behind the CATextLayer
 		

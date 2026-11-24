@@ -298,6 +298,7 @@ extension BXScriptCommand_displayMessageWindow
 		
 		Self.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius)
 //		BXScriptCommand_displayMessage.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius, autoresizingMask:[])
+		BXScriptCommand_displayMessage.updateTintLayer(in:view, cornerRadius:cornerRadius, isConnected:pointerLength != nil)
 		BXScriptCommand_displayMessage.updatePointerLayer(in:view, position:position, anchor:anchor, pointerLength:pointerLength, lineWidth:3)
 	}
 

@@ -2,7 +2,7 @@
 //
 //  BXScriptEnvironment.swift
 //	Lightweight and extensible scripting engine for Swift based applications
-//  Copyright ©2023 Peter Baumgartner. All rights reserved.
+//  Copyright ©2023-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -95,6 +95,7 @@ extension BXScriptEnvironment
 		self[.hiliteTextColorKey] = primaryColor
 		self[.hiliteStrokeColorKey] = primaryColor
 		self[.hiliteFillColorKey] = primaryColor.withAlphaComponent(0.15)
+		self[.messageTintColorKey] = primaryColor.withAlphaComponent(0.7)
 	}
 
 	/// Sets default font for message commands
@@ -112,6 +113,7 @@ extension String
 	public static let hiliteTextColorKey = "hiliteTextColor"
 	public static let hiliteStrokeColorKey = "hiliteStrokeColor"
 	public static let hiliteFillColorKey = "hiliteFillColor"
+	public static let messageTintColorKey = "messageTintColor"
 }
 
 
