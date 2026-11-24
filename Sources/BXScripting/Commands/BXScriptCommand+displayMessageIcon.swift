@@ -87,10 +87,6 @@ public struct BXScriptCommand_displayMessageIcon : BXScriptCommand, BXScriptComm
 		guard let layer = view.layer else { return }
 		guard let textLayer = view.sublayer(named:BXScriptCommand_displayMessage.textLayerName) as? CATextLayer else { return }
 
-		let size = icon.size 
-		let textFrame = textLayer.frame
-		var iconPos:CGPoint = .zero
-
 		var iconLayer = view.sublayer(named:Self.sublayerName)
 		
 		if iconLayer == nil
@@ -102,21 +98,38 @@ public struct BXScriptCommand_displayMessageIcon : BXScriptCommand, BXScriptComm
 			iconLayer = sublayer
 		}
 
-		if position == .left
-		{
-			iconPos = textFrame.left
-			iconPos.x -= 6 + 0.5 * size.width
-		}
-		else
-		{
-			iconPos = textFrame.right
-			iconPos.x += 6 + 0.5 * size.width
-		}
-		
-
 		iconLayer?.contents = icon
 		iconLayer?.bounds = CGRect(origin:.zero, size:icon.size)
-		iconLayer?.position = iconPos
+		iconLayer?.position = Self.iconPosition(for:textLayer, size:icon.size, position:position)
+	}
+	
+	
+	/// Moves the icon layer back to the edge of the message text.
+	///
+	/// The displayMessage command calls this whenever it re-lays out the message, so that the icon follows
+	/// along instead of staying behind where the message used to be. Which side the icon belongs on is derived
+	/// from where it currently sits, so that no extra state has to be kept around just for this. Does nothing
+	/// when no icon is displayed.
+	
+	static func updateIconLayer(in view:NSView)
+	{
+		guard let iconLayer = view.sublayer(named:Self.sublayerName) else { return }
+		guard let textLayer = view.sublayer(named:BXScriptCommand_displayMessage.textLayerName) as? CATextLayer else { return }
+		
+		let position:Position = iconLayer.position.x < textLayer.position.x ? .left : .right
+		iconLayer.position = Self.iconPosition(for:textLayer, size:iconLayer.bounds.size, position:position)
+	}
+	
+	
+	/// Returns the center of an icon of the specified size, just outside the left or right edge of the message
+	
+	static func iconPosition(for textLayer:CATextLayer, size:CGSize, position:Position) -> CGPoint
+	{
+		let textFrame = textLayer.frame
+		var iconPos = position == .left ? textFrame.left : textFrame.right
+		iconPos.x += position == .left ? -(6 + 0.5 * size.width) : (6 + 0.5 * size.width)
+		
+		return iconPos
 	}
 	
 	

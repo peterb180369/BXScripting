@@ -379,6 +379,21 @@ extension BXScriptCommand_displayMessage
 		Self.updateBackgroundLayer(in:view, visible:showsBackground, padding:padding, cornerRadius:cornerRadius, autoresizingMask:autoresizingMask)
 		Self.updateShadowLayer(in:view, autoresizingMask:autoresizingMask)
 		Self.updatePointerLayer(in:view, position:position, anchor:anchor, pointerLength:pointerLength, lineWidth:lineWidth, autoresizingMask:autoresizingMask)
+		Self.updateAttachedLayers(in:view)
+	}
+	
+	
+	/// Moves the layers of other commands that attach themselves to this message.
+	///
+	/// The hilite and the message icon are added by separate commands, and both are positioned relative to the
+	/// message layers at the moment they are created. The message can move afterwards - when the window is
+	/// resized, for example - so they have to be moved along with it, or they are left behind at the location
+	/// where the message used to be. Neither layer is created here, they are only updated if they exist.
+	
+	static func updateAttachedLayers(in view:NSView)
+	{
+		BXScriptCommand_hiliteMessage.updateHiliteLayer(in:view)
+		BXScriptCommand_displayMessageIcon.updateIconLayer(in:view)
 	}
 	
 	

@@ -64,7 +64,7 @@ public struct BXScriptCommand_hiliteMessage : BXScriptCommand, BXScriptCommandCa
 		guard let window = self.window() ?? BXScriptCommand_displayMessageWindow.standaloneWindow else { return }
 		guard let view = window.contentView else { return }
 		guard let textLayer = view.sublayer(named:BXScriptCommand_displayMessage.textLayerName) as? CATextLayer else { return }
-		guard let backgroundLayer = view.sublayer(named:BXScriptCommand_displayMessage.backgroundLayerName) else { return }
+		guard view.sublayer(named:BXScriptCommand_displayMessage.backgroundLayerName) != nil else { return }
 		
 		let hiliteLayer:CALayer = view.createSublayer(named:Self.hiliteLayerName)
 		{
@@ -74,9 +74,7 @@ public struct BXScriptCommand_hiliteMessage : BXScriptCommand, BXScriptCommandCa
 		}
 		
 		hiliteLayer.backgroundColor = color.cgColor
-		hiliteLayer.bounds = backgroundLayer.bounds
-		hiliteLayer.position = backgroundLayer.position
-		hiliteLayer.cornerRadius = backgroundLayer.cornerRadius
+		Self.updateHiliteLayer(in:view)
 
         CATransaction.begin()
         let animation = CABasicAnimation(keyPath:"transform.scale.xy")
@@ -89,6 +87,22 @@ public struct BXScriptCommand_hiliteMessage : BXScriptCommand, BXScriptCommandCa
         textLayer.add(animation, forKey:"scale")
         CATransaction.commit()
 	}
+	
+	/// Moves the hilite layer onto the current position of the message background layer.
+	///
+	/// The displayMessage command calls this whenever it re-lays out the message, so that the hilite follows
+	/// along instead of staying behind where the message used to be. Does nothing when no hilite is displayed.
+	
+	static func updateHiliteLayer(in view:NSView)
+	{
+		guard let hiliteLayer = view.sublayer(named:Self.hiliteLayerName) else { return }
+		guard let backgroundLayer = view.sublayer(named:BXScriptCommand_displayMessage.backgroundLayerName) else { return }
+		
+		hiliteLayer.bounds = backgroundLayer.bounds
+		hiliteLayer.position = backgroundLayer.position
+		hiliteLayer.cornerRadius = backgroundLayer.cornerRadius
+	}
+	
 	
 	/// Removes the color tint from the message background layer
 	
