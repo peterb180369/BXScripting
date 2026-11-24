@@ -2,7 +2,7 @@
 //
 //  BXSubtitleWindowController.swift
 //	Displays a transparent window at the bottom of the screen with audio subtitles
-//  Copyright ©2024 Peter Baumgartner. All rights reserved.
+//  Copyright ©2024-2026 Peter Baumgartner. All rights reserved.
 //
 //**********************************************************************************************************************
 
@@ -104,7 +104,11 @@ public class BXSubtitleWindowController : NSWindowController, ObservableObject
 		window.isFloatingPanel = true
 		window.becomesKeyOnlyIfNeeded = true
 		window.hasShadow = false
-		window.backgroundColor = NSColor(calibratedWhite:0.0, alpha:0.45)
+		// Subtitles sit on top of arbitrary slideshow content, so the backing has to be dark enough that the
+		// white text is guaranteed to be readable even over a pure white image. At alpha 0.65 the backing can
+		// never get brighter than 35% gray, which keeps white text above a contrast ratio of 7:1.
+		
+		window.backgroundColor = NSColor(calibratedWhite:0.0, alpha:0.65)
 		window.level = .screenSaver
 		window.contentView = hostview
 		
