@@ -78,8 +78,7 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 				// Setup text to be spoken
 				
 				let text = text()
-				let fixedText = Self.fixPronunciation(for:text)
-				let utterance = AVSpeechUtterance(string:fixedText)
+				let utterance = AVSpeechUtterance(attributedString:Self.speechString(for:text))
 				utterance.voice = BXScriptVoice.bestAvailableVoice
 				Self.delegate.utterance = utterance
 				Self.delegate.updateVolume()
@@ -109,21 +108,109 @@ public struct BXScriptCommand_speakText : BXScriptCommand, BXScriptCommandCancel
 		Self.delegate.cleanup()
 	}
 	
-	/// Checks if we have any registered pronunciation fixes for the current language. If yes, then all occurances in the text will be replaced with the fixes that
-	/// force a better pronunciation.
+	/// Applies the registered pronunciations for the current language to the text that is to be spoken.
+	///
+	/// A term with a phonetic spelling stays in the text and gets its IPA notation attached as an attribute,
+	/// so the synthesizer is told which phonemes to produce. A term with a spoken form is replaced outright,
+	/// which is what a notation like "3/4" needs - it is not mispronounced, it is simply not meant to be read
+	/// out literally.
 	
-	public static func fixPronunciation(for text:String) -> String
+	public static func speechString(for text:String) -> NSAttributedString
 	{
-		var text = text
 		let code = BXScriptVoice.currentLanguageCode
-		let pronunciationFixes = BXScriptEnvironment.shared.speechPronunciationFixes[code] ?? [:]
-
-		for (key,value) in pronunciationFixes
+		let pronunciations = BXScriptEnvironment.shared.speechPronunciationFixes[code] ?? [:]
+		
+		// Longest term first, so that a term which contains a shorter one wins. Dictionary order is not
+		// stable, so without an explicit order the result could differ from one run to the next.
+		
+		let terms = pronunciations.keys.sorted
 		{
-			text = text.replacingOccurrences(of:key, with:value)
+			$0.count != $1.count ? $0.count > $1.count : $0 < $1
 		}
 		
-		return text
+		// Apply the replacements first, since they move the character offsets that the attributes below
+		// are attached to.
+		
+		var text = text
+		
+		for term in terms
+		{
+			guard case .spoken(let replacement) = pronunciations[term] else { continue }
+			
+			let mutable = NSMutableString(string:text)
+			
+			for range in Self.ranges(of:term, in:text).reversed()
+			{
+				mutable.replaceCharacters(in:range, with:replacement)
+			}
+			
+			text = mutable as String
+		}
+		
+		// Then attach the phonetics to whatever is left
+		
+		let string = NSMutableAttributedString(string:text)
+		let key = NSAttributedString.Key(rawValue:AVSpeechSynthesisIPANotationAttribute)
+		
+		for term in terms
+		{
+			guard case .phonetic(let ipa) = pronunciations[term] else { continue }
+			
+			for range in Self.ranges(of:term, in:text)
+			{
+				string.addAttribute(key, value:ipa, range:range)
+			}
+		}
+		
+		return string
+	}
+	
+	
+	/// Returns the ranges of all whole word occurrences of a term.
+	///
+	/// The word boundary check is what keeps a short term like "TV" from also matching inside "TVs". Note
+	/// that a trailing apostrophe does not count as a boundary violation, so "FotoMagico's" still has its
+	/// phonetics applied to the name itself.
+	
+	static func ranges(of term:String, in text:String) -> [NSRange]
+	{
+		let string = text as NSString
+		let length = string.length
+		var ranges:[NSRange] = []
+		var location = 0
+		
+		while location < length
+		{
+			let searchRange = NSRange(location:location, length:length-location)
+			let range = string.range(of:term, options:[], range:searchRange)
+			guard range.location != NSNotFound else { break }
+			
+			if Self.isWholeWord(range, in:string)
+			{
+				ranges.append(range)
+			}
+			
+			location = range.location + max(range.length,1)
+		}
+		
+		return ranges
+	}
+	
+	
+	private static func isWholeWord(_ range:NSRange, in string:NSString) -> Bool
+	{
+		func isLetterOrDigit(at index:Int) -> Bool
+		{
+			guard let scalar = Unicode.Scalar(string.character(at:index)) else { return false }
+			return CharacterSet.alphanumerics.contains(scalar)
+		}
+		
+		if range.location > 0 && isLetterOrDigit(at:range.location-1) { return false }
+		
+		let end = range.location + range.length
+		if end < string.length && isLetterOrDigit(at:end) { return false }
+		
+		return true
 	}
  }
 

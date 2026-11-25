@@ -122,16 +122,47 @@ extension String
 
 extension BXScriptEnvironment
 {
-	/// A lookup table for fixing words that not pronounced correcty by AVSpeechSynthesizer and its voices.
+	/// A lookup table for words that AVSpeechSynthesizer does not pronounce correctly.
 	///
-	/// The first key is the language code (en,de,fr). The second key is the word that is being pronounced incorrectly or funny.
-	/// The value is a modified string that forces a correct pronunciation for the language.
+	/// The first key is the language code (en,de,fr). The second key is the word or phrase that comes out
+	/// wrong. See BXScriptPronunciation for the two ways of fixing it.
 	
-	public var speechPronunciationFixes:[String:[String:String]]
+	public var speechPronunciationFixes:[String:[String:BXScriptPronunciation]]
 	{
 		set { self[.speechPronunciationFixesKey] = newValue }
 		get { self[.speechPronunciationFixesKey] ?? [:] }
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// MARK: -
+
+/// Describes how a word or phrase should be spoken.
+
+public enum BXScriptPronunciation
+{
+	/// International Phonetic Alphabet notation, e.g. "ˌfoʊtoʊˈmadʒɪkoʊ" for FotoMagico.
+	///
+	/// The word stays in the text and the synthesizer is told which phonemes to produce for it, so this is
+	/// real phonetics rather than a misspelling that happens to fool one particular voice. It was measured to
+	/// work identically for premium, enhanced and compact voices.
+	///
+	/// ATTENTION: invalid notation is not ignored. The synthesizer renders near silence instead, so a typo
+	/// here makes the word disappear rather than merely mispronouncing it. Check new notation by ear, or with
+	/// the PronunciationProbe in the Experiments folder, which flags a suspiciously short rendering.
+	
+	case phonetic(String)
+	
+	/// A plain text replacement.
+	///
+	/// Use this where the problem is not how a word is pronounced but that the written form is not meant to
+	/// be read out literally at all - "3/4" as "three quarter", or "2160p" as "21 60 P". Phonetics would be
+	/// the wrong tool for those, since there is nothing wrong with how the words themselves are spoken.
+	
+	case spoken(String)
 }
 
 
